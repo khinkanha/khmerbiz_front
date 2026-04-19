@@ -1,0 +1,23 @@
+/* Theme: Green (STYLE_GREEN = 3) */
+:root {
+  --primary-color: #22c55e;
+  --primary-dark: #15803d;
+  --primary-light: #86efac;
+  --bg-color: #ffffff;
+  --text-color: #1f2937;
+  --header-bg: #ffffff;
+  --footer-bg: #14532d;
+  --footer-text: #f0fdf4;
+  --nav-bg: #22c55e;
+  --nav-text: #ffffff;
+  --nav-hover: #16a34a;
+  --sidebar-bg: #14532d;
+  --sidebar-text: #f0fdf4;
+  --sidebar-hover: #166534;
+  --sidebar-active: #22c55e;
+  --card-bg: #ffffff;
+  --card-border: #bbf7d0;
+  --input-bg: #ffffff;
+  --input-border: #d1d5db;
+  --input-focus: #22c55e;
+}

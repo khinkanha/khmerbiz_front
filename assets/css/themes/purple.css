@@ -1,0 +1,23 @@
+/* Theme: Purple (STYLE_PURPIL = 4) */
+:root {
+  --primary-color: #a855f7;
+  --primary-dark: #7e22ce;
+  --primary-light: #d8b4fe;
+  --bg-color: #ffffff;
+  --text-color: #1f2937;
+  --header-bg: #ffffff;
+  --footer-bg: #581c87;
+  --footer-text: #faf5ff;
+  --nav-bg: #a855f7;
+  --nav-text: #ffffff;
+  --nav-hover: #9333ea;
+  --sidebar-bg: #581c87;
+  --sidebar-text: #faf5ff;
+  --sidebar-hover: #6b21a8;
+  --sidebar-active: #a855f7;
+  --card-bg: #ffffff;
+  --card-border: #e9d5ff;
+  --input-bg: #ffffff;
+  --input-border: #d1d5db;
+  --input-focus: #a855f7;
+}

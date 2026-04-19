@@ -1,0 +1,23 @@
+/* Theme: Red (STYLE_RED = 2) */
+:root {
+  --primary-color: #ef4444;
+  --primary-dark: #b91c1c;
+  --primary-light: #fca5a5;
+  --bg-color: #ffffff;
+  --text-color: #1f2937;
+  --header-bg: #ffffff;
+  --footer-bg: #991b1b;
+  --footer-text: #fef2f2;
+  --nav-bg: #ef4444;
+  --nav-text: #ffffff;
+  --nav-hover: #dc2626;
+  --sidebar-bg: #7f1d1d;
+  --sidebar-text: #fef2f2;
+  --sidebar-hover: #991b1b;
+  --sidebar-active: #ef4444;
+  --card-bg: #ffffff;
+  --card-border: #fecaca;
+  --input-bg: #ffffff;
+  --input-border: #d1d5db;
+  --input-focus: #ef4444;
+}

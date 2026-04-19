@@ -1,0 +1,38 @@
+/* Theme: Default (STYLE_DEFAULT = 0) */
+:root {
+  --primary-color: #3b82f6;
+  --primary-dark: #1d4ed8;
+  --primary-light: #93c5fd;
+  --bg-color: #ffffff;
+  --text-color: #1f2937;
+  --header-bg: #ffffff;
+  --footer-bg: #1f2937;
+  --footer-text: #f3f4f6;
+  --nav-bg: #3b82f6;
+  --nav-text: #ffffff;
+  --nav-hover: #2563eb;
+  --sidebar-bg: #1f2937;
+  --sidebar-text: #f3f4f6;
+  --sidebar-hover: #374151;
+  --sidebar-active: #3b82f6;
+  --card-bg: #ffffff;
+  --card-border: #e5e7eb;
+  --input-bg: #ffffff;
+  --input-border: #d1d5db;
+  --input-focus: #3b82f6;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: 'Battambang', system-ui, sans-serif;
+}
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--primary-dark);
+}
