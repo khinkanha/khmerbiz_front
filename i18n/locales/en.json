@@ -97,6 +97,7 @@
     "moveDown": "Move Down"
   },
   "settings": {
+    "language": "Language",
     "logoSetting": "Logo Setting",
     "logoPosition": "Logo Position",
     "logoAlign": "Logo Align",

@@ -1,4 +1,7 @@
 import type { Media, PaginatedResponse } from '~/types'
+import { acceptHMRUpdate, defineStore } from 'pinia'
+import { useApi} from '~/composables/useApi'
+import { useUpload } from '~/composables/useUpload'
 
 export const useMediaStore = defineStore('media', () => {
   const api = useApi()
@@ -22,12 +25,13 @@ export const useMediaStore = defineStore('media', () => {
       const response = await api.get<PaginatedResponse<Media>>(`/media?${params}`)
 
       if (response.success && response.data) {
-        mediaList.value = response.data.data
+        mediaList.value = response.data.items
+        const pag = response.data.pagination
         pagination.value = {
-          page: response.data.page,
-          limit: response.data.limit,
-          total: response.data.total,
-          totalPages: response.data.totalPages,
+          page: pag.page,
+          limit: pag.limit,
+          total: pag.total,
+          totalPages: pag.totalPages,
         }
       }
     } catch (error) {
@@ -88,7 +92,7 @@ export const useMediaStore = defineStore('media', () => {
       const response = await api.delete(`/media/${id}`)
 
       if (response.success) {
-        mediaList.value = mediaList.value.filter(m => m.media_id !== id)
+        mediaList.value = mediaList.value.filter(m => m.photo_id !== id)
         return true
       }
 

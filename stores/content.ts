@@ -8,7 +8,8 @@ import type {
   NewsForm,
   PaginatedResponse,
 } from '~/types'
-
+import { acceptHMRUpdate, defineStore } from 'pinia'
+import { useApi } from '~/composables/useApi'
 export const useContentStore = defineStore('content', () => {
   const api = useApi()
 
@@ -35,15 +36,16 @@ export const useContentStore = defineStore('content', () => {
         params.append('search', search)
       }
 
-      const response = await api.get<PaginatedResponse<Content>>(`/content?${params}`)
+      const response = await api.get<PaginatedResponse<any>>(`/content?${params}`)
 
       if (response.success && response.data) {
-        contents.value = response.data.data
+        contents.value = response.data.items
+        const pag = response.data.pagination
         pagination.value = {
-          page: response.data.page,
-          limit: response.data.limit,
-          total: response.data.total,
-          totalPages: response.data.totalPages,
+          page: pag.page,
+          limit: pag.limit,
+          total: pag.total,
+          totalPages: pag.totalPages,
         }
       }
     } catch (error) {
@@ -53,7 +55,7 @@ export const useContentStore = defineStore('content', () => {
 
   const fetchContent = async (id: number) => {
     try {
-      const response = await api.get<Content>(`/content/${id}`)
+      const response = await api.get<any>(`/content/${id}`)
 
       if (response.success && response.data) {
         currentContent.value = response.data
@@ -107,10 +109,10 @@ export const useContentStore = defineStore('content', () => {
 
   const fetchItems = async (contentId: number) => {
     try {
-      const response = await api.get<ContentItem[]>(`/content/${contentId}/items`)
+      const response = await api.get<any>(`/content/${contentId}/items`)
 
       if (response.success && response.data) {
-        contentItems.value = response.data
+        contentItems.value = response.data.items || response.data
       }
     } catch (error) {
       console.error('Failed to fetch items:', error)
@@ -210,12 +212,13 @@ export const useContentStore = defineStore('content', () => {
       const response = await api.get<PaginatedResponse<News>>(`/content/${contentId}/news?${params}`)
 
       if (response.success && response.data) {
-        newsList.value = response.data.data
+        newsList.value = response.data.items
+        const pag = response.data.pagination
         pagination.value = {
-          page: response.data.page,
-          limit: response.data.limit,
-          total: response.data.total,
-          totalPages: response.data.totalPages,
+          page: pag.page,
+          limit: pag.limit,
+          total: pag.total,
+          totalPages: pag.totalPages,
         }
       }
     } catch (error) {

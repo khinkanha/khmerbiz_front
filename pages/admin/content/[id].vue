@@ -1,140 +1,154 @@
 <template>
-  <div class="content-form-page">
-    <div class="page-header">
-      <h1 class="page-title">
-        {{ isNewContent ? $t('contentManager.addNew') : $t('contentManager.edit') }}
-      </h1>
-      <div class="page-actions">
-        <Button
-          :label="$t('common.back')"
-          icon="pi pi-arrow-left"
-          outlined
-          @click="$router.back()"
-        />
-        <Button
-          :label="$t('common.save')"
-          icon="pi pi-check"
-          @click="handleSave"
-          :loading="saving"
-        />
+  <div>
+    <div class="content-form-page">
+      <div class="page-header">
+        <h1 class="page-title">
+          {{ isNewContent ? $t('contentManager.addNew') : $t('contentManager.edit') }}
+        </h1>
+        <div class="page-actions">
+          <Button
+            :label="$t('common.back')"
+            icon="pi pi-arrow-left"
+            outlined
+            @click="$router.back()"
+          />
+          <Button
+            :label="$t('common.save')"
+            icon="pi pi-check"
+            @click="handleSave"
+            :loading="saving"
+          />
+        </div>
       </div>
-    </div>
 
-    <div class="form-grid">
-      <Card class="form-card">
-        <template #title>{{ $t('contentManager.contentTitle') }}</template>
-        <template #content>
-          <form @submit.prevent="handleSave" class="content-form">
-            <div class="form-group">
-              <label for="title">{{ $t('contentManager.contentTitle') }} *</label>
-              <InputText
-                id="title"
-                v-model="form.title"
-                :placeholder="$t('contentManager.contentTitle')"
-                :class="{ 'p-invalid': errors.title }"
-              />
-              <small v-if="errors.title" class="p-error">{{ errors.title }}</small>
-            </div>
-
-            <div class="form-group">
-              <label for="contentType">{{ $t('contentManager.contentType') }} *</label>
-              <Dropdown
-                id="contentType"
-                v-model="form.content_type"
-                :options="contentTypeOptions"
-                optionLabel="label"
-                optionValue="value"
-                :placeholder="$t('contentManager.contentType')"
-                :class="{ 'p-invalid': errors.content_type }"
-              />
-              <small v-if="errors.content_type" class="p-error">{{ errors.content_type }}</small>
-            </div>
-
-            <div class="form-group">
-              <label for="description">{{ $t('contentManager.description') }}</label>
-              <Textarea
-                id="description"
-                v-model="form.description"
-                rows="4"
-                :placeholder="$t('contentManager.description')"
-              />
-            </div>
-
-            <div class="form-group">
-              <label for="language">{{ $t('settings.language') }} *</label>
-              <Dropdown
-                id="language"
-                v-model="form.lang_id"
-                :options="domainStore.languages"
-                optionLabel="lang_name"
-                optionValue="lang_id"
-                :placeholder="$t('settings.language')"
-                :class="{ 'p-invalid': errors.lang_id }"
-              />
-              <small v-if="errors.lang_id" class="p-error">{{ errors.lang_id }}</small>
-            </div>
-
-            <div class="form-group">
-              <label for="status">{{ $t('contentManager.status') }}</label>
-              <div class="status-toggle">
-                <ToggleSwitch
-                  id="status"
-                  v-model="form.status"
-                  :trueValue="1"
-                  :falseValue="0"
+      <div class="form-grid">
+        <Card class="form-card">
+          <template #title>{{ $t('contentManager.contentTitle') }}</template>
+          <template #content>
+            <form @submit.prevent="handleSave" class="content-form">
+              <div class="form-group">
+                <label for="title">{{ $t('contentManager.contentTitle') }} *</label>
+                <InputText
+                  id="title"
+                  v-model="form.title"
+                  :placeholder="$t('contentManager.contentTitle')"
+                  :class="{ 'p-invalid': errors.title }"
                 />
-                <span>{{ form.status ? $t('contentManager.published') : $t('contentManager.draft') }}</span>
+                <small v-if="errors.title" class="p-error">{{ errors.title }}</small>
               </div>
+
+              <div class="form-group">
+                <label for="contentType">{{ $t('contentManager.contentType') }} *</label>
+                <Dropdown
+                  id="contentType"
+                  v-model="form.content_type"
+                  :options="contentTypeOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  :placeholder="$t('contentManager.contentType')"
+                  :class="{ 'p-invalid': errors.content_type }"
+                />
+                <small v-if="errors.content_type" class="p-error">{{ errors.content_type }}</small>
+              </div>
+
+              <div class="form-group">
+                <label for="description">{{ $t('contentManager.description') }}</label>
+                <ClientOnly>
+                  <Editor
+                    v-model="form.description"
+                    :init="{
+                      height: 300,
+                      menubar: 'tools',
+                      plugins: 'advlist autolink lists link image charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime media table paste',
+                      toolbar: 'undo redo | bold italic underline | forecolor backcolor | fontselect | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | fullscreen',
+                      branding: false,
+                      promotion: false,
+                    }"
+                  />
+                </ClientOnly>
+              </div>
+
+              <div class="form-group">
+                <label for="language">{{ $t('settings.language') }} *</label>
+                <Dropdown
+                  id="language"
+                  v-model="form.lang_id"
+                  :options="[...domainStore.languages]"
+                  optionLabel="lang_name"
+                  optionValue="lang_id"
+                  :placeholder="$t('settings.language')"
+                  :class="{ 'p-invalid': errors.lang_id }"
+                />
+                <small v-if="errors.lang_id" class="p-error">{{ errors.lang_id }}</small>
+              </div>
+
+              <div class="form-group">
+                <label for="status">{{ $t('contentManager.status') }}</label>
+                <div class="status-toggle">
+                  <ToggleSwitch
+                    id="status"
+                    :modelValue="form.status as any"
+                    @update:modelValue="(v: any) => form.status = v"
+                    :trueValue="1"
+                    :falseValue="0"
+                  />
+                  <span>{{ form.status ? $t('contentManager.published') : $t('contentManager.draft') }}</span>
+                </div>
+              </div>
+
+              <Message v-if="errorMessage" severity="error" :closable="false">
+                {{ errorMessage }}
+              </Message>
+            </form>
+          </template>
+        </Card>
+
+        <Card class="preview-card" v-if="!isNewContent">
+          <template #title>{{ $t('contentManager.actions') }}</template>
+          <template #content>
+            <div class="action-links">
+              <Button
+                :label="$t('contentManager.list')"
+                icon="pi pi-list"
+                outlined
+                @click="$router.push(`/admin/content/${contentId}/items`)"
+                class="w-full mb-3"
+              />
+              <Button
+                v-if="contentStore.currentContent?.content_type === ContentType.NEWS"
+                :label="$t('contentManager.blogNews')"
+                icon="pi pi-news"
+                outlined
+                @click="$router.push(`/admin/content/${contentId}/news`)"
+                class="w-full mb-3"
+              />
+              <Button
+                v-if="contentStore.currentContent?.content_type === ContentType.MAP"
+                :label="$t('contentManager.showMap')"
+                icon="pi pi-map"
+                outlined
+                @click="$router.push(`/admin/content/${contentId}/map`)"
+                class="w-full"
+              />
             </div>
-
-            <Message v-if="errorMessage" severity="error" :closable="false">
-              {{ errorMessage }}
-            </Message>
-          </form>
-        </template>
-      </Card>
-
-      <Card class="preview-card" v-if="!isNewContent">
-        <template #title>{{ $t('contentManager.actions') }}</template>
-        <template #content>
-          <div class="action-links">
-            <Button
-              :label="$t('contentManager.list')"
-              icon="pi pi-list"
-              outlined
-              @click="$router.push(`/admin/content/${contentId}/items`)"
-              class="w-full mb-3"
-            />
-            <Button
-              v-if="contentStore.currentContent?.content_type === ContentType.NEWS"
-              :label="$t('contentManager.blogNews')"
-              icon="pi pi-news"
-              outlined
-              @click="$router.push(`/admin/content/${contentId}/news`)"
-              class="w-full mb-3"
-            />
-            <Button
-              v-if="contentStore.currentContent?.content_type === ContentType.MAP"
-              :label="$t('contentManager.showMap')"
-              icon="pi pi-map"
-              outlined
-              @click="$router.push(`/admin/content/${contentId}/map`)"
-              class="w-full"
-            />
-          </div>
-        </template>
-      </Card>
+          </template>
+        </Card>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useContentStore, useDomainStore } from '~/stores'
 import { ContentType } from '~/types'
+import Editor from '@tinymce/tinymce-vue'
 
 definePageMeta({
+  layout: 'admin',
   middleware: 'auth',
 })
+
+import { useContentStore } from '~/stores/content'
+import { useDomainStore } from '~/stores/domain'
 
 const contentStore = useContentStore()
 const domainStore = useDomainStore()
@@ -154,7 +168,7 @@ const form = ref({
   description: '',
   content_type: ContentType.ARTICLE,
   lang_id: null as number | null,
-  status: 0,
+  status: 0 as boolean | string | number | undefined,
 })
 
 const errors = ref<Record<string, string>>({})
@@ -198,7 +212,7 @@ const handleSave = async () => {
   saving.value = true
 
   try {
-    let result
+    let result: boolean | { success: boolean; id?: number }
 
     if (isNewContent.value) {
       result = await contentStore.saveContent({
@@ -206,6 +220,7 @@ const handleSave = async () => {
         description: form.value.description,
         content_type: form.value.content_type,
         lang_id: form.value.lang_id!,
+        menu_id: 0,
       })
     } else {
       result = await contentStore.updateContent(contentId.value!, {
@@ -214,7 +229,7 @@ const handleSave = async () => {
       })
     }
 
-    if (result.success) {
+    if (result === true || (typeof result === 'object' && result.success)) {
       router.push('/admin/content')
     } else {
       errorMessage.value = t('common.error')
@@ -237,12 +252,18 @@ onMounted(async () => {
     await contentStore.fetchContent(contentId.value!)
 
     if (contentStore.currentContent) {
+      const raw = contentStore.currentContent as any
+      let desc = raw.description || ''
+      try {
+        const parsed = JSON.parse(desc)
+        desc = parsed.description || parsed.longdes || desc
+      } catch {}
       form.value = {
-        title: contentStore.currentContent.title,
-        description: contentStore.currentContent.description || '',
-        content_type: contentStore.currentContent.content_type,
-        lang_id: contentStore.currentContent.lang_id,
-        status: contentStore.currentContent.status,
+        title: raw.title,
+        description: desc,
+        content_type: raw.content_type,
+        lang_id: raw.lang_id,
+        status: raw.status,
       }
     }
   }

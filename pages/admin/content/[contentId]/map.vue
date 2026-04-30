@@ -25,7 +25,7 @@
             <LMap
               ref="mapRef"
               :zoom="mapZoom"
-              :center="mapCenter"
+              :center="mapCenter as any"
               :useGlobalLeaflet="false"
               @click="handleMapClick"
               class="leaflet-map"
@@ -118,12 +118,12 @@
 </template>
 
 <script setup lang="ts">
-import { useContentStore } from '~/stores'
 import { LMap, LTileLayer, LMarker, LPopup } from '@vue-leaflet/vue-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 
 definePageMeta({
+  layout: 'admin',
   middleware: 'auth',
 })
 
@@ -136,12 +136,12 @@ const saving = ref(false)
 const successMessage = ref('')
 const errorMessage = ref('')
 
-const mapCenter = ref({ lat: 11.5564, lng: 104.9282 }) // Default Cambodia
+const mapCenter = ref({ lat: 11.5564, lng: 104.9282 })
 const mapZoom = ref(13)
 const markerPosition = ref<L.LatLngExpression | null>(null)
 const markerTitle = ref('')
 
-const contentId = computed(() => Number(route.params.id))
+const contentId = computed(() => Number(route.params.contentId))
 
 const handleMapClick = (event: any) => {
   markerPosition.value = event.latlng

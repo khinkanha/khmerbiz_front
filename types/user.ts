@@ -4,10 +4,12 @@ export interface User {
   domain_id: number
   full_name: string
   phone: string
+  address: string | null
   email: string
   sitebuilder: number
   user_level: UserLevel
-  verify_code: string | null
+  
+  
 }
 
 export enum UserLevel {

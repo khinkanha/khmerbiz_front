@@ -1,6 +1,0 @@
-export { useAuthStore } from './auth'
-export { useDomainStore } from './domain'
-export { useContentStore } from './content'
-export { useMenuStore } from './menu'
-export { useSettingStore } from './setting'
-export { useMediaStore } from './media'

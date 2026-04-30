@@ -10,7 +10,7 @@ interface SiteConfig {
 
 export default defineEventHandler(async (event) => {
   const host = getHeader(event, 'host')?.replace(/^www\./, '')
-  const apiBaseUrl = process.env.NUXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'
+  const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl || 'http://localhost:8000/api/v1'
 
   try {
     const response = await $fetch<SiteConfig>(`${apiBaseUrl}/site/config`, {

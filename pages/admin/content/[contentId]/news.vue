@@ -174,10 +174,10 @@
 </template>
 
 <script setup lang="ts">
-import { useContentStore } from '~/stores'
 import { useConfirm } from 'primevue/useconfirm'
 
 definePageMeta({
+  layout: 'admin',
   middleware: 'auth',
 })
 
@@ -206,7 +206,7 @@ const newsForm = ref({
 
 const newsErrors = ref<Record<string, string>>({})
 
-const contentId = computed(() => Number(route.params.id))
+const contentId = computed(() => Number(route.params.contentId))
 
 const formatDate = (date: string | null) => {
   if (!date) return '-'
@@ -291,14 +291,14 @@ const handleSaveNews = async () => {
       publish_date: publishDate,
     }
 
-    let result
+    let result: boolean | { success: boolean; id?: number }
     if (editingNews.value) {
       result = await contentStore.updateNews(editingNews.value.news_id, data)
     } else {
       result = await contentStore.saveNews(data)
     }
 
-    if (result.success) {
+    if (result === true || (typeof result === 'object' && result.success)) {
       await contentStore.fetchNews(contentId.value)
       closeDialog()
     }

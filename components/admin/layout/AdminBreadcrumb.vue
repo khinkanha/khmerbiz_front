@@ -1,113 +1,137 @@
 <template>
-  <nav class="breadcrumb">
-    <ol class="breadcrumb-list">
-      <li class="breadcrumb-item">
-        <NuxtLink to="/admin">
-          <i class="pi pi-home"></i>
-        </NuxtLink>
-      </li>
-
-      <li
-        v-for="(item, index) in breadcrumbItems"
-        :key="index"
-        class="breadcrumb-item"
-      >
-        <i class="pi pi-chevron-right breadcrumb-separator"></i>
-        <NuxtLink v-if="item.to" :to="item.to">
-          {{ item.label }}
-        </NuxtLink>
-        <span v-else>{{ item.label }}</span>
+  <div class="container" v-if="authStore.isAuthenticated">
+    <ol class="breadcrumb" v-if="breadcrumbs.length">
+      <li v-for="(crumb, i) in breadcrumbs" :key="i" :class="{ active: i === breadcrumbs.length - 1 }">
+        <NuxtLink v-if="crumb.to" :to="crumb.to">{{ crumb.label }}</NuxtLink>
+        <span v-else>{{ crumb.label }}</span>
       </li>
     </ol>
-  </nav>
+
+    <p class="pull-right breadcrumb-actions" v-if="hasDomain">
+      <button class="btn btn-default" @click="toggleLang" style="font-weight: bold">
+        {{ currentLangText }}
+      </button>
+      <a
+        class="btn btn-default"
+        :href="domainName"
+        target="_blank"
+        title="Click here to see your website"
+      >
+        <i class="fa fa-globe"></i> <strong>{{ domainName }}</strong>
+      </a>
+    </p>
+    <div class="clearfix"></div>
+
+    <!-- Alert messages -->
+    <div v-if="alertSuccess" class="alert alert-success alert-dismissable">
+      <a href="#" class="close" @click.prevent="alertSuccess = ''">&times;</a>
+      {{ alertSuccess }}
+    </div>
+    <div v-if="alertError" class="alert alert-danger alert-dismissable">
+      <a href="#" class="close" @click.prevent="alertError = ''">&times;</a>
+      {{ alertError }}
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-interface BreadcrumbItem {
-  label: string
-  to?: string
-}
+import { useAuthStore } from '~/stores/auth'
+import { useDomainStore } from '~/stores/domain'
+import { useI18n } from '#imports'
 
+const authStore = useAuthStore()
+const domainStore = useDomainStore()
+const { locale } = useI18n()
 const route = useRoute()
-const { t } = useI18n()
 
-const breadcrumbMap: Record<string, string> = {
-  content: t('sidebar.content'),
-  menu: t('sidebar.menu'),
-  media: t('sidebar.media'),
-  users: t('sidebar.users'),
-  settings: t('sidebar.settings'),
-  profile: t('header.profile'),
-  password: t('userManager.passwordSetting'),
+const alertSuccess = ref('')
+const alertError = ref('')
+
+const hasDomain = computed(() => (authStore.user?.domain_id ?? 0) > 0)
+const domainName = computed(() => domainStore.domain?.domain_name || '')
+
+const currentLangText = computed(() => locale.value === 'en' ? 'EN' : 'ខ្មែរ')
+
+const toggleLang = () => {
+  locale.value = locale.value === 'en' ? 'kh' : 'en'
 }
 
-const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
-  const pathSegments = route.path.split('/').filter(Boolean)
+const breadcrumbs = computed(() => {
+  const path = route.path
+  const crumbs: { label: string; to?: string }[] = []
 
-  if (pathSegments.length === 1 && pathSegments[0] === 'admin') {
-    return []
+  if (path.startsWith('/admin/settings')) {
+    crumbs.push({ label: 'Settings', to: '/admin/settings' })
+    if (path.includes('/logo')) crumbs.push({ label: 'Logo' })
+    else if (path.includes('/menu')) crumbs.push({ label: 'Menu' })
+    else if (path.includes('/banner')) crumbs.push({ label: 'Slideshow' })
+    else if (path.includes('/language')) crumbs.push({ label: 'Language' })
+    else if (path.includes('/social')) crumbs.push({ label: 'Social' })
+    else crumbs.push({ label: 'Other' })
+  } else if (path.startsWith('/admin/menu')) {
+    crumbs.push({ label: 'Menu', to: '/admin/menu' })
+    if (route.params.id) crumbs.push({ label: 'Edit' })
+  } else if (path.startsWith('/admin/content')) {
+    crumbs.push({ label: 'Content', to: '/admin/content' })
+    if (route.params.contentId) crumbs.push({ label: 'Items' })
+    if (route.params.id && !route.params.contentId) crumbs.push({ label: 'Edit' })
+  } else if (path.startsWith('/admin/media')) {
+    crumbs.push({ label: 'Media' })
+  } else if (path.startsWith('/admin/users')) {
+    crumbs.push({ label: 'Users' })
+  } else if (path.startsWith('/admin/super/domains')) {
+    crumbs.push({ label: 'Domains', to: '/admin/super/domains' })
+    if (route.params.id) crumbs.push({ label: 'Dashboard' })
+    if (path.includes('/add')) crumbs.push({ label: 'New' })
+  } else if (path.startsWith('/admin/super/announcing')) {
+    crumbs.push({ label: 'Announce' })
+  } else if (path.startsWith('/admin/super/users')) {
+    crumbs.push({ label: 'Members' })
+  } else if (path === '/admin/profile') {
+    crumbs.push({ label: 'Profile' })
+  } else if (path === '/admin/password') {
+    crumbs.push({ label: 'Password' })
   }
 
-  const items: BreadcrumbItem[] = []
-  let currentPath = ''
-
-  for (let i = 1; i < pathSegments.length; i++) {
-    const segment = pathSegments[i]
-    currentPath += `/${segment}`
-
-    if (segment === 'admin') continue
-
-    const label = breadcrumbMap[segment] || segment
-    const isLast = i === pathSegments.length - 1
-
-    items.push({
-      label,
-      to: isLast ? undefined : currentPath,
-    })
-  }
-
-  return items
+  return crumbs
 })
+
+provide('setAlertSuccess', (msg: string) => { alertSuccess.value = msg })
+provide('setAlertError', (msg: string) => { alertError.value = msg })
 </script>
 
 <style scoped>
-.breadcrumb {
-  padding: 0;
+.container {
+  margin-top: 5px;
 }
 
-.breadcrumb-list {
-  display: flex;
-  align-items: center;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  gap: 0.5rem;
+.breadcrumb-actions {
+  margin-top: -38px;
+  margin-bottom: 10px;
 }
 
-.breadcrumb-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
+.breadcrumb-actions .btn {
+  margin-left: 5px;
 }
 
-.breadcrumb-item a {
-  color: #4a5568;
+.clearfix::after {
+  content: '';
+  display: table;
+  clear: both;
+}
+
+.close {
+  float: right;
+  font-size: 21px;
+  font-weight: bold;
+  line-height: 1;
+  color: #000;
+  text-shadow: 0 1px 0 #fff;
+  opacity: 0.2;
   text-decoration: none;
-  transition: color 0.2s;
 }
 
-.breadcrumb-item a:hover {
-  color: #667eea;
-}
-
-.breadcrumb-item span {
-  color: #1a202c;
-  font-weight: 500;
-}
-
-.breadcrumb-separator {
-  font-size: 0.625rem;
-  color: #a0aec0;
+.close:hover {
+  opacity: 0.5;
 }
 </style>

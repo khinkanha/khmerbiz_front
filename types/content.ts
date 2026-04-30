@@ -8,6 +8,8 @@ export interface Content {
   userid: number
   status: number
   lang_id: number
+  items?: ContentItem[]
+  news?: News[]
 }
 
 export interface ContentItem {

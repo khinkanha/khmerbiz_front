@@ -6,11 +6,13 @@ export interface ApiResponse<T = any> {
 }
 
 export interface PaginatedResponse<T = any> {
-  data: T[]
-  total: number
-  page: number
-  limit: number
-  totalPages: number
+  items: T[]
+  pagination: {
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }
 }
 
 export interface ApiError {

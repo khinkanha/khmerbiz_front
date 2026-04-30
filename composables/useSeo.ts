@@ -82,8 +82,9 @@ export const useSeo = () => {
     content: Content,
     item?: ContentItem
   ) => {
-    const imageUrl = item?.photo || content.photo
-      ? `${photoUrl}${item?.photo || content.photo}`
+    const photoPath = item?.photo || content.items?.[0]?.photo
+    const imageUrl = photoPath
+      ? `${photoUrl}${photoPath}`
       : undefined
 
     setMeta({

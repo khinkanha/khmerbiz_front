@@ -1,5 +1,6 @@
 import type { Domain, Setting, Language, Banner, SocialMedia, MenuItem } from '~/types'
-
+import { acceptHMRUpdate, defineStore } from 'pinia'
+import { useApi } from '~/composables/useApi'
 export const useDomainStore = defineStore('domain', () => {
   const api = useApi()
 
@@ -42,7 +43,7 @@ export const useDomainStore = defineStore('domain', () => {
     const lang = languages.value.find(l => l.lang_id === langId)
     if (lang) {
       currentLanguage.value = lang
-      if (process.client) {
+      if (import.meta.client) {
         localStorage.setItem('language', String(langId))
       }
       await fetchMenuTree()

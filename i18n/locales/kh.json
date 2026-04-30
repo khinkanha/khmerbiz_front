@@ -33,8 +33,8 @@
     "priority": "អាទិភាព",
     "primaryImage": "រូបភាពសំខាន់",
     "featureItem": "ធាតុលក្ខណៈពិសេស",
-    "publishDate": "Publish Date",
-    "createNew": "Create New",
+    "publishDate": "ថ្ងៃចុះផ្សាយ",
+    "createNew": "បង្កើតថ្មី",
     "saveDraft": "រក្សាទុកមាតិការព្រាង",
     "loadDraft": "ទាញយកមាតិការព្រាង"
   },
@@ -55,7 +55,8 @@
   "header": {
     "welcome": "សូមស្វាគមន៍",
     "profile": "ប្រវត្តិរូប",
-    "logout": "ចាកចេញ"
+    "logout": "ចាកចេញ",
+    "viewWebsite": "មើលវេបសាយ"
   },
   "mediaManager": {
     "title": "បណ្ណាល័យមីឌៀ",
@@ -97,6 +98,7 @@
     "moveDown": "ផ្លាស់ទីចុះក្រោម"
   },
   "settings": {
+    "language": "ភាសា",
     "logoSetting": "កំណត់រូបសញ្ញា",
     "logoPosition": "ទីតាំងរូបសញ្ញា",
     "logoAlign": "ការតម្រឹមរូបសញ្ញា",
@@ -154,9 +156,12 @@
     "socialSetting": "កំណត់សង្គម",
     "otherSetting": "កំណត់ផ្សេងៗ",
     "admin": "អែតមីន",
+    "domains": "ដូម៉ែន",
     "announce": "ការប្រកាស",
     "login": "ចូល",
-    "logout": "ចាកចេញ"
+    "logout": "ចាកចេញ",
+    "profile": "ការកំណត់ប្រវត្តិរូប",
+    "password": "ការកំណត់ពាក្យសំងាត់"
   },
   "userManager": {
     "title": "គ្រប់គ្រងអ្នកប្រើប្រាស់",

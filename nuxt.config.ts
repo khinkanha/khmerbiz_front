@@ -1,13 +1,24 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-export default defineNuxtConfig({
+export default defineNuxtConfig(<any>{
   devtools: { enabled: true },
+
+  vue: {
+    compilerOptions: {
+      isCustomElement: (tag: string) => tag.includes('-'),
+    },
+  },
+
+  typescript: {
+    strict: false,
+    typeCheck: false,
+  },
   devServer: {
-    port: 80
+    port: 8080
   },
   runtimeConfig: {
     public: {
-      apiBaseUrl: 'https://khmerbizapi.s2.web141.com/api/v1',
-      photoUrl: 'https://khmer.biz',
+      apiBaseUrl: 'http://khmerbiz-api.localhost/api/v1',
+      photoUrl: 'https://khmer.sgp1.digitaloceanspaces.com/',
       siteUrl: 'https://khmer.biz',
     },
   },
@@ -16,14 +27,7 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@nuxtjs/i18n',
     '@nuxtjs/tailwindcss',
-    'nuxt-primevue',
   ],
-
-  primevue: {
-    options: {
-      theme: 'none',
-    },
-  },
 
   i18n: {
     locales: [
@@ -61,11 +65,22 @@ export default defineNuxtConfig({
   css: [
     '~/assets/css/fonts.css',
     '~/assets/css/themes/default.css',
+    '~/assets/css/admin.css',
+    '@fortawesome/fontawesome-free/css/all.min.css',
     'primeicons/primeicons.css',
     'leaflet/dist/leaflet.css',
+    'quill/dist/quill.snow.css',
   ],
 
   ssr: true,
+
+  build: {
+    transpile: ['primevue'],
+  },
+
+  components: [
+    { path: '~/components', pathPrefix: false },
+  ],
 
   compatibilityDate: '2024-01-01',
 })

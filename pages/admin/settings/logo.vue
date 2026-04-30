@@ -1,164 +1,104 @@
 <template>
-  <div class="logo-settings-page">
-    <div class="page-header">
-      <h1 class="page-title">{{ $t('settings.logoSetting') }}</h1>
-    </div>
-
-    <div class="logo-grid">
-      <Card class="logo-card">
-        <template #title>Desktop Logo</template>
-        <template #content>
-          <div class="logo-uploader">
-            <div v-if="desktopLogoPreview" class="logo-preview">
-              <img :src="desktopLogoPreview" alt="Desktop Logo" />
-              <Button
-                icon="pi pi-times"
-                rounded
-                text
-                severity="danger"
-                @click="clearDesktopLogo"
-                class="remove-btn"
-              />
-            </div>
-            <FileUpload
-              v-else
-              mode="basic"
-              :customUpload="true"
-              @select="handleDesktopLogoSelect"
-              :auto="false"
-              accept="image/*"
-              chooseLabel="Upload Desktop Logo"
-            />
+  <div>
+    <form @submit.prevent="handleSave">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>{{ $t('settings.logoPosition') }}</label>
+            <select v-model="form.logo_pos" class="form-control">
+              <option value="1">Top</option>
+              <option value="2">Middle</option>
+              <option value="3">Bottom</option>
+            </select>
           </div>
-        </template>
-      </Card>
-
-      <Card class="logo-card">
-        <template #title>Mobile Logo</template>
-        <template #content>
-          <div class="logo-uploader">
-            <div v-if="mobileLogoPreview" class="logo-preview">
-              <img :src="mobileLogoPreview" alt="Mobile Logo" />
-              <Button
-                icon="pi pi-times"
-                rounded
-                text
-                severity="danger"
-                @click="clearMobileLogo"
-                class="remove-btn"
-              />
-            </div>
-            <FileUpload
-              v-else
-              mode="basic"
-              :customUpload="true"
-              @select="handleMobileLogoSelect"
-              :auto="false"
-              accept="image/*"
-              chooseLabel="Upload Mobile Logo"
-            />
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>{{ $t('settings.logoAlign') }}</label>
+            <select v-model="form.logo_align" class="form-control">
+              <option value="1">Left</option>
+              <option value="2">Center</option>
+              <option value="3">Right</option>
+            </select>
           </div>
-        </template>
-      </Card>
-    </div>
-
-    <div class="form-actions">
-      <Button
-        :label="$t('settings.save')"
-        @click="handleSave"
-        :loading="saving"
-      />
-    </div>
-
-    <Message v-if="successMessage" severity="success" :closable="false">
-      {{ successMessage }}
-    </Message>
-
-    <Message v-if="errorMessage" severity="error" :closable="false">
-      {{ errorMessage }}
-    </Message>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>{{ $t('settings.uploadLogo') }} <span class="text-danger">(Height:97 pixels)</span></label>
+            <input type="file" accept="image/*" @change="handleDesktopSelect" class="form-control" />
+            <div v-if="desktopLogoPreview" style="margin-top:8px">
+              <img :src="desktopLogoPreview" style="max-height:80px" />
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label>{{ $t('settings.mobileLogo') }} <span class="text-danger">(97 x 97 pixels)</span></label>
+            <input type="file" accept="image/*" @change="handleMobileSelect" class="form-control" />
+            <div v-if="mobileLogoPreview" style="margin-top:8px">
+              <img :src="mobileLogoPreview" style="max-height:80px" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-if="successMessage" class="alert alert-success">{{ successMessage }}</div>
+      <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+      <button type="submit" class="btn btn-danger" :disabled="saving">
+        <i class="fa fa-floppy-o"></i> {{ $t('settings.save') }}
+      </button>
+    </form>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useSettingStore } from '~/stores'
+definePageMeta({ layout: 'admin', middleware: 'auth' })
 
-definePageMeta({
-  middleware: 'auth',
-})
+import { useSettingStore } from '~/stores/setting'
 
 const settingStore = useSettingStore()
 const { t } = useI18n()
 const config = useRuntimeConfig()
-
 const photoUrl = config.public.photoUrl || 'https://khmer.biz'
 
+const form = ref({ logo_pos: '1', logo_align: '1' })
 const desktopLogoFile = ref<File | null>(null)
 const mobileLogoFile = ref<File | null>(null)
 const desktopLogoPreview = ref('')
 const mobileLogoPreview = ref('')
-
 const saving = ref(false)
 const successMessage = ref('')
 const errorMessage = ref('')
 
-const handleDesktopLogoSelect = (event: any) => {
-  const file = event.files[0]
+const handleDesktopSelect = (e: Event) => {
+  const file = (e.target as HTMLInputElement).files?.[0]
   if (file) {
     desktopLogoFile.value = file
     desktopLogoPreview.value = URL.createObjectURL(file)
   }
 }
 
-const clearDesktopLogo = () => {
-  desktopLogoFile.value = null
-  desktopLogoPreview.value = ''
-}
-
-const handleMobileLogoSelect = (event: any) => {
-  const file = event.files[0]
+const handleMobileSelect = (e: Event) => {
+  const file = (e.target as HTMLInputElement).files?.[0]
   if (file) {
     mobileLogoFile.value = file
     mobileLogoPreview.value = URL.createObjectURL(file)
   }
 }
 
-const clearMobileLogo = () => {
-  mobileLogoFile.value = null
-  mobileLogoPreview.value = ''
-}
-
 const handleSave = async () => {
   successMessage.value = ''
   errorMessage.value = ''
-
   saving.value = true
-
   try {
-    const data: {
-      logo?: File | string
-      mobileLogo?: File | string
-    } = {}
-
-    if (desktopLogoFile.value) {
-      data.logo = desktopLogoFile.value
-    } else if (desktopLogoPreview.value) {
-      data.logo = desktopLogoPreview.value
-    }
-
-    if (mobileLogoFile.value) {
-      data.mobileLogo = mobileLogoFile.value
-    } else if (mobileLogoPreview.value) {
-      data.mobileLogo = mobileLogoPreview.value
-    }
-
+    const data: any = { ...form.value }
+    if (desktopLogoFile.value) data.logo = desktopLogoFile.value
+    if (mobileLogoFile.value) data.mobileLogo = mobileLogoFile.value
     const success = await settingStore.updateLogoSettings(data)
-
     if (success) {
       successMessage.value = t('common.success')
-      setTimeout(() => {
-        successMessage.value = ''
-      }, 3000)
+      setTimeout(() => { successMessage.value = '' }, 3000)
     } else {
       errorMessage.value = t('common.error')
     }
@@ -171,73 +111,13 @@ const handleSave = async () => {
 
 onMounted(async () => {
   await settingStore.fetchSettings()
-
   if (settingStore.settings) {
-    if (settingStore.settings.logo) {
-      desktopLogoPreview.value = `${photoUrl}${settingStore.settings.logo}`
+    form.value = {
+      logo_pos: String(settingStore.settings.logo_pos || 1),
+      logo_align: String(settingStore.settings.logo_align || 1),
     }
-    if (settingStore.settings.mobile_logo) {
-      mobileLogoPreview.value = `${photoUrl}${settingStore.settings.mobile_logo}`
-    }
+    if (settingStore.settings.logo) desktopLogoPreview.value = `${photoUrl}${settingStore.settings.logo}`
+    if (settingStore.settings.mobile_logo) mobileLogoPreview.value = `${photoUrl}${settingStore.settings.mobile_logo}`
   }
 })
 </script>
-
-<style scoped>
-.logo-settings-page {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.page-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1a202c;
-  margin: 0;
-}
-
-.logo-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-.logo-card {
-  border: 1px solid #e2e8f0;
-}
-
-.logo-uploader {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.logo-preview {
-  position: relative;
-  padding: 1rem;
-  border: 1px dashed #e2e8f0;
-  border-radius: 8px;
-  background-color: #f7fafc;
-}
-
-.logo-preview img {
-  max-width: 100%;
-  max-height: 150px;
-  display: block;
-  margin: 0 auto;
-}
-
-.remove-btn {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  padding-top: 1rem;
-  border-top: 1px solid #e2e8f0;
-}
-</style>

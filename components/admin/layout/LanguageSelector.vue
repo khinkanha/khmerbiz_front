@@ -1,5 +1,5 @@
 <template>
-  <div class="language-selector">
+  <div class="language-selector" :class="{ dark }">
     <Button
       @click="toggleMenu"
       class="language-button"
@@ -11,7 +11,7 @@
         :alt="currentLanguage.lang_name"
         class="flag-icon"
       />
-      <span v-if="currentLanguage">{{ currentLanguage.lang_name }}</span>
+      <span v-if="currentLanguage">{{ currentLanguage.lang_code?.toUpperCase() }}</span>
       <i class="pi pi-chevron-down"></i>
     </Button>
 
@@ -20,21 +20,21 @@
 </template>
 
 <script setup lang="ts">
-import { useDomainStore } from '~/stores'
+import type { MenuItem } from 'primevue/menuitem'
+import { useDomainStore } from '~/stores/domain'
+
+defineProps<{
+  dark?: boolean
+}>()
 
 const domainStore = useDomainStore()
 const menuRef = ref()
 
 const currentLanguage = computed(() => domainStore.currentLanguage)
 
-const languageMenuItems = computed(() => {
+const languageMenuItems = computed((): MenuItem[] => {
   return domainStore.languages.map(lang => ({
     label: lang.lang_name,
-    icon: () => h('img', {
-      src: `/flag/${lang.flag_icon}`,
-      alt: lang.lang_name,
-      class: 'flag-icon',
-    }),
     command: () => setLanguage(lang.lang_id),
   }))
 })
@@ -57,15 +57,24 @@ const setLanguage = async (langId: number) => {
 .language-button {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.35rem;
   color: #4a5568;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
 }
 
 .flag-icon {
-  width: 20px;
-  height: 14px;
+  width: 18px;
+  height: 13px;
   object-fit: cover;
   border-radius: 2px;
+}
+
+/* Dark mode for navbar */
+.language-selector.dark .language-button {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.language-selector.dark .language-button:hover {
+  color: #fff;
 }
 </style>

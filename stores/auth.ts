@@ -1,3 +1,5 @@
+import { acceptHMRUpdate, defineStore } from 'pinia'
+import { useApi } from '~/composables/useApi'
 import type { User, LoginForm, SignupForm, ProfileForm, PasswordForm } from '~/types'
 
 export const useAuthStore = defineStore('auth', () => {

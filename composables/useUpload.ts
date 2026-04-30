@@ -1,4 +1,5 @@
 import type { MediaUpload, PresignedUrlResponse } from '~/types'
+import { useApi } from '~/composables/useApi'
 
 export const useUpload = () => {
   const api = useApi()

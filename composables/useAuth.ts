@@ -52,7 +52,7 @@ export const useAuth = () => {
       api.clearTokens()
       user.value = null
       isAuthenticated.value = false
-      if (process.client) {
+      if (import.meta.client) {
         localStorage.removeItem('user')
       }
     }
@@ -65,7 +65,7 @@ export const useAuth = () => {
       if (response.success && response.data) {
         user.value = response.data
         isAuthenticated.value = true
-        if (process.client) {
+        if (import.meta.client) {
           localStorage.setItem('user', JSON.stringify(response.data))
         }
       }
@@ -103,7 +103,7 @@ export const useAuth = () => {
   const checkAuth = async () => {
     api.getStoredTokens()
 
-    if (process.client) {
+    if (import.meta.client) {
       const storedUser = localStorage.getItem('user')
       if (storedUser) {
         try {

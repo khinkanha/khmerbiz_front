@@ -4,8 +4,10 @@ import type {
   SocialMedia,
   BannerForm,
   SocialMediaForm,
+  Language,
 } from '~/types'
-
+import { acceptHMRUpdate, defineStore } from 'pinia'
+import { useApi} from '~/composables/useApi'
 export const useSettingStore = defineStore('setting', () => {
   const api = useApi()
 
@@ -232,21 +234,86 @@ export const useSettingStore = defineStore('setting', () => {
     }
   }
 
+  const languages = ref<Language[]>([])
+
+  const fetchLanguages = async () => {
+    try {
+      const response = await api.get<Language[]>('/settings/languages')
+      if (response.success && response.data) {
+        languages.value = response.data
+      }
+    } catch (error) {
+      console.error('Failed to fetch languages:', error)
+    }
+  }
+
+  const addLanguage = async (data: { lang_name: string; lang_code: string; flag_icon: string }): Promise<{ success: boolean; id?: number }> => {
+    try {
+      const response = await api.post<{ lang_id: number }>('/settings/languages', data)
+      if (response.success && response.data) {
+        await fetchLanguages()
+        return { success: true, id: response.data.lang_id }
+      }
+      return { success: false }
+    } catch (error) {
+      console.error('Failed to add language:', error)
+      return { success: false }
+    }
+  }
+
+  const deleteLanguage = async (id: number): Promise<boolean> => {
+    try {
+      const response = await api.delete(`/settings/languages/${id}`)
+      if (response.success) {
+        languages.value = languages.value.filter(l => l.lang_id !== id)
+        return true
+      }
+      return false
+    } catch (error) {
+      console.error('Failed to delete language:', error)
+      return false
+    }
+  }
+
+  const setDefaultLanguage = async (id: number): Promise<boolean> => {
+    try {
+      const response = await api.put(`/settings/languages/${id}/default`, {})
+      if (response.success) {
+        await fetchLanguages()
+        return true
+      }
+      return false
+    } catch (error) {
+      console.error('Failed to set default language:', error)
+      return false
+    }
+  }
+
+  const reorderBanners = (reordered: Banner[]) => {
+    banners.value = reordered.map((banner, index) => ({ ...banner, banner_order: index }))
+  }
+
   return {
     settings: readonly(settings),
     banners: readonly(banners),
     socialMedia: readonly(socialMedia),
+    languages: readonly(languages),
     fetchSettings,
     updateSettings,
     fetchBanners,
     addBanner,
     updateBanner,
     deleteBanner,
+    reorderBanners,
     fetchSocialMedia,
     addSocialMedia,
     updateSocialMedia,
     deleteSocialMedia,
     updateLogoSettings,
+    fetchLanguages,
+    addLanguage,
+    deleteLanguage,
+    setDefaultLanguage,
   }
 })
 

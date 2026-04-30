@@ -9,8 +9,6 @@
 </template>
 
 <script setup lang="ts">
-import { useDomainStore } from '~/stores'
-import { useTheme } from '~/composables'
 
 const domainStore = useDomainStore()
 const { getThemeClass } = useTheme()

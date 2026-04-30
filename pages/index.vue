@@ -12,8 +12,8 @@
 </template>
 
 <script setup lang="ts">
-import { useDomainStore } from '~/stores'
-import { useTheme } from '~/composables'
+
+import { useDomainStore } from '~/stores/domain'
 
 const domainStore = useDomainStore()
 const { resolveThemeComponent } = useTheme()

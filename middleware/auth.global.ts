@@ -1,19 +1,28 @@
-import { useAuthStore } from '~/stores'
+import { useAuthStore } from '~/stores/auth'
 
 export default defineNuxtRouteMiddleware(async (to) => {
   const authStore = useAuthStore()
+  const publicRoutes = ['/admin/login', '/admin/signup']
+  const isAdminRoute = to.path.startsWith('/admin')
+  const isSuperAdminRoute = to.path.startsWith('/admin/super')
 
   // Initialize auth state on client side
   if (import.meta.client) {
-    await authStore.checkAuth()
+    authStore.initialize()
+    // Only fetch profile for protected admin routes when tokens exist
+    if (isAdminRoute && !publicRoutes.includes(to.path) && authStore.isAuthenticated) {
+      await authStore.fetchProfile()
+    }
   }
-
-  const publicRoutes = ['/admin/login', '/admin/signup']
-  const isAdminRoute = to.path.startsWith('/admin')
 
   if (isAdminRoute && !publicRoutes.includes(to.path)) {
     if (!authStore.isAuthenticated) {
       return navigateTo('/admin/login')
+    }
+
+    // Super admin routes require super admin role
+    if (isSuperAdminRoute && !authStore.isSuperAdmin) {
+      return navigateTo('/admin')
     }
   }
 

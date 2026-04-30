@@ -12,8 +12,11 @@ export interface Setting {
   logo_position: string | null
   logo_align: string | null
   menu_align: string | null
+  menu_pos: number | null
   screen_mode: string | null
+  s_mode: number | null
   banner_mode: string | null
+  banner_pos: number | null
   plugin_mode: string | null
   background: string | null
   footer_align: number
@@ -21,6 +24,7 @@ export interface Setting {
   tracking_id: string | null
   chat_script: string | null
   page_style: number
+  logo_pos: number | null
 }
 
 export enum ColorStyle {
@@ -80,4 +84,5 @@ export interface Language {
   lang_name: string
   flag_icon: string
   status: number
+  is_default: number
 }

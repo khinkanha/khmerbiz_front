@@ -1,11 +1,11 @@
-import type { ApiResponse, ApiError } from '~/types/api'
+import type { ApiResponse } from '~/types/api'
 
 let accessToken: string | null = null
 let refreshToken: string | null = null
 
 export const useApi = () => {
   const config = useRuntimeConfig()
-  const baseURL = config.public.apiBaseUrl || 'http://localhost:8000/api/v1'
+  const baseURL = config.public.apiBaseUrl
 
   const setTokens = (access: string, refresh: string) => {
     accessToken = access
@@ -55,24 +55,28 @@ export const useApi = () => {
     }
   }
 
-  const fetch = async <T = any>(
+  const apiFetch = async <T = any>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> => {
     getStoredTokens()
 
     const url = `${baseURL}${endpoint}`
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      ...options.headers,
+    const isFormData = options.body instanceof FormData
+    const headers: Record<string, string> = {
+      ...(options.headers as Record<string, string>),
+    }
+
+    if (!isFormData) {
+      headers['Content-Type'] = 'application/json'
     }
 
     if (accessToken) {
-      headers.Authorization = `Bearer ${accessToken}`
+      headers['Authorization'] = `Bearer ${accessToken}`
     }
 
     try {
-      const response = await fetch(url, {
+      const response = await globalThis.fetch(url, {
         ...options,
         headers,
       })
@@ -82,7 +86,7 @@ export const useApi = () => {
       if (response.status === 401 && refreshToken) {
         const refreshed = await refreshAccessToken()
         if (refreshed) {
-          return fetch<T>(endpoint, options)
+          return apiFetch<T>(endpoint, options)
         }
       }
 
@@ -107,18 +111,18 @@ export const useApi = () => {
     }
   }
 
-  const get = <T = any>(endpoint: string) => fetch<T>(endpoint, { method: 'GET' })
+  const get = <T = any>(endpoint: string) => apiFetch<T>(endpoint, { method: 'GET' })
   const post = <T = any>(endpoint: string, body: any) =>
-    fetch<T>(endpoint, {
+    apiFetch<T>(endpoint, {
       method: 'POST',
-      body: JSON.stringify(body),
+      body: body instanceof FormData ? body : JSON.stringify(body),
     })
   const put = <T = any>(endpoint: string, body: any) =>
-    fetch<T>(endpoint, {
+    apiFetch<T>(endpoint, {
       method: 'PUT',
-      body: JSON.stringify(body),
+      body: body instanceof FormData ? body : JSON.stringify(body),
     })
-  const del = <T = any>(endpoint: string) => fetch<T>(endpoint, { method: 'DELETE' })
+  const del = <T = any>(endpoint: string) => apiFetch<T>(endpoint, { method: 'DELETE' })
 
   return {
     get,

@@ -10,8 +10,8 @@
       >
         <div class="video-wrapper">
           <iframe
-            v-if="getEmbedUrl(item.video_url)"
-            :src="getEmbedUrl(item.video_url)"
+            v-if="item.video_url && getEmbedUrl(item.video_url)"
+            :src="getEmbedUrl(item.video_url!) ?? undefined"
             :title="item.title"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

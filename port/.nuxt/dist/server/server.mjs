@@ -1,1 +1,0 @@
-export { default } from "file:///Users/admin/dev/website/4khweb_new/frontend/node_modules/@nuxt/vite-builder/dist/runtime/vite-node.mjs"

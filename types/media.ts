@@ -1,14 +1,10 @@
 export interface Media {
-  media_id: number
-  domain_id: number
+  photo_id: number
   file_name: string
-  original_name: string
-  file_type: string
-  file_size: number
-  file_url: string
-  folder: string
-  userid: number
-  created_at: string
+  title: string | null
+  server_id: number
+  domain_id: number
+  code: string
 }
 
 export interface PresignedUrlResponse {
