@@ -56,6 +56,7 @@
                 <ClientOnly>
                   <Editor
                     v-model="form.description"
+                    tinymceScriptSrc="/tinymce/tinymce.min.js"
                     :init="{
                       height: 300,
                       menubar: 'tools',
