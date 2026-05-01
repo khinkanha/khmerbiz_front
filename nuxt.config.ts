@@ -1,6 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig(<any>{
-  devtools: { enabled: true },
+  devtools: { enabled: false },
+  experimental: {
+    appManifest: false
+  },
 
   vue: {
     compilerOptions: {
@@ -13,7 +16,7 @@ export default defineNuxtConfig(<any>{
     typeCheck: false,
   },
   devServer: {
-    port: 8080
+    port: 8888
   },
   runtimeConfig: {
     public: {
@@ -33,9 +36,7 @@ export default defineNuxtConfig(<any>{
     locales: [
       { code: 'en', name: 'English', file: 'en.json' },
       { code: 'kh', name: 'ខ្មែរ', file: 'kh.json' },
-      { code: 'ch', name: '中文', file: 'ch.json' },
-      { code: 'th', name: 'ไทย', file: 'th.json' },
-      { code: 'vn', name: 'Tiếng Việt', file: 'vn.json' },
+      { code: 'ch', name: '中文', file: 'ch.json' }
     ],
     defaultLocale: 'kh',
     lazy: true,
