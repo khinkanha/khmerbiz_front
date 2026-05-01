@@ -6,19 +6,21 @@
 
     <form @submit.prevent="handleChangePassword">
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-12">
           <div class="form-group">
             <label for="cpassword">{{ $t('userManager.currentPassword') }}</label>
-            <input type="password" id="cpassword" v-model="form.current_password" class="form-control" :placeholder="$t('userManager.currentPassword')" />
+            <input type="password" id="cpassword" v-model="form.currentPassword" class="form-control" :placeholder="$t('userManager.currentPassword')" />
           </div>
         </div>
-        <div class="col-md-6">
+        </div>
+        <div class="row">
+        <div class="col-md-12">
           <div class="form-group">
             <label for="npassword">{{ $t('userManager.newPassword') }}</label>
-            <input type="password" id="npassword" v-model="form.new_password" class="form-control" :placeholder="$t('userManager.newPassword')" />
+            <input type="password" id="npassword" v-model="form.newPassword" class="form-control" :placeholder="$t('userManager.newPassword')" />
           </div>
         </div>
-      </div>
+        </div>
       <button type="submit" class="btn btn-danger" :disabled="loading">
         <i class="fa fa-floppy-o"></i> {{ $t('userManager.save') }}
       </button>
@@ -34,7 +36,7 @@ import { useAuthStore } from '~/stores/auth'
 const authStore = useAuthStore()
 const { t } = useI18n()
 
-const form = ref({ current_password: '', new_password: '', confirm_password: '' })
+const form = ref({ currentPassword: '', newPassword: '' })
 const loading = ref(false)
 const successMessage = ref('')
 const errorMessage = ref('')
@@ -42,20 +44,19 @@ const errorMessage = ref('')
 const handleChangePassword = async () => {
   successMessage.value = ''
   errorMessage.value = ''
-  if (!form.value.current_password || !form.value.new_password) {
+  if (!form.value.currentPassword || !form.value.newPassword) {
     errorMessage.value = t('validation.required')
     return
   }
   loading.value = true
   try {
     const result = await authStore.changePassword({
-      current_password: form.value.current_password,
-      new_password: form.value.new_password,
-      confirm_password: form.value.new_password,
+      currentPassword: form.value.currentPassword,
+      newPassword: form.value.newPassword
     })
     if (result.success) {
       successMessage.value = result.message || t('common.success')
-      form.value = { current_password: '', new_password: '', confirm_password: '' }
+      form.value = { currentPassword: '', newPassword: '' }
       setTimeout(() => { successMessage.value = '' }, 3000)
     } else {
       errorMessage.value = result.message || t('common.error')

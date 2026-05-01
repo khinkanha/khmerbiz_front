@@ -60,7 +60,7 @@ export const useAuth = () => {
 
   const fetchProfile = async () => {
     try {
-      const response = await api.get<User>('/auth/profile')
+      const response = await api.get<User>('/users/me')
 
       if (response.success && response.data) {
         user.value = response.data
@@ -76,7 +76,7 @@ export const useAuth = () => {
 
   const updateProfile = async (data: ProfileForm): Promise<boolean> => {
     try {
-      const response = await api.put<User>('/auth/profile', data)
+      const response = await api.put<User>('/users/me', data)
 
       if (response.success && response.data) {
         user.value = response.data

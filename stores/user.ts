@@ -23,17 +23,18 @@ export const useUserStore = defineStore('user', () => {
     full_name: string
     email: string
     phone?: string
-  }): Promise<{ success: boolean; id?: number }> => {
+    password?: string
+  }): Promise<{ success: boolean; id?: number; message?: string }> => {
     try {
       const response = await api.post<{ userid: number }>('/users', data)
       if (response.success && response.data) {
         await fetchUsers()
         return { success: true, id: response.data.userid }
       }
-      return { success: false }
+      return { success: false, message: response.message }
     } catch (error) {
       console.error('Failed to add user:', error)
-      return { success: false }
+      return { success: false, message: 'Network error' }
     }
   }
 

@@ -1,6 +1,7 @@
 import PrimeVue from 'primevue/config'
 import Aura from '@primevue/themes/aura'
 import ConfirmationService from 'primevue/confirmationservice'
+import ToastService from 'primevue/toastservice'
 
 import Button from 'primevue/button'
 import Calendar from 'primevue/calendar'
@@ -25,6 +26,7 @@ import ProgressSpinner from 'primevue/progressspinner'
 import Slider from 'primevue/slider'
 import Tag from 'primevue/tag'
 import Textarea from 'primevue/textarea'
+import Toast from 'primevue/toast'
 import ToggleSwitch from 'primevue/toggleswitch'
 
 export default defineNuxtPlugin((nuxtApp) => {
@@ -38,12 +40,13 @@ export default defineNuxtPlugin((nuxtApp) => {
   })
 
   nuxtApp.vueApp.use(ConfirmationService)
+  nuxtApp.vueApp.use(ToastService)
 
   const components = {
     Button, Calendar, Card, Carousel, Checkbox, Column, ConfirmDialog,
     DataTable, Dialog, Dropdown, Editor, FileUpload, InputNumber, InputText,
     Menu, Message, Paginator, Password, ProgressBar, ProgressSpinner,
-    Slider, Tag, Textarea, ToggleSwitch,
+    Slider, Tag, Textarea, Toast, ToggleSwitch,
   }
 
   for (const [name, component] of Object.entries(components)) {

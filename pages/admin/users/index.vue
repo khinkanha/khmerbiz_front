@@ -13,7 +13,7 @@
             <div class="col-md-6">
               <div class="form-group">
                 <label>{{ $t('userManager.username') }}</label>
-                <input type="text" v-model="addForm.username" class="form-control" :placeholder="$t('userManager.username')" />
+                <input type="text" v-model="addForm.username" class="form-control" minlength="5" :placeholder="$t('userManager.username')" />
               </div>
             </div>
             <div class="col-md-6">
@@ -34,6 +34,14 @@
               <div class="form-group">
                 <label>{{ $t('userManager.email') }}</label>
                 <input type="email" v-model="addForm.email" class="form-control" :placeholder="$t('userManager.email')" />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>{{ $t('userManager.password') }}</label>
+                <input type="password" v-model="addForm.password" class="form-control" minlength="6" :placeholder="$t('userManager.password')" />
               </div>
             </div>
           </div>
@@ -88,21 +96,37 @@
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
 import { useUserStore } from '~/stores/user'
+import { useToast } from 'primevue/usetoast'
 
 const userStore = useUserStore()
+const toast = useToast()
 
 const showForm = ref(false)
 const showPasswordDialog = ref(false)
 const selectedUser = ref<any>(null)
-const addForm = ref({ username: '', full_name: '', phone: '', email: '' })
+const addForm = ref({ username: '', full_name: '', phone: '', email: '', password: '' })
 const passwordForm = ref({ new_password: '' })
 
 const handleAdd = async () => {
-  if (!addForm.value.username) return
-  await userStore.addUser(addForm.value)
-  showForm.value = false
-  addForm.value = { username: '', full_name: '', phone: '', email: '' }
-  await userStore.fetchUsers()
+  if (!addForm.value.username || addForm.value.username.length < 5) {
+    toast.add({ severity: 'warn', summary: 'Validation', detail: 'Username must be at least 5 characters', life: 3000 })
+    return
+  }
+  if (!addForm.value.password || addForm.value.password.length < 6) {
+    toast.add({ severity: 'warn', summary: 'Validation', detail: 'Password must be at least 6 characters', life: 3000 })
+    return
+  }
+  const result = await userStore.addUser(addForm.value)
+  if (result.success) {
+    toast.add({ severity: 'success', summary: 'Success', detail: 'User created successfully', life: 3000 })
+    showForm.value = false
+    addForm.value = { username: '', full_name: '', phone: '', email: '', password: '' }
+    await userStore.fetchUsers()
+    console.log('User created:', result)
+  } else {
+    console.log('Failed to create user:', result)
+    toast.add({ severity: 'error', summary: 'Error', detail: result.message || 'Failed to create user', life: 5000 })
+  }
 }
 
 const openSetPassword = (user: any) => {
@@ -113,8 +137,13 @@ const openSetPassword = (user: any) => {
 
 const handleSetPassword = async () => {
   if (!selectedUser.value || !passwordForm.value.new_password) return
-  await userStore.setUserPassword(selectedUser.value.userid, passwordForm.value.new_password)
-  showPasswordDialog.value = false
+  const success = await userStore.setUserPassword(selectedUser.value.userid, passwordForm.value.new_password)
+  if (success) {
+    toast.add({ severity: 'success', summary: 'Success', detail: 'Password updated', life: 3000 })
+    showPasswordDialog.value = false
+  } else {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to set password', life: 3000 })
+  }
 }
 
 onMounted(async () => {

@@ -1,5 +1,7 @@
 <template>
   <div class="admin-layout">
+    <Toast />
+
     <!-- Logo -->
     <div class="container text-right admin-logo-bar">
       <img src="/assets/images/logo/2logo.gif" alt="Logo" />

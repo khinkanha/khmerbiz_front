@@ -8,8 +8,8 @@ export interface User {
   email: string
   sitebuilder: number
   user_level: UserLevel
-  
-  
+
+
 }
 
 export enum UserLevel {
@@ -44,7 +44,7 @@ export interface ProfileForm {
 }
 
 export interface PasswordForm {
-  current_password: string
-  new_password: string
-  confirm_password: string
+  newPassword: string
+  currentPassword: string
+  confirmPassword: string | null
 }

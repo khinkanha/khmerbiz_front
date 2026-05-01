@@ -106,7 +106,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const fetchProfile = async () => {
     try {
-      const response = await api.get<User>('/auth/profile')
+      const response = await api.get<User>('/users/me')
 
       if (response.success && response.data) {
         setUser(response.data)
@@ -125,7 +125,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const updateProfile = async (data: ProfileForm): Promise<boolean> => {
     try {
-      const response = await api.put<User>('/auth/profile', data)
+      const response = await api.put<User>('/users/me', data)
 
       if (response.success && response.data) {
         setUser(response.data)
@@ -141,7 +141,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const changePassword = async (data: PasswordForm): Promise<{ success: boolean; message?: string }> => {
     try {
-      const response = await api.post('/auth/password', data)
+      const response = await api.put('/users/me/password', data)
       return { success: response.success, message: response.message }
     } catch (error: any) {
       return { success: false, message: error.message || 'Password change failed' }
