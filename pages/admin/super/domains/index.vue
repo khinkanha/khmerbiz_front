@@ -41,7 +41,7 @@ const assignPermission = (id: number) => {
 
 onMounted(async () => {
   try {
-    const res = await api.get('/super/domains')
+    const res = await api.get('/domains')
     domains.value = res.data || []
   } catch (e) {
     console.error(e)

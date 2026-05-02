@@ -64,7 +64,8 @@ const handleSend = async () => {
   }
   sending.value = true
   try {
-    const response = await api.post('/super/announcing', form.value)
+    // TODO: Backend has no /domains/announce endpoint — needs to be added
+    const response = await api.post('/domains/announce', form.value)
     if (response.success) {
       successMessage.value = t('common.success')
       form.value = { subject: '', to_email: '', send_to_all: false, message: '' }

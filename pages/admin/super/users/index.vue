@@ -37,7 +37,7 @@ const users = ref<any[]>([])
 
 onMounted(async () => {
   try {
-    const res = await api.get('/super/members')
+    const res = await api.get('/users')
     if (res.success) {
       users.value = res.data || []
     }

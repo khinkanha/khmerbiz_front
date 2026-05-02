@@ -15,10 +15,9 @@ export const useSettingStore = defineStore('setting', () => {
   const banners = ref<Banner[]>([])
   const socialMedia = ref<SocialMedia[]>([])
 
-  const fetchSettings = async (domainId?: number) => {
+  const fetchSettings = async () => {
     try {
-      const url = domainId ? `/settings/domain/${domainId}` : '/settings'
-      const response = await api.get<Setting>(url)
+      const response = await api.get<Setting>('/settings')
 
       if (response.success && response.data) {
         settings.value = response.data
@@ -30,7 +29,7 @@ export const useSettingStore = defineStore('setting', () => {
 
   const updateSettings = async (data: Partial<Setting>): Promise<boolean> => {
     try {
-      const response = await api.put('/settings', data)
+      const response = await api.put('/settings/general', data)
 
       if (response.success) {
         if (settings.value) {
@@ -46,10 +45,9 @@ export const useSettingStore = defineStore('setting', () => {
     }
   }
 
-  const fetchBanners = async (domainId?: number) => {
+  const fetchBanners = async () => {
     try {
-      const url = domainId ? `/settings/banners/domain/${domainId}` : '/settings/banners'
-      const response = await api.get<Banner[]>(url)
+      const response = await api.get<Banner[]>('/banners')
 
       if (response.success && response.data) {
         banners.value = response.data
@@ -73,7 +71,7 @@ export const useSettingStore = defineStore('setting', () => {
         formData.append('photo', data.photo)
       }
 
-      const response = await api.post<{ banner_id: number }>('/settings/banners', formData)
+      const response = await api.post<{ banner_id: number }>('/banners', formData)
 
       if (response.success && response.data) {
         await fetchBanners()
@@ -88,45 +86,14 @@ export const useSettingStore = defineStore('setting', () => {
   }
 
   const updateBanner = async (id: number, data: Partial<BannerForm>): Promise<boolean> => {
-    try {
-      const formData = new FormData()
-
-      if (data.title !== undefined) {
-        formData.append('title', data.title)
-      }
-      if (data.link !== undefined) {
-        formData.append('link', data.link)
-      }
-      if (data.banner_order !== undefined) {
-        formData.append('banner_order', String(data.banner_order))
-      }
-      if (data.status !== undefined) {
-        formData.append('status', String(data.status))
-      }
-
-      if (typeof data.photo === 'string') {
-        formData.append('existing_photo', data.photo)
-      } else if (data.photo) {
-        formData.append('photo', data.photo)
-      }
-
-      const response = await api.put(`/settings/banners/${id}`, formData)
-
-      if (response.success) {
-        await fetchBanners()
-        return true
-      }
-
-      return false
-    } catch (error) {
-      console.error('Failed to update banner:', error)
-      return false
-    }
+    // TODO: Backend has no PUT /banners/:id endpoint — needs to be added
+    console.warn('updateBanner: no backend endpoint for banner update')
+    return false
   }
 
   const deleteBanner = async (id: number): Promise<boolean> => {
     try {
-      const response = await api.delete(`/settings/banners/${id}`)
+      const response = await api.delete(`/banners/${id}`)
 
       if (response.success) {
         banners.value = banners.value.filter(b => b.banner_id !== id)
@@ -140,10 +107,9 @@ export const useSettingStore = defineStore('setting', () => {
     }
   }
 
-  const fetchSocialMedia = async (domainId?: number) => {
+  const fetchSocialMedia = async () => {
     try {
-      const url = domainId ? `/settings/social/domain/${domainId}` : '/settings/social'
-      const response = await api.get<SocialMedia[]>(url)
+      const response = await api.get<SocialMedia[]>('/settings/social-media')
 
       if (response.success && response.data) {
         socialMedia.value = response.data
@@ -155,7 +121,7 @@ export const useSettingStore = defineStore('setting', () => {
 
   const addSocialMedia = async (data: SocialMediaForm): Promise<{ success: boolean; id?: number }> => {
     try {
-      const response = await api.post<{ social_id: number }>('/settings/social', data)
+      const response = await api.post<{ social_id: number }>('/settings/social-media', data)
 
       if (response.success && response.data) {
         await fetchSocialMedia()
@@ -170,24 +136,14 @@ export const useSettingStore = defineStore('setting', () => {
   }
 
   const updateSocialMedia = async (id: number, data: Partial<SocialMediaForm>): Promise<boolean> => {
-    try {
-      const response = await api.put(`/settings/social/${id}`, data)
-
-      if (response.success) {
-        await fetchSocialMedia()
-        return true
-      }
-
-      return false
-    } catch (error) {
-      console.error('Failed to update social media:', error)
-      return false
-    }
+    // TODO: Backend has no PUT /settings/social-media/:id endpoint — needs to be added
+    console.warn('updateSocialMedia: no backend endpoint for social media update')
+    return false
   }
 
   const deleteSocialMedia = async (id: number): Promise<boolean> => {
     try {
-      const response = await api.delete(`/settings/social/${id}`)
+      const response = await api.delete(`/settings/social-media/${id}`)
 
       if (response.success) {
         socialMedia.value = socialMedia.value.filter(s => s.social_id !== id)
@@ -220,7 +176,7 @@ export const useSettingStore = defineStore('setting', () => {
         formData.append('mobile_logo', data.mobileLogo)
       }
 
-      const response = await api.post('/settings/logo', formData)
+      const response = await api.put('/settings/logo', formData)
 
       if (response.success) {
         await fetchSettings()

@@ -44,7 +44,7 @@ export const useMediaStore = defineStore('media', () => {
       const response = await api.post<{
         uploadUrl: string
         key: string
-      }>('/media/presigned', {
+      }>('/media/upload-url', {
         fileName,
         fileType,
         folder,

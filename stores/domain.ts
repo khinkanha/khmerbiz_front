@@ -1,6 +1,8 @@
 import type { Domain, Setting, Language, Banner, SocialMedia, MenuItem } from '~/types'
 import { acceptHMRUpdate, defineStore } from 'pinia'
 import { useApi } from '~/composables/useApi'
+
+
 export const useDomainStore = defineStore('domain', () => {
   const api = useApi()
 
@@ -13,15 +15,16 @@ export const useDomainStore = defineStore('domain', () => {
   const menuTree = ref<MenuItem[]>([])
   const menuCache = ref<Record<number, MenuItem[]>>({})
 
-  const resolveDomain = async () => {
+  const resolveDomain = async (domainId?: number) => {
     try {
+      const endpoint = domainId ? `/site/config?domain_id=${domainId}` : '/site/config'
       const response = await api.get<{
         domain: Domain
         settings: Setting
         languages: Language[]
         banners: Banner[]
         socialMedia: SocialMedia[]
-      }>('/site/config')
+      }>(endpoint)
 
       if (response.success && response.data) {
         domain.value = response.data.domain
@@ -61,7 +64,7 @@ export const useDomainStore = defineStore('domain', () => {
     }
 
     try {
-      const response = await api.get<MenuItem[]>(`/menu/tree/${langId}`)
+      const response = await api.get<MenuItem[]>(`/site/menu`)
       if (response.success && response.data) {
         const tree = buildMenuTree(response.data)
         menuTree.value = tree

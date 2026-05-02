@@ -77,7 +77,7 @@ const form = ref({
 const handleSave = async () => {
   errorMessage.value = ''
   try {
-    const res = await api.post('/super/domains', form.value)
+    const res = await api.post('/domains', form.value)
     if (res.success) {
       navigateTo('/admin/super/domains')
     } else {

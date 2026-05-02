@@ -39,31 +39,15 @@ export const useUserStore = defineStore('user', () => {
   }
 
   const updateUser = async (id: number, data: Partial<User>): Promise<boolean> => {
-    try {
-      const response = await api.put(`/users/${id}`, data)
-      if (response.success) {
-        await fetchUsers()
-        return true
-      }
-      return false
-    } catch (error) {
-      console.error('Failed to update user:', error)
-      return false
-    }
+    // TODO: Backend has no generic PUT /users/:id — only specific sub-routes
+    console.warn('updateUser: no backend endpoint for generic user update')
+    return false
   }
 
   const deleteUser = async (id: number): Promise<boolean> => {
-    try {
-      const response = await api.delete(`/users/${id}`)
-      if (response.success) {
-        users.value = users.value.filter(u => u.userid !== id)
-        return true
-      }
-      return false
-    } catch (error) {
-      console.error('Failed to delete user:', error)
-      return false
-    }
+    // TODO: Backend has no DELETE /users/:id endpoint — needs to be added
+    console.warn('deleteUser: no backend endpoint for user deletion')
+    return false
   }
 
   const setUserPassword = async (id: number, password: string): Promise<boolean> => {

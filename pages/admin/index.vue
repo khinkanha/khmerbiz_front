@@ -58,8 +58,13 @@
 
 <script setup lang="ts">
 definePageMeta({ layout: 'admin' })
-
+import { useDomainStore } from '~/stores/domain'
+import { useAuthStore } from '~/stores/auth'
+const domainStore = useDomainStore()  
 const authStore = useAuthStore()
+onMounted( async () => {
+   await domainStore.resolveDomain(authStore.user?.domain_id)
+})
 </script>
 
 <style scoped>

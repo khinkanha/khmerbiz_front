@@ -92,7 +92,7 @@ export const useAuth = () => {
 
   const changePassword = async (data: PasswordForm): Promise<boolean> => {
     try {
-      const response = await api.post('/auth/password', data)
+      const response = await api.put('/users/me/password', data)
       return response.success
     } catch (error) {
       console.error('Failed to change password:', error)

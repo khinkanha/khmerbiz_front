@@ -1,6 +1,7 @@
 import type { MenuItem, MenuForm } from '~/types'
 import { acceptHMRUpdate, defineStore } from 'pinia'
 import { useApi} from '~/composables/useApi'
+
 export const useMenuStore = defineStore('menu', () => {
   const api = useApi()
 
@@ -8,12 +9,12 @@ export const useMenuStore = defineStore('menu', () => {
   const menuTree = ref<MenuItem[]>([])
   const menuCache = ref<Record<number, MenuItem[]>>({})
 
-  const fetchMenuItems = async (domainId: number) => {
+  const fetchMenuItems = async () => {
     try {
-      const response = await api.get<MenuItem[]>(`/menu/domain/${domainId}`)
+      const response = await api.get<{items:MenuItem[]}>(`/menus`)
 
       if (response.success && response.data) {
-        menuItems.value = response.data
+        menuItems.value = response.data.items
       }
     } catch (error) {
       console.error('Failed to fetch menu items:', error)
@@ -27,7 +28,7 @@ export const useMenuStore = defineStore('menu', () => {
     }
 
     try {
-      const response = await api.get<MenuItem[]>(`/menu/tree/${langId}`)
+      const response = await api.get<MenuItem[]>(`/menus`)
 
       if (response.success && response.data) {
         const tree = buildMenuTree(response.data)
@@ -67,7 +68,7 @@ export const useMenuStore = defineStore('menu', () => {
 
   const fetchMenuItem = async (id: number) => {
     try {
-      const response = await api.get<MenuItem>(`/menu/${id}`)
+      const response = await api.get<MenuItem>(`/menus/${id}`)
 
       if (response.success && response.data) {
         return response.data
@@ -82,7 +83,7 @@ export const useMenuStore = defineStore('menu', () => {
 
   const addMenuItem = async (data: MenuForm): Promise<{ success: boolean; id?: number }> => {
     try {
-      const response = await api.post<{ item_id: number }>('/menu', data)
+      const response = await api.post<{ item_id: number }>('/menus', data)
 
       if (response.success && response.data) {
         await refreshLanguageCache(data.lang_id)
@@ -98,7 +99,7 @@ export const useMenuStore = defineStore('menu', () => {
 
   const updateMenuItem = async (id: number, data: Partial<MenuForm>): Promise<boolean> => {
     try {
-      const response = await api.put(`/menu/${id}`, data)
+      const response = await api.put(`/menus/${id}`, data)
 
       if (response.success) {
         const item = menuItems.value.find(m => m.item_id === id)
@@ -117,7 +118,7 @@ export const useMenuStore = defineStore('menu', () => {
 
   const deleteMenuItem = async (id: number): Promise<boolean> => {
     try {
-      const response = await api.delete(`/menu/${id}`)
+      const response = await api.delete(`/menus/${id}`)
 
       if (response.success) {
         menuItems.value = menuItems.value.filter(m => m.item_id !== id)
@@ -138,7 +139,7 @@ export const useMenuStore = defineStore('menu', () => {
 
   const reorderMenu = async (id: number, direction: 'up' | 'down'): Promise<boolean> => {
     try {
-      const response = await api.post(`/menu/${id}/reorder`, { direction })
+      const response = await api.put(`/menus/${id}/order`, { direction })
       return response.success
     } catch (error) {
       console.error('Failed to reorder menu:', error)
@@ -148,7 +149,7 @@ export const useMenuStore = defineStore('menu', () => {
 
   const refreshLanguageCache = async (langId: number) => {
     try {
-      const response = await api.get<MenuItem[]>(`/menu/tree/${langId}`)
+      const response = await api.get<MenuItem[]>(`/menus`)
 
       if (response.success && response.data) {
         const tree = buildMenuTree(response.data)

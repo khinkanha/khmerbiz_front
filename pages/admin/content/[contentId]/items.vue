@@ -253,9 +253,9 @@ const handleSaveItem = async () => {
 
     let result: boolean | { success: boolean; id?: number }
     if (editingItem.value) {
-      result = await contentStore.updateItem(editingItem.value.item_id, data)
+      result = await contentStore.updateItem(contentId.value, editingItem.value.item_id, data)
     } else {
-      result = await contentStore.saveItem(data)
+      result = await contentStore.saveItem(contentId.value, data)
     }
 
     if (result === true || (typeof result === 'object' && result.success)) {
@@ -278,7 +278,7 @@ const confirmDelete = (item: any) => {
 }
 
 const deleteItem = async (id: number) => {
-  await contentStore.deleteItem(id)
+  await contentStore.deleteItem(contentId.value, id)
 }
 
 onMounted(async () => {

@@ -119,7 +119,7 @@ export const useContentStore = defineStore('content', () => {
     }
   }
 
-  const saveItem = async (data: ItemForm): Promise<{ success: boolean; id?: number }> => {
+  const saveItem = async (contentId: number, data: ItemForm): Promise<{ success: boolean; id?: number }> => {
     try {
       const formData = new FormData()
       formData.append('title', data.title)
@@ -142,7 +142,7 @@ export const useContentStore = defineStore('content', () => {
         formData.append('is_feature', String(data.is_feature ? 1 : 0))
       }
 
-      const response = await api.post<{ item_id: number }>(`/content/items`, formData)
+      const response = await api.post<{ item_id: number }>(`/content/${contentId}/items`, formData)
 
       if (response.success && response.data) {
         return { success: true, id: response.data.item_id }
@@ -155,7 +155,7 @@ export const useContentStore = defineStore('content', () => {
     }
   }
 
-  const updateItem = async (id: number, data: Partial<ItemForm>): Promise<boolean> => {
+  const updateItem = async (contentId: number, id: number, data: Partial<ItemForm>): Promise<boolean> => {
     try {
       const formData = new FormData()
       if (data.title) {
@@ -180,7 +180,7 @@ export const useContentStore = defineStore('content', () => {
         formData.append('is_feature', String(data.is_feature ? 1 : 0))
       }
 
-      const response = await api.put(`/content/items/${id}`, formData)
+      const response = await api.put(`/content/${contentId}/items/${id}`, formData)
       return response.success
     } catch (error) {
       console.error('Failed to update item:', error)
@@ -188,9 +188,9 @@ export const useContentStore = defineStore('content', () => {
     }
   }
 
-  const deleteItem = async (id: number): Promise<boolean> => {
+  const deleteItem = async (contentId: number, id: number): Promise<boolean> => {
     try {
-      const response = await api.delete(`/content/items/${id}`)
+      const response = await api.delete(`/content/${contentId}/items/${id}`)
       if (response.success) {
         contentItems.value = contentItems.value.filter(i => i.item_id !== id)
         return true
@@ -226,9 +226,9 @@ export const useContentStore = defineStore('content', () => {
     }
   }
 
-  const fetchNewsDetail = async (newsId: number) => {
+  const fetchNewsDetail = async (contentId: number, newsId: number) => {
     try {
-      const response = await api.get<News>(`/news/${newsId}`)
+      const response = await api.get<News>(`/content/${contentId}/news/${newsId}`)
 
       if (response.success && response.data) {
         currentNews.value = response.data
@@ -238,7 +238,7 @@ export const useContentStore = defineStore('content', () => {
     }
   }
 
-  const saveNews = async (data: NewsForm): Promise<{ success: boolean; id?: number }> => {
+  const saveNews = async (contentId: number, data: NewsForm): Promise<{ success: boolean; id?: number }> => {
     try {
       const formData = new FormData()
       formData.append('title', data.title)
@@ -251,7 +251,7 @@ export const useContentStore = defineStore('content', () => {
         formData.append('publish_date', data.publish_date)
       }
 
-      const response = await api.post<{ news_id: number }>(`/news`, formData)
+      const response = await api.post<{ news_id: number }>(`/content/${contentId}/news`, formData)
 
       if (response.success && response.data) {
         return { success: true, id: response.data.news_id }
@@ -264,7 +264,7 @@ export const useContentStore = defineStore('content', () => {
     }
   }
 
-  const updateNews = async (id: number, data: Partial<NewsForm>): Promise<boolean> => {
+  const updateNews = async (contentId: number, id: number, data: Partial<NewsForm>): Promise<boolean> => {
     try {
       const formData = new FormData()
       if (data.title) {
@@ -283,7 +283,7 @@ export const useContentStore = defineStore('content', () => {
         formData.append('publish_date', data.publish_date)
       }
 
-      const response = await api.put(`/news/${id}`, formData)
+      const response = await api.put(`/content/${contentId}/news/${id}`, formData)
       return response.success
     } catch (error) {
       console.error('Failed to update news:', error)
@@ -291,9 +291,9 @@ export const useContentStore = defineStore('content', () => {
     }
   }
 
-  const deleteNews = async (id: number): Promise<boolean> => {
+  const deleteNews = async (contentId: number, id: number): Promise<boolean> => {
     try {
-      const response = await api.delete(`/news/${id}`)
+      const response = await api.delete(`/content/${contentId}/news/${id}`)
       if (response.success) {
         newsList.value = newsList.value.filter(n => n.news_id !== id)
         return true
@@ -312,7 +312,7 @@ export const useContentStore = defineStore('content', () => {
     marker?: string
   }): Promise<boolean> => {
     try {
-      const response = await api.post(`/content/${contentId}/map`, location)
+      const response = await api.put(`/content/${contentId}/map`, location)
       return response.success
     } catch (error) {
       console.error('Failed to save map location:', error)

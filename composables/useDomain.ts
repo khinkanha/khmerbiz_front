@@ -51,7 +51,7 @@ export const useDomain = () => {
     if (!currentLanguage.value) return
 
     try {
-      const response = await api.get<MenuItem[]>(`/menu/tree/${currentLanguage.value.lang_id}`)
+      const response = await api.get<MenuItem[]>(`/site/menu`)
       if (response.success && response.data) {
         menuTree.value = buildMenuTree(response.data)
       }

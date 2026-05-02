@@ -47,8 +47,8 @@ const statusText = computed(() => {
 const handleAction = async (action: string) => {
   if (!confirm(`Are you sure to ${action}?`)) return
   try {
-    await api.post(`/super/domains/${domainId.value}/${action}`, {})
-    const res = await api.get(`/super/domains/${domainId.value}`)
+    await api.put(`/domains/${domainId.value}/status`, { status: action === 'activate' ? 1 : action === 'suspend' ? 2 : 3 })
+    const res = await api.get(`/domains/${domainId.value}`)
     domain.value = res.data
   } catch (e) {
     console.error(e)
@@ -57,7 +57,7 @@ const handleAction = async (action: string) => {
 
 onMounted(async () => {
   try {
-    const res = await api.get(`/super/domains/${domainId.value}`)
+    const res = await api.get(`/domains/${domainId.value}`)
     domain.value = res.data
   } catch (e) {
     console.error(e)

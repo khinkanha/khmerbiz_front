@@ -90,7 +90,7 @@ const flatMenuItems = computed(() => {
     }
     return result
   }
-  return flatten([...menuStore.menuTree])
+  return flatten([...menuStore.menuItems])
 })
 
 const getLanguageByLangId = (langId: number): Language | undefined => {
@@ -121,11 +121,10 @@ const confirmDelete = async (item: any) => {
 }
 
 onMounted(async () => {
-  if (domainStore.languages.length > 0) {
-    selectedLangId.value = domainStore.languages[0].lang_id
+ 
     loading.value = true
-    await menuStore.fetchMenuTree(selectedLangId.value)
+    await menuStore.fetchMenuItems()
     loading.value = false
-  }
+ 
 })
 </script>

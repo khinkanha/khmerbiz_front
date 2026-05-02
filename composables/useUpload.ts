@@ -12,7 +12,7 @@ export const useUpload = () => {
     folder: string = 'uploads'
   ): Promise<PresignedUrlResponse | null> => {
     try {
-      const response = await api.post<PresignedUrlResponse>('/media/presigned', {
+      const response = await api.post<PresignedUrlResponse>('/media/upload-url', {
         fileName,
         fileType,
         folder,

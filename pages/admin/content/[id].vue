@@ -150,9 +150,11 @@ definePageMeta({
 
 import { useContentStore } from '~/stores/content'
 import { useDomainStore } from '~/stores/domain'
+import { useAuthStore } from '~/stores/auth'
 
 const contentStore = useContentStore()
 const domainStore = useDomainStore()
+const authStore = useAuthStore()
 const { t } = useI18n()
 const router = useRouter()
 const route = useRoute()
@@ -243,7 +245,7 @@ const handleSave = async () => {
 }
 
 onMounted(async () => {
-  await domainStore.resolveDomain()
+  await domainStore.resolveDomain(authStore.user?.domain_id)
 
   if (domainStore.languages.length > 0) {
     form.value.lang_id = domainStore.languages[0].lang_id
