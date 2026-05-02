@@ -22,7 +22,6 @@ export default defineNuxtConfig(<any>{
     public: {
       apiBaseUrl: 'http://khmerbiz-api.localhost/api/v1',
       photoUrl: 'https://khmer.sgp1.digitaloceanspaces.com/',
-      siteUrl: 'https://khmer.biz',
     },
   },
 
