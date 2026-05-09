@@ -68,19 +68,19 @@
                   />
                 </ClientOnly>
               </div>
-
               <div class="form-group">
-                <label for="language">{{ $t('settings.language') }} *</label>
+                <label for="menu">{{ $t('menuManager.menuName') }} *</label>
                 <Dropdown
-                  id="language"
-                  v-model="form.lang_id"
-                  :options="[...domainStore.languages]"
-                  optionLabel="lang_name"
-                  optionValue="lang_id"
-                  :placeholder="$t('settings.language')"
-                  :class="{ 'p-invalid': errors.lang_id }"
+                  id="menu"
+                  v-model="form.menu_id"
+                  :options="menuOptions"
+                  optionLabel="item_name"
+                  optionValue="item_id"
+                  :placeholder="$t('menuManager.selectMenu')"
+                  :class="{ 'p-invalid': errors.menu_id }"
+                  showClear
                 />
-                <small v-if="errors.lang_id" class="p-error">{{ errors.lang_id }}</small>
+                <small v-if="errors.menu_id" class="p-error">{{ errors.menu_id }}</small>
               </div>
 
               <div class="form-group">
@@ -151,10 +151,12 @@ definePageMeta({
 import { useContentStore } from '~/stores/content'
 import { useDomainStore } from '~/stores/domain'
 import { useAuthStore } from '~/stores/auth'
+import { useMenuStore } from '~/stores/menu'
 
 const contentStore = useContentStore()
 const domainStore = useDomainStore()
 const authStore = useAuthStore()
+const menuStore = useMenuStore()
 const { t } = useI18n()
 const router = useRouter()
 const route = useRoute()
@@ -171,6 +173,7 @@ const form = ref({
   description: '',
   content_type: ContentType.ARTICLE,
   lang_id: null as number | null,
+  menu_id: null as number | null,
   status: 0 as boolean | string | number | undefined,
 })
 
@@ -187,6 +190,29 @@ const contentTypeOptions = [
   { label: 'Map', value: ContentType.MAP },
 ]
 
+const menuOptions = computed(() => {
+  const flatten = (items: any[], prefix = ''): any[] => {
+    const result: any[] = []
+    for (const item of items) {
+      const label = prefix + (item.item_name || '')
+      result.push({ item_id: item.item_id, item_name: label, lang_id: item.lang_id })
+      if (item.children?.length) {
+        result.push(...flatten(item.children, label + ' → '))
+      }
+    }
+    return result
+  }
+  return flatten([...menuStore.menuTree])
+})
+
+watch(() => form.value.menu_id, (menuId) => {
+  if (menuId == null) return
+  const selected = menuOptions.value.find((opt: any) => opt.item_id === menuId)
+  if (selected?.lang_id) {
+    form.value.lang_id = selected.lang_id
+  }
+})
+
 const validateForm = (): boolean => {
   errors.value = {}
 
@@ -200,6 +226,10 @@ const validateForm = (): boolean => {
 
   if (form.value.lang_id === null) {
     errors.value.lang_id = t('validation.required')
+  }
+
+  if (form.value.menu_id === null) {
+    errors.value.menu_id = t('validation.required')
   }
 
   return Object.keys(errors.value).length === 0
@@ -223,7 +253,7 @@ const handleSave = async () => {
         description: form.value.description,
         content_type: form.value.content_type,
         lang_id: form.value.lang_id!,
-        menu_id: 0,
+        menu_id: form.value.menu_id!,
       })
     } else {
       result = await contentStore.updateContent(contentId.value!, {
@@ -246,10 +276,7 @@ const handleSave = async () => {
 
 onMounted(async () => {
   await domainStore.resolveDomain(authStore.user?.domain_id)
-
-  if (domainStore.languages.length > 0) {
-    form.value.lang_id = domainStore.languages[0].lang_id
-  }
+  await menuStore.fetchAllMenuTree()
 
   if (!isNewContent.value) {
     await contentStore.fetchContent(contentId.value!)
@@ -266,6 +293,7 @@ onMounted(async () => {
         description: desc,
         content_type: raw.content_type,
         lang_id: raw.lang_id,
+        menu_id: raw.menu_id ?? null,
         status: raw.status,
       }
     }

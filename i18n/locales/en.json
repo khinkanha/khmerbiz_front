@@ -94,7 +94,8 @@
     "edit": "Edit",
     "delete": "Delete",
     "moveUp": "Move Up",
-    "moveDown": "Move Down"
+    "moveDown": "Move Down",
+    "selectMenu": "Select Menu"
   },
   "settings": {
     "language": "Language",

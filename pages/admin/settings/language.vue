@@ -56,11 +56,11 @@ const adding = ref(false)
 const langForm = ref({ lang_name: '', flag_icon: '' })
 
 const flagOptions = [
-  { label: 'ខ្មែរ (KH)', value: 'kh.png' },
-  { label: 'English (EN)', value: 'en.png' },
-  { label: '中文 (CH)', value: 'ch.png' },
-  { label: 'ไทย (TH)', value: 'th.png' },
-  { label: 'Tiếng Việt (VN)', value: 'vn.png' },
+  { label: 'ខ្មែរ (KH)', value: 'kh.svg' },
+  { label: 'English (EN)', value: 'en.svg' },
+  { label: '中文 (CH)', value: 'ch.svg' },
+  { label: 'ไทย (TH)', value: 'th.svg' },
+  { label: 'Tiếng Việt (VN)', value: 'vn.svg' },
 ]
 
 const handleAddLanguage = async () => {
@@ -70,7 +70,7 @@ const handleAddLanguage = async () => {
     const selectedFlag = flagOptions.find(f => f.value === langForm.value.flag_icon)
     await settingStore.addLanguage({
       lang_name: langForm.value.lang_name,
-      lang_code: selectedFlag?.value?.replace('.png', '') || 'kh',
+      lang_code: selectedFlag?.value?.replace('.svg', '') || 'kh',
       flag_icon: langForm.value.flag_icon,
     })
     langForm.value = { lang_name: '', flag_icon: '' }

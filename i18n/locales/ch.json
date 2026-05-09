@@ -94,7 +94,8 @@
     "edit": "编辑",
     "delete": "删除",
     "moveUp": "上移",
-    "moveDown": "下移"
+    "moveDown": "下移",
+    "selectMenu": "Select Menu"
   },
   "settings": {
     "logoSetting": "标志设置",

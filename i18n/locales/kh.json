@@ -95,7 +95,8 @@
     "edit": "កែសម្រួល",
     "delete": "លុប",
     "moveUp": "ផ្លាស់ទីឡើងលើ",
-    "moveDown": "ផ្លាស់ទីចុះក្រោម"
+    "moveDown": "ផ្លាស់ទីចុះក្រោម",
+    "selectMenu": "Select Menu"
   },
   "settings": {
     "language": "ភាសា",

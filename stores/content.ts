@@ -59,6 +59,7 @@ export const useContentStore = defineStore('content', () => {
 
       if (response.success && response.data) {
         currentContent.value = response.data
+        console.log('Fetched content:', response.data)
       }
     } catch (error) {
       console.error('Failed to fetch content:', error)

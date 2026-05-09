@@ -3,114 +3,57 @@
     <div class="page-header">
       <h1 class="page-title">{{ $t('contentManager.title') }}</h1>
       <div class="page-actions">
-        <Button
-          :label="$t('contentManager.addNew')"
+        <Button :label="$t('contentManager.addNew')" icon="pi pi-plus" @click="$router.push('/admin/content/new')" />
+        <!-- <Button
+          label="Test"
           icon="pi pi-plus"
-          @click="$router.push('/admin/content/new')"
+          @click="$router.push('/test')"
         />
+        <NuxtLink to="/test">Go to Test</NuxtLink>
+        -->
       </div>
     </div>
 
     <Card class="filter-card">
       <template #content>
         <div class="filter-row">
-          <InputText
-            v-model="searchQuery"
-            :placeholder="$t('contentManager.search')"
-            class="search-input"
-          />
-          <Dropdown
-            v-model="contentTypeFilter"
-            :options="contentTypeOptions"
-            optionLabel="label"
-            optionValue="value"
-            :placeholder="$t('contentManager.contentType')"
-            class="filter-dropdown"
-            showClear
-          />
-          <Dropdown
-            v-model="statusFilter"
-            :options="statusOptions"
-            optionLabel="label"
-            optionValue="value"
-            :placeholder="$t('contentManager.status')"
-            class="filter-dropdown"
-            showClear
-          />
-          <Button
-            :label="$t('contentManager.btnsearch')"
-            icon="pi pi-search"
-            @click="handleSearch"
-          />
+          <InputText v-model="searchQuery" :placeholder="$t('contentManager.search')" class="search-input" />
+          <Dropdown v-model="contentTypeFilter" :options="contentTypeOptions" optionLabel="label" optionValue="value"
+            :placeholder="$t('contentManager.contentType')" class="filter-dropdown" showClear />
+          <Dropdown v-model="statusFilter" :options="statusOptions" optionLabel="label" optionValue="value"
+            :placeholder="$t('contentManager.status')" class="filter-dropdown" showClear />
+          <Button :label="$t('contentManager.btnsearch')" icon="pi pi-search" @click="handleSearch" />
         </div>
       </template>
     </Card>
 
     <Card class="content-list-card">
       <template #content>
-        <DataTable
-          :value="contentStore.contents"
-          :loading="loading"
-          :paginator="true"
-          :rows="pagination.limit"
-          :totalRecords="pagination.total"
-          :lazy="true"
-          @page="onPageChange"
-          :rowsPerPageOptions="[10, 20, 50]"
-          stripedRows
-          class="content-table"
-        >
+        <DataTable :value="contentStore.contents" :loading="loading" :paginator="true" :rows="pagination.limit"
+          :totalRecords="pagination.total" :lazy="true" @page="onPageChange" :rowsPerPageOptions="[10, 20, 50]"
+          stripedRows class="content-table">
           <Column field="content_id" header="ID" :style="{ width: '80px' }" />
           <Column field="title" :header="$t('contentManager.contentTitle')" />
-          <Column
-            field="content_type"
-            :header="$t('contentManager.contentType')"
-            :style="{ width: '150px' }"
-          >
+          <Column field="content_type" :header="$t('contentManager.contentType')" :style="{ width: '150px' }">
             <template #body="{ data }">
               <Tag :value="getContentTypeLabel(data.content_type)" />
             </template>
           </Column>
-          <Column
-            field="status"
-            :header="$t('contentManager.status')"
-            :style="{ width: '120px' }"
-          >
+          <Column field="status" :header="$t('contentManager.status')" :style="{ width: '120px' }">
             <template #body="{ data }">
-              <Tag
-                :value="data.status === 1 ? $t('contentManager.published') : $t('contentManager.draft')"
-                :severity="data.status === 1 ? 'success' : 'warning'"
-              />
+              <Tag :value="data.status === 1 ? $t('contentManager.published') : $t('contentManager.draft')"
+                :severity="data.status === 1 ? 'success' : 'warning'" />
             </template>
           </Column>
-          <Column
-            :header="$t('contentManager.actions')"
-            :style="{ width: '200px' }"
-          >
+          <Column :header="$t('contentManager.actions')" :style="{ width: '200px' }">
             <template #body="{ data }">
               <div class="action-buttons">
-                <Button
-                  icon="pi pi-pencil"
-                  rounded
-                  text
-                  @click="$router.push(`/admin/content/${data.content_id}`)"
-                  v-tooltip.top="$t('contentManager.edit')"
-                />
-                <Button
-                  icon="pi pi-list"
-                  rounded
-                  text
-                  @click="$router.push(`/admin/content/${data.content_id}/items`)"
-                  v-tooltip.top="$t('contentManager.list')"
-                />
-                <Button
-                  icon="pi pi-trash"
-                  rounded
-                  text
-                  severity="danger"
-                  @click="confirmDelete(data)"
-                  v-tooltip.top="$t('contentManager.delete')"
-                />
+                <Button icon="pi pi-pencil" rounded text @click="$router.push(`/admin/content/${data.content_id}`)"
+                  v-tooltip.top="$t('contentManager.edit')" />
+                <Button icon="pi pi-list" rounded text @click="$router.push(`/admin/content/${data.content_id}/items`)"
+                  v-tooltip.top="$t('contentManager.list')" />
+                <Button icon="pi pi-trash" rounded text severity="danger" @click="confirmDelete(data)"
+                  v-tooltip.top="$t('contentManager.delete')" />
               </div>
             </template>
           </Column>

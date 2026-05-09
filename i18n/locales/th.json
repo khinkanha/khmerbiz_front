@@ -94,7 +94,8 @@
     "edit": "แก้ไข",
     "delete": "ลบ",
     "moveUp": "เลื่อนขึ้น",
-    "moveDown": "เลื่อนลง"
+    "moveDown": "เลื่อนลง",
+    "selectMenu": "Select Menu"
   },
   "settings": {
     "logoSetting": "การตั้งค่าโลโก้",

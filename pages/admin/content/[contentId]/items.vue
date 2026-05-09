@@ -8,7 +8,6 @@
         </h1>
       </div>
     </div>
-
     <div class="split-layout">
       <!-- Left: Add/Edit Form -->
       <Card class="form-card">

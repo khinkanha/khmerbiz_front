@@ -50,6 +50,7 @@ export default defineNuxtConfig(<any>{
     '/article/**': { ssr: true },
     '/news/**': { ssr: true },
     '/legal': { ssr: true },
+    '/test/**': { ssr: true },
   },
 
   app: {

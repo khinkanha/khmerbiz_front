@@ -29,11 +29,12 @@ export const useMenuStore = defineStore('menu', () => {
 
     try {
       const response = await api.get<MenuItem[]>(`/menus`)
-
-      if (response.success && response.data) {
-        const tree = buildMenuTree(response.data)
+      if (response.success && response.data ) {
+        const tree = buildMenuTree(response.data.items || response.data)
         menuTree.value = tree
+
         menuCache.value[langId] = tree
+        
       }
     } catch (error) {
       console.error('Failed to fetch menu tree:', error)
@@ -152,7 +153,7 @@ export const useMenuStore = defineStore('menu', () => {
       const response = await api.get<MenuItem[]>(`/menus`)
 
       if (response.success && response.data) {
-        const tree = buildMenuTree(response.data)
+        const tree = buildMenuTree(response.data.items || response.data)
         menuCache.value[langId] = tree
       }
     } catch (error) {
@@ -166,6 +167,18 @@ export const useMenuStore = defineStore('menu', () => {
 
   const clearCache = () => {
     menuCache.value = {}
+  }
+
+  const fetchAllMenuTree = async () => {
+    try {
+      const response = await api.get<MenuItem[]>(`/menus`)
+
+      if (response.success && response.data) {
+        menuTree.value = buildMenuTree(response.data.items || response.data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch all menu tree:', error)
+    }
   }
 
   const findMenuItemInTree = (id: number, tree: MenuItem[] = menuTree.value): MenuItem | null => {
@@ -193,6 +206,7 @@ export const useMenuStore = defineStore('menu', () => {
     deleteMenuItem,
     reorderMenu,
     clearCache,
+    fetchAllMenuTree,
     findMenuItemInTree,
   }
 })

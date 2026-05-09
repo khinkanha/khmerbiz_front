@@ -64,7 +64,7 @@ export const useDomainStore = defineStore('domain', () => {
     }
 
     try {
-      const response = await api.get<MenuItem[]>(`/site/menu`)
+      const response = await api.get<MenuItem[]>(`/menus`)
       if (response.success && response.data) {
         const tree = buildMenuTree(response.data)
         menuTree.value = tree
