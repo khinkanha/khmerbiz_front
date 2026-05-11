@@ -6,17 +6,13 @@
         <span v-else>{{ crumb.label }}</span>
       </li>
     </ol>
-
+    <div v-if="route.path === '/admin'" class="container"><br /></div>
+    <br />
     <p class="pull-right breadcrumb-actions" v-if="hasDomain">
       <button class="btn btn-default" @click="toggleLang" style="font-weight: bold">
         {{ currentLangText }}
       </button>
-      <a
-        class="btn btn-default"
-        :href="domainName"
-        target="_blank"
-        title="Click here to see your website"
-      >
+      <a class="btn btn-default" :href="'http://' + domainName" target="_blank" title="Click here to see your website">
         <i class="fa fa-globe"></i> <strong>{{ domainName }}</strong>
       </a>
     </p>
