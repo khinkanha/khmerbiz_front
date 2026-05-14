@@ -17,14 +17,21 @@ export const useDomainStore = defineStore('domain', () => {
 
   const resolveDomain = async (domainId?: number) => {
     try {
-      const endpoint = domainId ? `/site/config?domain_id=${domainId}` : '/site/config'
-      const response = await api.get<{
+      let endpoint = domainId ? `/site/config?domain_id=${domainId}` : '/site/config'
+      let response = await api.get<{
         domain: Domain
         settings: Setting
         languages: Language[]
         banners: Banner[]
         socialMedia: SocialMedia[]
       }>(endpoint)
+
+      // Fallback to /site/default when domain not found
+      if (!response.success && !domainId) {
+        const host = import.meta.client ? window.location.hostname : ''
+        const fallbackEndpoint = host ? `/site/default?domain_name=${host}` : '/site/default'
+        response = await api.get<typeof response.data>(fallbackEndpoint)
+      }
 
       if (response.success && response.data) {
         domain.value = response.data.domain
