@@ -64,6 +64,7 @@ export const useDomainStore = defineStore('domain', () => {
     if (!currentLanguage.value) return
 
     const langId = currentLanguage.value.lang_id
+    const domainId = domain.value?.domain_id
 
     if (menuCache.value[langId]) {
       menuTree.value = menuCache.value[langId]
@@ -71,9 +72,11 @@ export const useDomainStore = defineStore('domain', () => {
     }
 
     try {
-      const response = await api.get<MenuItem[]>(`/menus`)
+      const endpoint = domainId ? `/site/menu?domain_id=${domainId}` : '/site/menu'
+      const response = await api.get<MenuItem[]>(endpoint)
       if (response.success && response.data) {
-        const tree = buildMenuTree(response.data)
+        const data = response.data
+        const tree = Array.isArray(data) ? buildMenuTree(data) : data
         menuTree.value = tree
         menuCache.value[langId] = tree
       }

@@ -4,12 +4,8 @@
     <div class="top-bar">
       <div class="container top-bar-inner">
         <div class="brand" @click="goHome">
-          <img
-            v-if="settings?.logo"
-            :src="config.photoUrl+settings.logo"
-            :alt="settings?.title || 'Logo'"
-            class="brand-logo"
-          />
+          <img v-if="settings?.logo" :src="config.photoUrl + settings.logo" :alt="settings?.title || 'Logo'"
+            class="brand-logo" />
           <div v-if="settings?.title" class="brand-title">
             <h1>{{ settings.title }}</h1>
           </div>
@@ -22,27 +18,28 @@
     </div>
 
     <!-- Navigation Bar -->
-    <nav v-if="!isSitebuilder" class="nav-bar">
+    <nav class="nav-bar">
       <div class="container nav-inner">
         <ul class="nav-list" :class="{ 'mobile-open': mobileMenuOpen }">
-          <li
-            v-for="item in menuTree"
-            :key="item.item_id"
-            class="nav-item"
-            :class="{ 'has-dropdown': item.children && item.children.length > 0 }"
-          >
-            <NuxtLink :to="item.item_url || '#'" class="nav-link">
+          <li v-for="item in menuTree" :key="item.item_id" class="nav-item"
+            :class="{ 'has-dropdown': item.children && item.children.length > 0 }">
+            <a v-if="isSinglePage" :href="`#section-${item.item_id}`" class="nav-link"
+              @click.prevent="scrollToSection(item.item_id)">
+              {{ item.item_name }}
+            </a>
+            <NuxtLink v-else :to="item.item_url || '#'" class="nav-link">
               {{ item.item_name }}
             </NuxtLink>
 
             <div v-if="item.children && item.children.length > 0" class="dropdown-menu">
               <div class="dropdown-inner">
-                <NuxtLink
-                  v-for="child in item.children"
-                  :key="child.item_id"
-                  :to="child.item_url || '#'"
-                  class="dropdown-link"
-                >
+                <a v-if="isSinglePage" v-for="child in item.children" :key="child.item_id"
+                  :href="`#section-${child.item_id}`" class="dropdown-link"
+                  @click.prevent="scrollToSection(child.item_id)">
+                  {{ child.item_name }}
+                </a>
+                <NuxtLink v-else v-for="child in item.children" :key="child.item_id" :to="child.item_url || '#'"
+                  class="dropdown-link">
                   {{ child.item_name }}
                 </NuxtLink>
               </div>
@@ -69,12 +66,21 @@ import { navigateTo } from 'nuxt/app'
 
 const domainStore = useDomainStore()
 const authStore = useAuthStore()
-const config=useRuntimeConfig().public
+const config = useRuntimeConfig().public
 
 const settings = computed(() => domainStore.settings)
 const menuTree = computed(() => domainStore.menuTree)
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 const isSitebuilder = computed(() => (authStore.user?.sitebuilder ?? 0) !== 0)
+const isSinglePage = computed(() => settings.value?.page_style !== 0)
+
+const scrollToSection = (itemId: number) => {
+  const el = document.getElementById(`section-${itemId}`)
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth' })
+    mobileMenuOpen.value = false
+  }
+}
 
 const headerClass = computed(() => {
   const style = settings.value?.theme ?? 0
