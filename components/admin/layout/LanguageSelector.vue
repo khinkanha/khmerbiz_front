@@ -7,7 +7,7 @@
     >
       <img
         v-if="currentLanguage"
-        :src="`/flag/${currentLanguage.flag_icon}`"
+        :src="`/flag/${flagMap(currentLanguage.flag)}`"
         :alt="currentLanguage.lang_name"
         class="flag-icon"
       />
@@ -31,6 +31,18 @@ const domainStore = useDomainStore()
 const menuRef = ref()
 
 const currentLanguage = computed(() => domainStore.currentLanguage)
+
+const flagMap = (flag: number) => {
+  const flags: Record<number, string> = {
+    0: 'kh.svg',
+    1: 'en.svg',
+    2: 'ch.svg',
+    3: 'th.svg',
+    4: 'vn.svg',
+    5: 'fr.svg',
+  }
+  return flags[flag] || 'kh.svg'
+}
 
 const languageMenuItems = computed((): MenuItem[] => {
   return domainStore.languages.map(lang => ({

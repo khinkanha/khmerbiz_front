@@ -6,7 +6,7 @@
         <div class="brand" @click="goHome">
           <img
             v-if="settings?.logo"
-            :src="settings.logo"
+            :src="config.photoUrl+settings.logo"
             :alt="settings?.title || 'Logo'"
             class="brand-logo"
           />
@@ -69,6 +69,7 @@ import { navigateTo } from 'nuxt/app'
 
 const domainStore = useDomainStore()
 const authStore = useAuthStore()
+const config=useRuntimeConfig().public
 
 const settings = computed(() => domainStore.settings)
 const menuTree = computed(() => domainStore.menuTree)

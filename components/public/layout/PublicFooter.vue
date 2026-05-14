@@ -57,7 +57,7 @@
                 class="language-link"
                 :class="{ active: currentLanguage?.lang_id === lang.lang_id }"
               >
-                <img :src="`/flag/${lang.flag_icon}`" :alt="lang.lang_name" />
+                <img :src="`/flag/${flagMap(lang.flag)}`" :alt="lang.lang_name" />
                 {{ lang.lang_name }}
               </button>
             </div>
@@ -87,6 +87,18 @@ const currentLanguage = computed(() => domainStore.currentLanguage)
 const menuTree = computed(() => domainStore.menuTree)
 
 const currentYear = new Date().getFullYear()
+
+const flagMap = (flag: number) => {
+  const flags: Record<number, string> = {
+    0: 'kh.svg',
+    1: 'en.svg',
+    2: 'ch.svg',
+    3: 'th.svg',
+    4: 'vn.svg',
+    5: 'fr.svg',
+  }
+  return flags[flag] || 'kh.svg'
+}
 
 const setLanguage = async (langId: number) => {
   await domainStore.setLanguage(langId)
