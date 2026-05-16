@@ -1,20 +1,11 @@
 <template>
   <section class="news-section">
     <h2 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h2>
-
     <div class="news-grid">
-      <NuxtLink
-        v-for="news in items"
-        :key="news.news_id"
-        :to="`/news/${domainId}/${contentId}/${news.news_id}`"
-        class="news-card"
-      >
+      <NuxtLink v-for="news in items" :key="news.id" :to="`/news/${news.id}`"
+        class="news-card">
         <div class="news-image">
-          <img
-            v-if="news.photo"
-            :src="`${photoUrl}${news.photo}`"
-            :alt="news.title"
-          />
+          <img v-if="news.photo" :src="`${photoUrl}${news.photo}`" :alt="news.title" />
           <div v-else class="news-placeholder">
             <i class="pi pi-image"></i>
           </div>
@@ -60,7 +51,7 @@ withDefaults(defineProps<Props>(), {
 })
 
 const config = useRuntimeConfig()
-const photoUrl = config.public.photoUrl || 'https://khmer.biz'
+const photoUrl = config.public.photoUrl
 
 const formatDate = (date: string | null) => {
   if (!date) return ''

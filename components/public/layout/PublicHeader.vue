@@ -27,7 +27,8 @@
               @click.prevent="scrollToSection(item.item_id)">
               {{ item.item_name }}
             </a>
-            <NuxtLink v-else :to="item.item_url || '#'" class="nav-link">
+            <NuxtLink v-else :to="`/pages/${domain?.domain_id}/${item.item_id}`" class="nav-link"
+              :class="{ 'router-link-active': isMenuActive(item) }">
               {{ item.item_name }}
             </NuxtLink>
 
@@ -38,8 +39,10 @@
                   @click.prevent="scrollToSection(child.item_id)">
                   {{ child.item_name }}
                 </a>
-                <NuxtLink v-else v-for="child in item.children" :key="child.item_id" :to="child.item_url || '#'"
-                  class="dropdown-link">
+                <NuxtLink v-else v-for="child in item.children" :key="child.item_id"
+                  :to="`/pages/${domain?.domain_id}/${child.item_id}`"
+                  class="dropdown-link"
+                  :class="{ active: isChildActive(child.item_id) }">
                   {{ child.item_name }}
                 </NuxtLink>
               </div>
@@ -67,8 +70,10 @@ import { navigateTo } from 'nuxt/app'
 const domainStore = useDomainStore()
 const authStore = useAuthStore()
 const config = useRuntimeConfig().public
+const route = useRoute()
 
 const settings = computed(() => domainStore.settings)
+const domain = computed(() => domainStore.domain)
 const menuTree = computed(() => domainStore.menuTree)
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 const isSitebuilder = computed(() => (authStore.user?.sitebuilder ?? 0) !== 0)
@@ -96,6 +101,21 @@ const toggleMobileMenu = () => {
 const goHome = () => {
   navigateTo('/')
 }
+
+const isMenuActive = (item: any) => {
+  const path = `/pages/${domain.value?.domain_id}/${item.item_id}`
+  if (route.path === path) return true
+  // If viewing a child page, highlight the parent
+  if (item.children?.length) {
+    return item.children.some((child: any) => isChildActive(child.item_id))
+  }
+  return false
+}
+
+const isChildActive = (childId: number) => {
+  const path = `/pages/${domain.value?.domain_id}/${childId}`
+  return route.path === path
+}
 </script>
 
 <style scoped>
@@ -120,7 +140,8 @@ const goHome = () => {
 .top-bar-inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  position: relative;
 }
 
 .brand {
@@ -128,6 +149,11 @@ const goHome = () => {
   align-items: center;
   gap: 1rem;
   cursor: pointer;
+}
+
+.top-actions {
+  position: absolute;
+  right: 1rem;
 }
 
 .brand-logo {
@@ -191,6 +217,7 @@ const goHome = () => {
   text-decoration: none;
   font-size: 0.875rem;
   font-weight: 500;
+  font-family: var(--font-moul, 'Moul', serif);
   transition: background-color 0.2s, color 0.2s;
   white-space: nowrap;
   height: 100%;
@@ -245,6 +272,12 @@ const goHome = () => {
 .dropdown-link:hover {
   background-color: var(--primary-color, #3b82f6);
   color: white;
+}
+
+.dropdown-link.active {
+  background-color: var(--primary-color, #3b82f6);
+  color: white;
+  font-weight: 600;
 }
 
 /* Login Button */

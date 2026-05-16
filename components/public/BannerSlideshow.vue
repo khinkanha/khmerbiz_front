@@ -68,6 +68,7 @@ const photoUrl = config.public.photoUrl || 'https://khmer.biz'
   position: relative;
   width: 100%;
   overflow: hidden;
+  border-radius: 30px;
 }
 
 .banner-link {
@@ -76,8 +77,6 @@ const photoUrl = config.public.photoUrl || 'https://khmer.biz'
 
 .banner-image {
   width: 100%;
-  aspect-ratio: 21/7;
-  object-fit: cover;
   display: block;
 }
 
@@ -119,8 +118,8 @@ const photoUrl = config.public.photoUrl || 'https://khmer.biz'
 }
 
 @media (max-width: 768px) {
-  .banner-image {
-    aspect-ratio: 16/8;
+  .banner-slide {
+    border-radius: 12px;
   }
 
   .banner-caption {

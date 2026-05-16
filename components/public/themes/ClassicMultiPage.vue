@@ -13,277 +13,238 @@
         </div>
 
         <template v-else>
-          <!-- Featured News / Important Events Section -->
-          <section v-if="allNews.length > 0" class="section featured-section">
+          <!-- News Section -->
+          <section v-if="allNews.length > 0" class="section news-section">
             <div class="section-header">
               <h2 class="section-title">
                 <span class="title-bar"></span>
                 {{ $t('contentManager.latestNews') }}
               </h2>
             </div>
-            <div class="featured-layout">
-              <!-- Large Featured Card -->
-              <NuxtLink
-                v-if="allNews[0]"
-                :to="`/news/${domain.domain_id}/${allNews[0].content_id}/${allNews[0].news_id}`"
-                class="featured-main-card"
+
+            <!-- Featured News: First 2 as large cards -->
+            <div v-if="paginatedNews.length > 0" class="featured-grid">
+              <a
+                v-for="news in paginatedNews.slice(0, 2)"
+                :key="news.news_id"
+                href="#"
+                class="featured-card"
+                @click.prevent="goToNews(news)"
               >
-                <div class="featured-img-wrap">
+                <div class="featured-card-img">
                   <img
-                    v-if="allNews[0].photo"
-                    :src="`${photoUrl}${allNews[0].photo}`"
-                    :alt="allNews[0].title"
+                    v-if="news.photo"
+                    :src="`${photoUrl}${news.photo}`"
+                    :alt="news.title"
                   />
                   <div v-else class="img-placeholder">
                     <i class="pi pi-image"></i>
                   </div>
                 </div>
-                <div class="featured-info">
-                  <h3>{{ allNews[0].title }}</h3>
-                  <p v-if="allNews[0].short_description">{{ allNews[0].short_description }}</p>
-                  <span v-if="allNews[0].publish_date" class="news-date">
-                    <i class="pi pi-calendar"></i>
-                    {{ formatDate(allNews[0].publish_date) }}
-                  </span>
+                <div class="featured-card-body">
+                  <h4 class="media-heading">
+                    <a href="#" @click.prevent="goToNews(news)">
+                      {{ news.title }}
+                    </a>
+                  </h4>
+                  <p v-if="news.short_description" class="featured-excerpt">
+                    {{ news.short_description }}
+                  </p>
+                  <p class="date">
+                    <i class="fa fa-clock-o"></i>
+                    {{ formatDate(news.publish_date) }}
+                  </p>
                 </div>
-              </NuxtLink>
+              </a>
+            </div>
 
-              <!-- Side News List -->
-              <div class="featured-side-list">
-                <NuxtLink
-                  v-for="news in allNews.slice(1, 5)"
-                  :key="news.news_id"
-                  :to="`/news/${domain.domain_id}/${news.content_id}/${news.news_id}`"
-                  class="side-news-item"
-                >
-                  <div class="side-thumb">
-                    <img
-                      v-if="news.photo"
-                      :src="`${photoUrl}${news.photo}`"
-                      :alt="news.title"
-                    />
-                    <div v-else class="img-placeholder small">
-                      <i class="pi pi-image"></i>
-                    </div>
+            <!-- Media List: Remaining news -->
+            <div v-if="paginatedNews.length > 2" class="news-media-list">
+              <template v-for="(news, index) in paginatedNews.slice(2)" :key="news.news_id">
+                <div class="news-media-item">
+                  <div class="media-left">
+                    <a href="#" @click.prevent="goToNews(news)">
+                      <img
+                        v-if="news.photo"
+                        :src="`${photoUrl}${news.photo}`"
+                        :alt="news.title"
+                      />
+                      <div v-else class="img-placeholder small">
+                        <i class="pi pi-image"></i>
+                      </div>
+                    </a>
                   </div>
-                  <div class="side-info">
-                    <h4>{{ news.title }}</h4>
-                    <span v-if="news.publish_date" class="news-date">
-                      <i class="pi pi-calendar"></i>
+                  <div class="media-body">
+                    <h4 class="media-heading">
+                      <a href="#" @click.prevent="goToNews(news)">
+                        {{ news.title }}
+                      </a>
+                    </h4>
+                    <p v-if="news.short_description" class="media-excerpt">
+                      {{ news.short_description }}
+                    </p>
+                    <p class="date">
+                      <i class="fa fa-clock-o"></i>
                       {{ formatDate(news.publish_date) }}
-                    </span>
+                    </p>
                   </div>
-                </NuxtLink>
-              </div>
-            </div>
-          </section>
-
-          <!-- Photo Gallery Strip -->
-          <section v-if="allPhotos.length > 0" class="section gallery-strip-section">
-            <div class="section-header">
-              <h2 class="section-title">
-                <span class="title-bar"></span>
-                {{ $t('contentManager.photo') }}
-              </h2>
-            </div>
-            <div class="gallery-strip">
-              <div
-                v-for="item in allPhotos.slice(0, 8)"
-                :key="item.item_id"
-                class="gallery-thumb"
-                @click="openLightbox(item)"
-              >
-                <img :src="`${photoUrl}${item.photo}`" :alt="item.title || ''" />
-              </div>
-            </div>
-
-            <!-- Lightbox -->
-            <Dialog
-              v-model:visible="showLightbox"
-              :style="{ width: '90vw' }"
-              :modal="true"
-              :showHeader="false"
-              :closable="true"
-              contentClass="lightbox-content"
-            >
-              <img
-                v-if="lightboxItem"
-                :src="`${photoUrl}${lightboxItem.photo}`"
-                :alt="lightboxItem.title || ''"
-                class="lightbox-img"
-              />
-              <div v-if="lightboxItem?.title" class="lightbox-caption">
-                {{ lightboxItem.title }}
-              </div>
-            </Dialog>
-          </section>
-
-          <!-- Content Layout: Main + Sidebar -->
-          <div class="content-layout">
-            <!-- Main Column -->
-            <div class="content-main">
-              <template v-for="menuItem in menuTree" :key="menuItem.item_id">
-                <!-- Menu items with children -->
-                <section
-                  v-if="menuItem.children && menuItem.children.length > 0"
-                  class="section"
-                  :id="`section-${menuItem.item_id}`"
-                >
-                  <div class="section-header">
-                    <h2 class="section-title">
-                      <span class="title-bar"></span>
-                      {{ menuItem.item_name }}
-                    </h2>
-                  </div>
-
-                  <!-- Render each child's content -->
-                  <div
-                    v-for="child in menuItem.children"
-                    :key="child.item_id"
-                    :id="`section-${child.item_id}`"
-                    class="sub-section"
-                  >
-                    <template v-if="getContentForMenuItem(child.item_id)">
-                      <!-- NEWS type -->
-                      <NewsSection
-                        v-if="getContentType(child.item_id) === ContentType.NEWS"
-                        :items="getContentForMenuItem(child.item_id)!.news"
-                        :domain-id="domain.domain_id"
-                        :content-id="getContentForMenuItem(child.item_id)!.content.content_id"
-                        :section-title="child.item_name || ''"
-                      />
-                      <!-- PHOTO type -->
-                      <PhotoGallery
-                        v-else-if="getContentType(child.item_id) === ContentType.PHOTO"
-                        :items="getContentForMenuItem(child.item_id)!.items"
-                        :section-title="child.item_name || ''"
-                      />
-                      <!-- VIDEO type -->
-                      <VideoSection
-                        v-else-if="getContentType(child.item_id) === ContentType.VIDEO"
-                        :items="getContentForMenuItem(child.item_id)!.items"
-                        :section-title="child.item_name || ''"
-                      />
-                      <!-- MAP type -->
-                      <MapDisplay
-                        v-else-if="getContentType(child.item_id) === ContentType.MAP"
-                        :map-data="parseMapData(getContentForMenuItem(child.item_id)!.content)"
-                        :section-title="child.item_name || ''"
-                      />
-                      <!-- DOCUMENT type -->
-                      <DocumentSection
-                        v-else-if="getContentType(child.item_id) === ContentType.DOCUMENT"
-                        :items="getContentForMenuItem(child.item_id)!.items"
-                        :section-title="child.item_name || ''"
-                      />
-                      <!-- ARTICLE type (default) -->
-                      <ArticleSection
-                        v-else
-                        :content="getContentForMenuItem(child.item_id)!.content"
-                        :show-title="true"
-                      />
-                    </template>
-                  </div>
-                </section>
-
-                <!-- Menu items without children -->
-                <section
-                  v-else
-                  class="section"
-                  :id="`section-${menuItem.item_id}`"
-                >
-                  <div class="section-header">
-                    <h2 class="section-title">
-                      <span class="title-bar"></span>
-                      {{ menuItem.item_name }}
-                    </h2>
-                  </div>
-
-                  <template v-if="getContentForMenuItem(menuItem.item_id)">
-                    <NewsSection
-                      v-if="getContentType(menuItem.item_id) === ContentType.NEWS"
-                      :items="getContentForMenuItem(menuItem.item_id)!.news"
-                      :domain-id="domain.domain_id"
-                      :content-id="getContentForMenuItem(menuItem.item_id)!.content.content_id"
-                    />
-                    <PhotoGallery
-                      v-else-if="getContentType(menuItem.item_id) === ContentType.PHOTO"
-                      :items="getContentForMenuItem(menuItem.item_id)!.items"
-                    />
-                    <VideoSection
-                      v-else-if="getContentType(menuItem.item_id) === ContentType.VIDEO"
-                      :items="getContentForMenuItem(menuItem.item_id)!.items"
-                    />
-                    <MapDisplay
-                      v-else-if="getContentType(menuItem.item_id) === ContentType.MAP"
-                      :map-data="parseMapData(getContentForMenuItem(menuItem.item_id)!.content)"
-                    />
-                    <DocumentSection
-                      v-else-if="getContentType(menuItem.item_id) === ContentType.DOCUMENT"
-                      :items="getContentForMenuItem(menuItem.item_id)!.items"
-                    />
-                    <ArticleSection
-                      v-else
-                      :content="getContentForMenuItem(menuItem.item_id)!.content"
-                    />
-                  </template>
-                </section>
+                </div>
+                <hr v-if="index < paginatedNews.slice(2).length - 1" class="news-separator" />
               </template>
             </div>
 
-            <!-- Sidebar -->
-            <aside class="content-sidebar">
-              <!-- Latest News Widget -->
-              <div v-if="allNews.length > 0" class="sidebar-widget">
-                <h3 class="widget-title">
+            <!-- Pagination -->
+            <div v-if="totalPages > 1" class="pagination-wrap">
+              <ul class="pagination-list">
+                <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                  <button class="page-link" :disabled="currentPage === 1" @click="currentPage = 1">
+                    &laquo;
+                  </button>
+                </li>
+                <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                  <button class="page-link" :disabled="currentPage === 1" @click="currentPage--">
+                    &lsaquo;
+                  </button>
+                </li>
+                <li
+                  v-for="page in visiblePages"
+                  :key="page"
+                  class="page-item"
+                  :class="{ active: page === currentPage }"
+                >
+                  <button class="page-link" @click="currentPage = page">{{ page }}</button>
+                </li>
+                <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                  <button class="page-link" :disabled="currentPage === totalPages" @click="currentPage++">
+                    &rsaquo;
+                  </button>
+                </li>
+                <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                  <button class="page-link" :disabled="currentPage === totalPages" @click="currentPage = totalPages">
+                    &raquo;
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </section>
+
+          <!-- Content Sections from Menu Tree -->
+          <template v-for="menuItem in menuTree" :key="menuItem.item_id">
+            <!-- Menu items with children -->
+            <section
+              v-if="menuItem.children && menuItem.children.length > 0"
+              class="section"
+              :id="`section-${menuItem.item_id}`"
+            >
+              <div class="section-header">
+                <h2 class="section-title">
                   <span class="title-bar"></span>
-                  {{ $t('contentManager.latestNews') }}
-                </h3>
-                <div class="sidebar-news-list">
-                  <NuxtLink
-                    v-for="news in allNews.slice(0, 6)"
-                    :key="news.news_id"
-                    :to="`/news/${domain.domain_id}/${news.content_id}/${news.news_id}`"
-                    class="sidebar-news-item"
-                  >
-                    <img
-                      v-if="news.photo"
-                      :src="`${photoUrl}${news.photo}`"
-                      :alt="news.title"
-                      class="sidebar-news-thumb"
-                    />
-                    <div class="sidebar-news-info">
-                      <h4>{{ news.title }}</h4>
-                      <span v-if="news.publish_date" class="news-date">
-                        {{ formatDate(news.publish_date) }}
-                      </span>
-                    </div>
-                  </NuxtLink>
-                </div>
+                  {{ menuItem.item_name }}
+                </h2>
               </div>
 
-              <!-- Social Media Widget -->
-              <div v-if="socialMedia.length > 0" class="sidebar-widget">
-                <h3 class="widget-title">
-                  <span class="title-bar"></span>
-                  {{ $t('settings.socialMedia') }}
-                </h3>
-                <div class="sidebar-social-links">
-                  <a
-                    v-for="social in socialMedia"
-                    :key="social.social_id"
-                    :href="social.url"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="sidebar-social-link"
-                  >
-                    <i :class="social.icon_class"></i>
-                    <span>{{ social.platform }}</span>
-                  </a>
-                </div>
+              <div
+                v-for="child in menuItem.children"
+                :key="child.item_id"
+                :id="`section-${child.item_id}`"
+                class="sub-section"
+              >
+                <template v-if="getContentForMenuItem(child.item_id)">
+                  <NewsSection
+                    v-if="getContentType(child.item_id) === ContentType.NEWS"
+                    :items="getContentForMenuItem(child.item_id)!.news"
+                    :domain-id="domain.domain_id"
+                    :content-id="getContentForMenuItem(child.item_id)!.content.content_id"
+                    :section-title="child.item_name || ''"
+                  />
+                  <PhotoGallery
+                    v-else-if="getContentType(child.item_id) === ContentType.PHOTO"
+                    :items="getContentForMenuItem(child.item_id)!.items"
+                    :section-title="child.item_name || ''"
+                  />
+                  <VideoSection
+                    v-else-if="getContentType(child.item_id) === ContentType.VIDEO"
+                    :items="getContentForMenuItem(child.item_id)!.items"
+                    :section-title="child.item_name || ''"
+                  />
+                  <MapDisplay
+                    v-else-if="getContentType(child.item_id) === ContentType.MAP"
+                    :map-data="parseMapData(getContentForMenuItem(child.item_id)!.content)"
+                    :section-title="child.item_name || ''"
+                  />
+                  <DocumentSection
+                    v-else-if="getContentType(child.item_id) === ContentType.DOCUMENT"
+                    :items="getContentForMenuItem(child.item_id)!.items"
+                    :section-title="child.item_name || ''"
+                  />
+                  <ArticleSection
+                    v-else
+                    :content="getContentForMenuItem(child.item_id)!.content"
+                    :show-title="true"
+                  />
+                </template>
               </div>
-            </aside>
-          </div>
+            </section>
+
+            <!-- Menu items without children -->
+            <section
+              v-else
+              class="section"
+              :id="`section-${menuItem.item_id}`"
+            >
+              <div class="section-header">
+                <h2 class="section-title">
+                  <span class="title-bar"></span>
+                  {{ menuItem.item_name }}
+                </h2>
+              </div>
+
+              <template v-if="getContentForMenuItem(menuItem.item_id)">
+                <NewsSection
+                  v-if="getContentType(menuItem.item_id) === ContentType.NEWS"
+                  :items="getContentForMenuItem(menuItem.item_id)!.news"
+                  :domain-id="domain.domain_id"
+                  :content-id="getContentForMenuItem(menuItem.item_id)!.content.content_id"
+                />
+                <PhotoGallery
+                  v-else-if="getContentType(menuItem.item_id) === ContentType.PHOTO"
+                  :items="getContentForMenuItem(menuItem.item_id)!.items"
+                />
+                <VideoSection
+                  v-else-if="getContentType(menuItem.item_id) === ContentType.VIDEO"
+                  :items="getContentForMenuItem(menuItem.item_id)!.items"
+                />
+                <MapDisplay
+                  v-else-if="getContentType(menuItem.item_id) === ContentType.MAP"
+                  :map-data="parseMapData(getContentForMenuItem(menuItem.item_id)!.content)"
+                />
+                <DocumentSection
+                  v-else-if="getContentType(menuItem.item_id) === ContentType.DOCUMENT"
+                  :items="getContentForMenuItem(menuItem.item_id)!.items"
+                />
+                <ArticleSection
+                  v-else
+                  :content="getContentForMenuItem(menuItem.item_id)!.content"
+                />
+              </template>
+            </section>
+          </template>
+
+          <!-- Social Media Links -->
+          <section v-if="socialMedia.length > 0" class="section social-section">
+            <div class="social-links-center">
+              <a
+                v-for="social in socialMedia"
+                :key="social.social_id"
+                :href="social.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="social-icon-link"
+              >
+                <i :class="social.icon_class"></i>
+              </a>
+            </div>
+          </section>
         </template>
       </div>
     </main>
@@ -307,11 +268,17 @@ interface Props {
 const props = defineProps<Props>()
 
 const config = useRuntimeConfig()
-const photoUrl = config.public.photoUrl || 'https://khmer.biz'
+const photoUrl = config.public.photoUrl
 
 const loading = ref(false)
-const showLightbox = ref(false)
-const lightboxItem = ref<ContentItem | null>(null)
+const currentPage = ref(1)
+const itemsPerPage = 10
+
+const goToNews = (news: any) => {
+  navigateTo(`/news/${news.news_id || news.id}`, {
+    state: { news }
+  })
+}
 
 // Collect all news from all content sections
 const allNews = computed(() => {
@@ -322,17 +289,29 @@ const allNews = computed(() => {
   return news
 })
 
-// Collect all photo items from all content sections
-const allPhotos = computed(() => {
-  const items: ContentItem[] = []
-  props.contentSections.forEach(section => {
-    if (section.content.content_type === ContentType.PHOTO) {
-      section.items.forEach(item => {
-        if (item.photo) items.push(item)
-      })
-    }
-  })
-  return items
+// Paginated news
+const totalPages = computed(() => Math.ceil(allNews.value.length / itemsPerPage))
+
+const paginatedNews = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage
+  return allNews.value.slice(start, start + itemsPerPage)
+})
+
+const visiblePages = computed(() => {
+  const pages: number[] = []
+  const total = totalPages.value
+  const current = currentPage.value
+  let start = Math.max(1, current - 2)
+  const end = Math.min(total, start + 4)
+  start = Math.max(1, end - 4)
+  for (let i = start; i <= end; i++) {
+    pages.push(i)
+  }
+  return pages
+})
+
+watch(totalPages, (val) => {
+  if (currentPage.value > val) currentPage.value = Math.max(1, val)
 })
 
 const getContentForMenuItem = (menuItemId: number): ContentSection | undefined => {
@@ -344,14 +323,14 @@ const getContentType = (menuItemId: number): ContentType | undefined => {
   return section?.content.content_type
 }
 
-const openLightbox = (item: ContentItem) => {
-  lightboxItem.value = item
-  showLightbox.value = true
-}
-
 const formatDate = (date: string | null) => {
   if (!date) return ''
-  return new Date(date).toLocaleDateString()
+  const d = new Date(date)
+  const day = String(d.getDate()).padStart(2, '0')
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const month = months[d.getMonth()]
+  const year = d.getFullYear()
+  return `${day}-${month}-${year}`
 }
 
 interface MapData {
@@ -379,7 +358,7 @@ const parseMapData = (content: Content): MapData => {
 
 .main-content {
   flex: 1;
-  background-color: #f5f5f5;
+  background-color: #fff;
 }
 
 .container {
@@ -404,11 +383,11 @@ const parseMapData = (content: Content): MapData => {
 
 /* ---- Sections ---- */
 .section {
-  padding: 2rem 0;
+  padding: 1.5rem 0;
 }
 
 .section-header {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .section-title {
@@ -416,68 +395,54 @@ const parseMapData = (content: Content): MapData => {
   font-weight: 700;
   color: var(--text-color, #1a202c);
   margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
   font-family: var(--font-battambang);
 }
 
 .title-bar {
-  display: inline-block;
-  width: 5px;
-  height: 24px;
-  background-color: var(--primary-color, #3b82f6);
-  border-radius: 2px;
-  flex-shrink: 0;
+  display: none;
 }
 
-/* ---- Featured News Section ---- */
-.featured-section {
-  padding-top: 2.5rem;
+/* ---- News Section ---- */
+.news-section {
+  padding-top: 2rem;
 }
 
-.featured-layout {
+/* ---- Featured Grid (first 2 news) ---- */
+.featured-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
-.featured-main-card {
+.featured-card {
   display: flex;
   flex-direction: column;
-  background: white;
+  background: #fff;
   border-radius: 8px;
   overflow: hidden;
   text-decoration: none;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: box-shadow 0.2s, transform 0.2s;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s;
 }
 
-.featured-main-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
+.featured-card:hover {
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.18);
 }
 
-.featured-img-wrap {
-  aspect-ratio: 16/10;
+.featured-card-img {
   overflow: hidden;
-  background: #e2e8f0;
 }
 
-.featured-img-wrap img {
+.featured-card-img img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s;
-}
-
-.featured-main-card:hover .featured-img-wrap img {
-  transform: scale(1.03);
+  height: auto;
+  display: block;
 }
 
 .img-placeholder {
   width: 100%;
-  height: 100%;
+  aspect-ratio: 16/10;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -488,32 +453,41 @@ const parseMapData = (content: Content): MapData => {
 
 .img-placeholder.small {
   font-size: 1.5rem;
+  aspect-ratio: auto;
+  width: 100%;
+  height: 100%;
+  min-height: 80px;
 }
 
-.featured-info {
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.featured-card-body {
+  padding: 20px;
 }
 
-.featured-info h3 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #1a202c;
-  margin: 0;
-  line-height: 1.5;
+.media-heading {
+  line-height: 1.6;
+  margin: 0 0 0.5rem 0;
   font-family: var(--font-battambang);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
-.featured-info p {
-  font-size: 0.875rem;
-  color: #718096;
-  margin: 0;
+.featured-card-body .media-heading {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.featured-card-body .media-heading a {
+  color: #333;
+  text-decoration: none;
+}
+
+.featured-card-body .media-heading a:hover {
+  color: var(--primary-color, #3b82f6);
+}
+
+.featured-excerpt {
+  font-size: 0.9rem;
+  color: #555;
+  margin: 0 0 0.5rem 0;
   line-height: 1.6;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -521,141 +495,128 @@ const parseMapData = (content: Content): MapData => {
   overflow: hidden;
 }
 
-.news-date {
-  font-size: 0.75rem;
-  color: #a0aec0;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
+.date {
+  font-size: 1rem;
+  color: #777;
+  margin: 0;
+  margin-top: 10px;
 }
 
-/* Side News List */
-.featured-side-list {
+.date i {
+  margin-right: 4px;
+}
+
+/* ---- Media List (remaining news) ---- */
+.news-media-list {
+  margin-bottom: 1rem;
+}
+
+.news-media-item {
   display: flex;
-  flex-direction: column;
   gap: 1rem;
+  padding: 0;
 }
 
-.side-news-item {
-  display: flex;
-  gap: 1rem;
-  background: white;
-  border-radius: 8px;
-  overflow: hidden;
-  text-decoration: none;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: box-shadow 0.2s;
-  flex: 1;
+.media-left {
+  flex: 0 0 16.667%;
+  max-width: 16.667%;
 }
 
-.side-news-item:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+.media-left a {
+  display: block;
 }
 
-.side-thumb {
-  width: 140px;
-  min-height: 100px;
-  flex-shrink: 0;
-  overflow: hidden;
-  background: #e2e8f0;
-}
-
-.side-thumb img {
+.media-left img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  display: block;
+  border-radius: 8px;
 }
 
-.side-info {
-  padding: 0.75rem 0.75rem 0.75rem 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.4rem;
+.media-body {
+  flex: 1;
   min-width: 0;
 }
 
-.side-info h4 {
-  font-size: 0.9rem;
+.media-body .media-heading {
+  font-size: 0.95rem;
   font-weight: 600;
-  color: #1a202c;
-  margin: 0;
-  line-height: 1.4;
-  font-family: var(--font-battambang);
+}
+
+.media-body .media-heading a {
+  color: #333;
+  text-decoration: none;
+}
+
+.media-body .media-heading a:hover {
+  color: var(--primary-color, #3b82f6);
+}
+
+.media-excerpt {
+  font-size: 0.875rem;
+  color: #555;
+  margin: 0.25rem 0 0 0;
+  line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-/* ---- Photo Gallery Strip ---- */
-.gallery-strip-section {
-  padding: 1.5rem 0;
-}
-
-.gallery-strip {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 0.75rem;
-}
-
-.gallery-thumb {
-  aspect-ratio: 4/3;
-  overflow: hidden;
-  border-radius: 6px;
-  cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.gallery-thumb:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-}
-
-.gallery-thumb img {
+.news-separator {
+  border: none;
+  border-top: 3px dotted #eee;
+  margin: 9px;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
-:deep(.lightbox-content) {
-  background: rgba(0, 0, 0, 0.9);
-  padding: 0;
-  border-radius: 8px;
-}
-
-.lightbox-img {
-  max-width: 100%;
-  max-height: 80vh;
-  object-fit: contain;
-  display: block;
-  margin: 0 auto;
-}
-
-.lightbox-caption {
+/* ---- Pagination ---- */
+.pagination-wrap {
   text-align: center;
-  padding: 1rem;
-  color: white;
-  font-size: 1rem;
+  padding: 1rem 0;
 }
 
-/* ---- Content Layout (Main + Sidebar) ---- */
-.content-layout {
-  display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 2rem;
-  padding-bottom: 2rem;
+.pagination-list {
+  display: inline-flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 4px;
 }
 
-.content-main {
-  min-width: 0;
+.page-item .page-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  color: #333;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.15s;
 }
 
-.content-main .section {
-  padding: 1.5rem 0;
+.page-item .page-link:hover:not(:disabled) {
+  background-color: #f5f5f5;
 }
 
+.page-item.active .page-link {
+  background-color: var(--primary-color, #3b82f6);
+  border-color: var(--primary-color, #3b82f6);
+  color: #fff;
+}
+
+.page-item.disabled .page-link {
+  color: #aaa;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ---- Content Sections ---- */
 .sub-section {
   margin-bottom: 1.5rem;
 }
@@ -664,151 +625,58 @@ const parseMapData = (content: Content): MapData => {
   margin-bottom: 0;
 }
 
-/* ---- Sidebar ---- */
-.content-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+.content-main .section {
+  padding: 1.5rem 0;
 }
 
-.sidebar-widget {
-  background: white;
-  border-radius: 8px;
-  padding: 1.25rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+/* ---- Social Media Section ---- */
+.social-section {
+  text-align: center;
+  padding: 1.5rem 0;
 }
 
-.widget-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text-color, #1a202c);
-  margin: 0 0 1rem 0;
+.social-links-center {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-family: var(--font-battambang);
+  justify-content: center;
+  gap: 1rem;
 }
 
-.widget-title .title-bar {
-  height: 18px;
-}
-
-.sidebar-news-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.sidebar-news-item {
-  display: flex;
-  gap: 0.75rem;
-  text-decoration: none;
-  color: inherit;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid #f0f0f0;
-  transition: opacity 0.2s;
-}
-
-.sidebar-news-item:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.sidebar-news-item:hover {
-  opacity: 0.8;
-}
-
-.sidebar-news-thumb {
-  width: 70px;
-  height: 50px;
-  object-fit: cover;
-  border-radius: 4px;
-  flex-shrink: 0;
-}
-
-.sidebar-news-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.sidebar-news-info h4 {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #1a202c;
-  margin: 0 0 0.25rem 0;
-  line-height: 1.4;
-  font-family: var(--font-battambong);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.sidebar-news-info .news-date {
-  font-size: 0.7rem;
-}
-
-.sidebar-social-links {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.sidebar-social-link {
-  display: flex;
+.social-icon-link {
+  display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 0.75rem;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: #555;
+  font-size: 1.25rem;
   text-decoration: none;
-  color: var(--text-color, #4a5568);
-  border-radius: 6px;
-  transition: background-color 0.2s;
-  font-size: 0.875rem;
+  transition: color 0.2s, transform 0.2s;
 }
 
-.sidebar-social-link:hover {
-  background-color: #f7fafc;
-}
-
-.sidebar-social-link i {
-  font-size: 1.1rem;
+.social-icon-link:hover {
   color: var(--primary-color, #3b82f6);
+  transform: scale(1.15);
 }
 
 /* ---- Responsive ---- */
-@media (max-width: 1024px) {
-  .content-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .content-sidebar {
-    display: none;
-  }
-}
-
 @media (max-width: 768px) {
-  .featured-layout {
+  .featured-grid {
     grid-template-columns: 1fr;
   }
 
-  .featured-side-list {
-    flex-direction: row;
-    overflow-x: auto;
-    gap: 0.75rem;
-    padding-bottom: 0.5rem;
-  }
-
-  .side-news-item {
-    min-width: 260px;
-    flex-shrink: 0;
-  }
-
-  .gallery-strip {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  .media-left {
+    flex: 0 0 100px;
+    max-width: 100px;
+    margin-bottom: 10px;
   }
 
   .section-title {
     font-size: 1.15rem;
+  }
+
+  .featured-card-body .media-heading {
+    font-size: 0.9rem;
   }
 }
 </style>

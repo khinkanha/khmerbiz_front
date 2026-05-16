@@ -9,6 +9,7 @@
       <div class="hero-overlay"></div>
       <div class="hero-content">
         <h1 class="hero-title">{{ settings.title || settings.domain_name }}</h1>
+        <p v-if="settings.company_desc" class="hero-subtitle">{{ settings.company_desc }}</p>
         <nav class="anchor-nav">
           <a
             v-for="menuItem in menuTree"
@@ -22,6 +23,7 @@
         </nav>
       </div>
       <div class="scroll-indicator" @click="scrollToFirstSection">
+        <span>Scroll</span>
         <i class="pi pi-chevron-down"></i>
       </div>
     </section>
@@ -29,44 +31,61 @@
     <!-- Content Sections -->
     <main class="main-content">
       <div
-        v-for="menuItem in menuTree"
+        v-for="(menuItem, index) in menuTree"
         :key="menuItem.item_id"
         class="content-section-wrapper"
+        :class="{ 'section-left': index % 2 === 0, 'section-right': index % 2 === 1 }"
         :id="`section-${menuItem.item_id}`"
       >
-        <!-- Section with submenu items -->
-        <div v-if="menuItem.children && menuItem.children.length > 0" class="submenu-section">
-          <div class="section-header">
-            <h2 class="section-title">{{ menuItem.item_name }}</h2>
-          </div>
+        <div class="section-inner">
+          <!-- Section number decoration -->
+          <span class="section-number">{{ String(index + 1).padStart(2, '0') }}</span>
 
-          <div class="submenu-grid">
-            <div
-              v-for="child in menuItem.children"
-              :key="child.item_id"
-              class="subsection"
-              :id="`subsection-${child.item_id}`"
-            >
+          <div class="section-content" :class="{ 'content-push-right': index % 2 === 1 }">
+            <!-- Section header -->
+            <div class="section-header">
+              <div class="section-line"></div>
+              <h2 class="section-title">{{ menuItem.item_name }}</h2>
+            </div>
+
+            <!-- Submenu items -->
+            <div v-if="menuItem.children && menuItem.children.length > 0" class="submenu-grid">
+              <div
+                v-for="child in menuItem.children"
+                :key="child.item_id"
+                class="submenu-card"
+                :id="`subsection-${child.item_id}`"
+              >
+                <ContentRenderer
+                  :content="getContentForMenuItem(child.item_id)"
+                  :domain-id="domain.domain_id"
+                />
+              </div>
+            </div>
+
+            <!-- Single content -->
+            <div v-else class="single-content">
               <ContentRenderer
-                :content="getContentForMenuItem(child.item_id)"
+                :content="getContentForMenuItem(menuItem.item_id)"
                 :domain-id="domain.domain_id"
               />
             </div>
           </div>
         </div>
 
-        <!-- Single content section -->
-        <div v-else class="single-section">
-          <div class="section-header" :id="`section-${menuItem.item_id}`">
-            <h2 class="section-title">{{ menuItem.item_name }}</h2>
-          </div>
-          <ContentRenderer
-            :content="getContentForMenuItem(menuItem.item_id)"
-            :domain-id="domain.domain_id"
-          />
+        <!-- Section divider -->
+        <div v-if="index < menuTree.length - 1" class="section-divider">
+          <span></span><span></span><span></span>
         </div>
       </div>
     </main>
+
+    <!-- Back to top -->
+    <transition name="fade">
+      <button v-if="showBackToTop" class="back-to-top" @click="scrollToTop">
+        <i class="pi pi-arrow-up"></i>
+      </button>
+    </transition>
   </div>
 </template>
 
@@ -89,6 +108,7 @@ const config = useRuntimeConfig()
 const photoUrl = config.public.photoUrl || 'https://khmer.biz'
 
 const heroBanner = computed(() => props.banners[0] || null)
+const showBackToTop = ref(false)
 
 const scrollToSection = (sectionId: number) => {
   const element = document.getElementById(`section-${sectionId}`)
@@ -103,9 +123,19 @@ const scrollToFirstSection = () => {
   }
 }
 
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
 const getContentForMenuItem = (menuItemId: number): ContentSection | null => {
   return props.contentSections.find(cs => cs.content.menu_id === menuItemId) || null
 }
+
+onMounted(() => {
+  window.addEventListener('scroll', () => {
+    showBackToTop.value = window.scrollY > window.innerHeight
+  })
+})
 </script>
 
 <style scoped>
@@ -113,6 +143,7 @@ const getContentForMenuItem = (menuItemId: number): ContentSection | null => {
   min-height: 100vh;
 }
 
+/* ===== Hero ===== */
 .hero-section {
   position: relative;
   height: 100vh;
@@ -124,21 +155,16 @@ const getContentForMenuItem = (menuItemId: number): ContentSection | null => {
 
 .hero-background {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-size: cover;
   background-position: center;
+  background-attachment: fixed;
 }
 
 .hero-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.4) 100%);
+  inset: 0;
+  background: linear-gradient(160deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 58, 95, 0.6) 100%);
 }
 
 .hero-content {
@@ -147,128 +173,261 @@ const getContentForMenuItem = (menuItemId: number): ContentSection | null => {
   text-align: center;
   color: white;
   padding: 0 1rem;
+  animation: heroFadeIn 1.2s ease-out;
+}
+
+@keyframes heroFadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .hero-title {
-  font-size: clamp(2rem, 5vw, 4rem);
+  font-size: clamp(2.2rem, 5vw, 4.5rem);
   font-weight: 700;
-  margin: 0 0 2rem 0;
+  margin: 0 0 1rem 0;
   font-family: var(--font-battambang);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+  letter-spacing: 0.02em;
+}
+
+.hero-subtitle {
+  font-size: clamp(0.95rem, 2vw, 1.2rem);
+  opacity: 0.8;
+  margin: 0 0 2.5rem 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .anchor-nav {
   display: flex;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.75rem;
   flex-wrap: wrap;
 }
 
 .anchor-link {
-  padding: 0.75rem 1.5rem;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
+  padding: 0.6rem 1.4rem;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
   color: white;
   text-decoration: none;
   border-radius: 30px;
   transition: all 0.3s;
   font-weight: 500;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .anchor-link:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--primary-color, #3b82f6);
+  border-color: transparent;
   transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .scroll-indicator {
   position: absolute;
-  bottom: 2rem;
+  bottom: 2.5rem;
   left: 50%;
   transform: translateX(-50%);
-  width: 40px;
-  height: 40px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border-radius: 50%;
+  gap: 0.4rem;
   color: white;
   cursor: pointer;
-  animation: bounce 2s infinite;
   z-index: 2;
+  opacity: 0.7;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: opacity 0.3s;
 }
 
-@keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
-    transform: translateX(-50%) translateY(0);
-  }
-  40% {
-    transform: translateX(-50%) translateY(-10px);
-  }
-  60% {
-    transform: translateX(-50%) translateY(-5px);
-  }
+.scroll-indicator:hover { opacity: 1; }
+
+.scroll-indicator i {
+  animation: scrollBounce 2s ease-in-out infinite;
 }
 
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+/* ===== Sections ===== */
 .main-content {
-  background-color: white;
+  background: white;
 }
 
 .content-section-wrapper {
-  min-height: 50vh;
-  padding: 4rem 0;
+  padding: 6rem 1rem;
+  position: relative;
+  overflow: hidden;
 }
 
-.content-section-wrapper:nth-child(even) {
-  background-color: #f7fafc;
+.content-section-wrapper.section-right {
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.section-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.section-number {
+  position: absolute;
+  top: -1.5rem;
+  left: 0;
+  font-size: clamp(5rem, 10vw, 8rem);
+  font-weight: 800;
+  color: rgba(0, 0, 0, 0.04);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+.section-right .section-number {
+  left: auto;
+  right: 0;
+}
+
+.section-content {
+  position: relative;
+  z-index: 1;
+}
+
+.content-push-right {
+  margin-left: auto;
+  max-width: 800px;
+}
+
+.section-left .section-content {
+  max-width: 800px;
 }
 
 .section-header {
-  text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+.section-line {
+  width: 40px;
+  height: 3px;
+  background: var(--primary-color, #3b82f6);
+  border-radius: 2px;
+  margin-bottom: 1rem;
 }
 
 .section-title {
-  font-size: 2rem;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
   font-weight: 700;
   color: #1a202c;
   margin: 0;
   font-family: var(--font-battambang);
 }
 
+/* ===== Content Cards ===== */
 .submenu-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
 }
 
-.subsection {
-  padding: 1rem;
+.submenu-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e2e8f0;
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.single-section {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0 1rem;
+.submenu-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
+.section-right .submenu-card {
+  background: white;
+}
+
+.single-content {
+  max-width: 100%;
+}
+
+/* ===== Section Divider ===== */
+.section-divider {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 0;
+  margin-top: 6rem;
+}
+
+.section-divider span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #cbd5e1;
+}
+
+/* ===== Back to Top ===== */
+.back-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--primary-color, #3b82f6);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s, box-shadow 0.3s;
+  z-index: 50;
+}
+
+.back-to-top:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+
+/* ===== Responsive ===== */
 @media (max-width: 768px) {
-  .hero-title {
-    font-size: 2rem;
+  .content-section-wrapper {
+    padding: 4rem 1rem;
+  }
+
+  .content-push-right {
+    margin-left: 0;
+  }
+
+  .section-number {
+    font-size: 4rem;
   }
 
   .anchor-nav {
     flex-direction: column;
     gap: 0.5rem;
+    align-items: center;
   }
 
-  .section-title {
-    font-size: 1.5rem;
+  .submenu-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

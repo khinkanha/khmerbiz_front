@@ -1,15 +1,8 @@
 <template>
-  <component
-    v-if="themeComponent"
-    :is="themeComponent"
-    :menu-tree="homeMenuTree.length ? homeMenuTree : domainStore.menuTree"
-    :content-sections="contentSections"
-    :banners="domainStore.banners"
-    :settings="domainStore.settings"
-    :domain="domainStore.domain"
-    :social-media="domainStore.socialMedia"
-    :language="domainStore.currentLanguage"
-  />
+  <component v-if="themeComponent" :is="themeComponent"
+    :menu-tree="homeMenuTree.length ? homeMenuTree : domainStore.menuTree" :content-sections="contentSections"
+    :banners="domainStore.banners" :settings="domainStore.settings" :domain="domainStore.domain"
+    :social-media="domainStore.socialMedia" :language="domainStore.currentLanguage" />
   <div v-else class="loading">
     <ProgressSpinner />
   </div>
@@ -54,6 +47,36 @@ const themeComponent = computed(() => {
 const contentSections = ref<ContentSection[]>([])
 const homeMenuTree = ref([])
 
+// Parse news item: description may be JSON {title, shortdes, longdes, photo, publish}
+const parseNewsItem = (item: any) => {
+  if (!item.description || typeof item.description !== 'string') return item
+  try {
+    const parsed = JSON.parse(item.description)
+    return {
+      ...item,
+      title: parsed.title || item.title || '',
+      short_description: parsed.shortdes || item.short_description || '',
+      description: parsed.longdes || parsed.longdescription || item.description,
+      photo: parsed.photo || item.photo || null,
+      publish_date: parsed.publish || parsed.publish_date || item.publish_date || null,
+    }
+  } catch {
+    return item
+  }
+}
+
+const parseNews = (news: any[]) => news.map(parseNewsItem)
+
+const mapSection = (s: any): ContentSection => ({
+  content: {
+    ...s.content,
+    news: parseNews(s.content.newsItems || s.content.news || []),
+    items: s.content.items || [],
+  },
+  items: s.content.items || [],
+  news: parseNews(s.content.newsItems || s.content.news || []),
+})
+
 onMounted(async () => {
   if (!domainStore.domain) {
     await domainStore.resolveDomain()
@@ -69,15 +92,43 @@ onMounted(async () => {
       // Map API { menu, content } to ContentSection { content, items, news }
       contentSections.value = items
         .filter((s: any) => s.content)
-        .map((s: any) => ({
-          content: {
-            ...s.content,
-            news: s.content.newsItems || s.content.news || [],
-            items: s.content.items || [],
-          },
-          items: s.content.items || [],
-          news: s.content.newsItems || s.content.news || [],
-        }))
+        .map(mapSection)
+    }
+  } else if (domainStore.settings) {
+    const domainId = domainStore.domain?.domain_id
+    if (domainId) {
+      // Collect all menu item IDs (including children) for ClassicMultiPage
+      const allMenuIds: number[] = []
+      const collectIds = (items: readonly any[]) => {
+        for (const item of items) {
+          allMenuIds.push(item.item_id)
+          if (item.children?.length) collectIds(item.children)
+        }
+      }
+      collectIds(domainStore.menuTree)
+
+      // Fetch content for each menu item in parallel
+      const results = await Promise.all(
+        allMenuIds.map(menuId =>
+          api.get<any[]>(`/site/pages/${domainId}/${menuId}`)
+            .then(res => res.success && res.data ? res.data : null)
+            .catch(() => null)
+        )
+      )
+
+      console.log('API results:', JSON.stringify(results?.[0], null, 2))
+
+      const sections: ContentSection[] = []
+      for (const data of results) {
+        if (!data) continue
+        const items = Array.isArray(data) ? data : [data]
+        for (const s of items) {
+          if (!s.content) continue
+          sections.push(mapSection(s))
+        }
+      }
+      console.log('sections:', sections.length, JSON.stringify(sections, null, 2))
+      contentSections.value = sections
     }
   }
 })

@@ -26,7 +26,7 @@ export interface ContentItem {
 }
 
 export interface News {
-  news_id: number
+  id: number
   content_id: number
   title: string
   short_description: string | null
