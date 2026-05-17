@@ -22,7 +22,6 @@
     />
     <NewsSection
       v-else-if="content && content.content_type === ContentType.NEWS"
-      :items="content.news || []"
       :domain-id="domainId"
       :content-id="content.content_id"
       :section-title="showTitle ? content.title : ''"

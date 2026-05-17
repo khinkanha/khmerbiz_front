@@ -10,10 +10,17 @@
         <article class="news-main">
           <header class="article-header">
             <h1 class="article-title">{{ news.title }}</h1>
-            <p class="article-date">
-              <i class="fa fa-clock-o"></i>
-              {{ formatDate(news.publish_date) }}
-            </p>
+            <div class="article-meta">
+              <span v-if="news.author?.full_name" class="meta-author">
+                <i class="pi pi-user"></i>
+                {{ news.author.full_name }}
+              </span>
+              <span v-if="news.author?.full_name && news.publish_date" class="meta-separator">|</span>
+              <span class="meta-date">
+                <i class="pi pi-calendar"></i>
+                {{ formatDate(news.publish_date) }}
+              </span>
+            </div>
           </header>
 
           <div v-if="news.photo" class="article-image">
@@ -42,7 +49,7 @@
                 <div class="sidebar-info">
                   <span class="sidebar-news-title">{{ item.title }}</span>
                   <span class="sidebar-news-date">
-                    <i class="fa fa-clock-o"></i>
+                    <i class="pi pi-calendar"></i>
                     {{ formatDate(item.publish_date) }}
                   </span>
                 </div>
@@ -61,6 +68,8 @@
 </template>
 
 <script setup lang="ts">
+import { parseNewsItem } from '~/composables/useNewsParser'
+
 definePageMeta({
   layout: 'default',
 })
@@ -75,23 +84,6 @@ const newsId = route.params.newsId as string
 const loading = ref(true)
 const news = ref<any>(null)
 const relatedNews = ref<any[]>([])
-
-const parseNewsItem = (item: any) => {
-  if (!item.description || typeof item.description !== 'string') return item
-  try {
-    const parsed = JSON.parse(item.description)
-    return {
-      ...item,
-      title: parsed.title || item.title || '',
-      short_description: parsed.shortdes || item.short_description || '',
-      description: parsed.longdes || parsed.longdescription || item.description,
-      photo: parsed.photo || item.photo || null,
-      publish_date: parsed.publish || parsed.publish_date || item.publish_date || null,
-    }
-  } catch {
-    return item
-  }
-}
 
 const goToNews = (item: any) => {
   navigateTo(`/news/${item.news_id || item.id}`, {
@@ -119,32 +111,21 @@ onMounted(async () => {
     }
   }
 
-  // Fetch related news via /site/home — extract newsItems from all sections
-  try {
-    const domainStore = useDomainStore()
-    const domainId = domainStore.domain?.domain_id
-    if (domainId) {
-      const response = await api.get<any[]>(`/site/home?domain_id=${domainId}`)
+  // Fetch related news via /site/list-news/:contentId
+  if (news.value?.content_id) {
+    try {
+      const response = await api.get<any>(`/site/list-news/${news.value.content_id}?page=1`)
       if (response.success && response.data) {
-        const sections = Array.isArray(response.data) ? response.data : [response.data]
-        const allNews: any[] = []
-        for (const section of sections) {
-          const items = section?.content?.newsItems || section?.content?.news || []
-          allNews.push(...items)
-        }
-        relatedNews.value = allNews
+        const data = response.data
+        const items = data.items || data
+        relatedNews.value = (Array.isArray(items) ? items : [])
           .map(parseNewsItem)
           .filter((n: any) => String(n.news_id || n.id) !== String(newsId))
-          .sort((a: any, b: any) => {
-            const da = a.publish_date ? new Date(a.publish_date).getTime() : 0
-            const db = b.publish_date ? new Date(b.publish_date).getTime() : 0
-            return db - da
-          })
           .slice(0, 10)
       }
+    } catch {
+      // Silently fail — sidebar is optional
     }
-  } catch {
-    // Silently fail — sidebar is optional
   }
 })
 
@@ -192,7 +173,7 @@ useHead({
 }
 
 .article-title {
-  font-size: 1.75rem;
+  font-size: 1rem;
   font-weight: 700;
   color: #1a202c;
   margin: 0 0 0.75rem 0;
@@ -200,14 +181,34 @@ useHead({
   line-height: 1.4;
 }
 
-.article-date {
-  font-size: 1rem;
+.article-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.825rem;
   color: #777;
   margin: 0;
 }
 
-.article-date i {
-  margin-right: 4px;
+.article-meta i {
+  margin-right: 3px;
+  font-size: 0.75rem;
+}
+
+.meta-author {
+  display: inline-flex;
+  align-items: center;
+  color: #555;
+  font-weight: 500;
+}
+
+.meta-separator {
+  color: #ccc;
+}
+
+.meta-date {
+  display: inline-flex;
+  align-items: center;
 }
 
 .article-image {
@@ -230,7 +231,8 @@ useHead({
 }
 
 .article-body {
-  line-height: 1.8;
+  font-size: 1.1rem;
+  line-height: 2;
   color: #4a5568;
   padding-bottom: 3rem;
 }
@@ -333,7 +335,7 @@ useHead({
 
 .sidebar-news-title {
   font-size: 0.85rem;
-  font-weight: 500;
+  font-weight: 600;
   color: #333;
   line-height: 1.4;
   display: -webkit-box;
@@ -388,7 +390,7 @@ useHead({
   }
 
   .article-title {
-    font-size: 1.35rem;
+    font-size: 1rem;
   }
 }
 </style>

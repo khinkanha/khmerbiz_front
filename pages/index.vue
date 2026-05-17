@@ -47,34 +47,12 @@ const themeComponent = computed(() => {
 const contentSections = ref<ContentSection[]>([])
 const homeMenuTree = ref([])
 
-// Parse news item: description may be JSON {title, shortdes, longdes, photo, publish}
-const parseNewsItem = (item: any) => {
-  if (!item.description || typeof item.description !== 'string') return item
-  try {
-    const parsed = JSON.parse(item.description)
-    return {
-      ...item,
-      title: parsed.title || item.title || '',
-      short_description: parsed.shortdes || item.short_description || '',
-      description: parsed.longdes || parsed.longdescription || item.description,
-      photo: parsed.photo || item.photo || null,
-      publish_date: parsed.publish || parsed.publish_date || item.publish_date || null,
-    }
-  } catch {
-    return item
-  }
-}
-
-const parseNews = (news: any[]) => news.map(parseNewsItem)
-
 const mapSection = (s: any): ContentSection => ({
   content: {
     ...s.content,
-    news: parseNews(s.content.newsItems || s.content.news || []),
     items: s.content.items || [],
   },
   items: s.content.items || [],
-  news: parseNews(s.content.newsItems || s.content.news || []),
 })
 
 // Find the first leaf menu item (prefer childless root, else first child)

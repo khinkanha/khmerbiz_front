@@ -14,7 +14,7 @@
 
         <template v-else>
           <!-- News Section -->
-          <section v-if="allNews.length > 0" class="section news-section">
+          <section v-if="featuredNews.length > 0" class="section news-section">
             <div class="section-header">
               <h2 class="section-title">
                 <span class="title-bar"></span>
@@ -152,7 +152,6 @@
                 <template v-if="getContentForMenuItem(child.item_id)">
                   <NewsSection
                     v-if="getContentType(child.item_id) === ContentType.NEWS"
-                    :items="getContentForMenuItem(child.item_id)!.news"
                     :domain-id="domain.domain_id"
                     :content-id="getContentForMenuItem(child.item_id)!.content.content_id"
                     :section-title="child.item_name || ''"
@@ -202,7 +201,6 @@
               <template v-if="getContentForMenuItem(menuItem.item_id)">
                 <NewsSection
                   v-if="getContentType(menuItem.item_id) === ContentType.NEWS"
-                  :items="getContentForMenuItem(menuItem.item_id)!.news"
                   :domain-id="domain.domain_id"
                   :content-id="getContentForMenuItem(menuItem.item_id)!.content.content_id"
                 />
@@ -254,6 +252,7 @@
 <script setup lang="ts">
 import type { MenuItem, Domain, Setting, Banner, SocialMedia, ContentSection, Language, ContentItem, Content } from '~/types'
 import { ContentType } from '~/types'
+import { parseNewsItem } from '~/composables/useNewsParser'
 
 interface Props {
   menuTree: MenuItem[]
@@ -269,6 +268,7 @@ const props = defineProps<Props>()
 
 const config = useRuntimeConfig()
 const photoUrl = config.public.photoUrl
+const api = useApi()
 
 const loading = ref(false)
 const currentPage = ref(1)
@@ -280,23 +280,37 @@ const goToNews = (news: any) => {
   })
 }
 
-// Collect feature news (priority === 1) from all content sections
-const allNews = computed(() => {
-  const news: any[] = []
-  props.contentSections.forEach(section => {
-    section.news.forEach(n => {
-      if (n.priority === 1) news.push(n)
-    })
-  })
-  return news
-})
+// Featured news fetched from /site/feature-news/:contentId for all NEWS sections
+const featuredNews = ref<any[]>([])
 
-// Paginated news
-const totalPages = computed(() => Math.ceil(allNews.value.length / itemsPerPage))
+const newsContentIds = computed(() =>
+  props.contentSections
+    .filter(cs => cs.content.content_type === ContentType.NEWS)
+    .map(cs => cs.content.content_id)
+)
+
+const fetchFeaturedNews = async () => {
+  if (newsContentIds.value.length === 0) return
+  try {
+    const results = await Promise.all(
+      newsContentIds.value.map(contentId =>
+        api.get<any>(`/site/feature-news/${contentId}`)
+          .then(res => res.success && res.data ? (Array.isArray(res.data) ? res.data : res.data.items || []) : [])
+          .catch(() => [])
+      )
+    )
+    featuredNews.value = results.flat().map(parseNewsItem)
+  } catch (e) {
+    console.error('Failed to fetch featured news:', e)
+  }
+}
+
+// Paginated news (client-side pagination over merged featured news)
+const totalPages = computed(() => Math.ceil(featuredNews.value.length / itemsPerPage))
 
 const paginatedNews = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage
-  return allNews.value.slice(start, start + itemsPerPage)
+  return featuredNews.value.slice(start, start + itemsPerPage)
 })
 
 const visiblePages = computed(() => {
@@ -314,6 +328,10 @@ const visiblePages = computed(() => {
 
 watch(totalPages, (val) => {
   if (currentPage.value > val) currentPage.value = Math.max(1, val)
+})
+
+onMounted(() => {
+  fetchFeaturedNews()
 })
 
 const getContentForMenuItem = (menuItemId: number): ContentSection | undefined => {

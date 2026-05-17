@@ -1,8 +1,8 @@
 <template>
   <section class="article-section">
     <div v-if="content" class="article-container">
-      <h2 v-if="showTitle" class="article-title">{{ content.title }}</h2>
-      <div class="article-content" v-html="content.description"></div>
+      <h2 v-if="showTitle" class="article-title">{{ decodedTitle }}</h2>
+      <div class="article-content" v-html="decodedDescription"></div>
     </div>
   </section>
 </template>
@@ -15,9 +15,28 @@ interface Props {
   showTitle?: boolean
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   showTitle: true,
 })
+
+const decodeContentDescription = (content: Content) => {
+  if (!content.description || typeof content.description !== 'string') {
+    return { title: content.title, description: content.description || '' }
+  }
+  try {
+    const parsed = JSON.parse(content.description)
+    return {
+      title: parsed.title || content.title,
+      description: parsed.description || parsed.longdes || parsed.longdescription || content.description,
+    }
+  } catch {
+    return { title: content.title, description: content.description }
+  }
+}
+
+const decoded = computed(() => decodeContentDescription(props.content))
+const decodedTitle = computed(() => decoded.value.title)
+const decodedDescription = computed(() => decoded.value.description)
 </script>
 
 <style scoped>
@@ -31,7 +50,7 @@ withDefaults(defineProps<Props>(), {
 }
 
 .article-title {
-  font-size: 1.75rem;
+  font-size: 1.60rem;
   font-weight: 700;
   color: #1a202c;
   margin: 0 0 1rem 0;

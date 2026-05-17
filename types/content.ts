@@ -34,12 +34,13 @@ export interface News {
   photo: string | null
   publish_date: string | null
   status: number
+  priority?: number
 }
 
 export interface ContentSection {
   content: Content
   items: ContentItem[]
-  news: News[]
+  news?: News[]
 }
 
 export enum ContentType {

@@ -2,91 +2,76 @@
   <section class="news-section">
     <h2 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h2>
 
-    <!-- Feature News (priority=1) -->
-    <div v-if="featureNews.length > 0" class="feature-news">
-      <NuxtLink
-        v-for="news in featureNews"
-        :key="'feat-' + news.id"
-        :to="`/news/${news.id}`"
-        class="feature-card"
-      >
-        <div class="feature-badge">{{ $t('contentManager.featured') || 'Featured' }}</div>
-        <div class="feature-card-image">
-          <img v-if="news.photo" :src="`${photoUrl}${news.photo}`" :alt="news.title" />
-          <div v-else class="news-placeholder">
-            <i class="pi pi-image"></i>
-          </div>
-        </div>
-        <div class="feature-card-body">
-          <h3 class="feature-title">{{ news.title }}</h3>
-          <p v-if="news.short_description" class="feature-excerpt">{{ news.short_description }}</p>
-          <div v-if="news.publish_date" class="feature-date">
-            <i class="pi pi-calendar"></i>
-            {{ formatDate(news.publish_date) }}
-          </div>
-        </div>
-      </NuxtLink>
+    <div v-if="loading" class="loading-state">
+      <ProgressSpinner />
     </div>
 
-    <!-- Regular News -->
-    <div class="news-grid">
-      <NuxtLink v-for="news in paginatedItems" :key="news.id" :to="`/news/${news.id}`"
-        class="news-card">
-        <div class="news-image">
-          <img v-if="news.photo" :src="`${photoUrl}${news.photo}`" :alt="news.title" />
-          <div v-else class="news-placeholder">
-            <i class="pi pi-image"></i>
+    <template v-else>
+      <!-- Feature News -->
+      <div v-if="featureNews.length > 0" class="feature-news">
+        <NuxtLink v-for="news in featureNews" :key="'feat-' + news.id" :to="`/news/${news.news_id || news.id}`"
+          class="feature-card">
+          <div class="feature-badge">{{ $t('contentManager.featured') || 'Featured' }}</div>
+          <div class="feature-card-image">
+            <img v-if="news.photo" :src="`${photoUrl}${news.photo}`" :alt="news.title" />
+            <div v-else class="news-placeholder">
+              <i class="pi pi-image"></i>
+            </div>
           </div>
-        </div>
-        <div class="news-content">
-          <h3 class="news-title">{{ news.title }}</h3>
-          <p v-if="news.short_description" class="news-excerpt">
-            {{ news.short_description }}
-          </p>
-          <div v-if="news.publish_date" class="news-date">
-            <i class="pi pi-calendar"></i>
-            {{ formatDate(news.publish_date) }}
+          <div class="feature-card-body">
+            <h3 class="feature-title">{{ news.title }}</h3>
+            <p v-if="news.short_description" class="feature-excerpt">{{ news.short_description }}</p>
+            <div v-if="news.publish_date" class="feature-date">
+              <i class="pi pi-calendar"></i>
+              {{ formatDate(news.publish_date) }}
+            </div>
           </div>
-        </div>
-      </NuxtLink>
-    </div>
+        </NuxtLink>
+      </div>
 
-    <!-- Pagination Controls -->
-    <div v-if="totalPages > 1" class="pagination-controls">
-      <button
-        class="pagination-btn"
-        :disabled="currentPage === 1"
-        @click="goToPage(1)"
-        :title="$t('common.first')"
-      >
-        <i class="pi pi-angle-double-left"></i>
-      </button>
-      <button
-        class="pagination-btn"
-        :disabled="currentPage === 1"
-        @click="goToPage(currentPage - 1)"
-        :title="$t('common.previous')"
-      >
-        <i class="pi pi-angle-left"></i>
-      </button>
-      <span class="pagination-info">{{ currentPage }} / {{ totalPages }}</span>
-      <button
-        class="pagination-btn"
-        :disabled="currentPage === totalPages"
-        @click="goToPage(currentPage + 1)"
-        :title="$t('common.next')"
-      >
-        <i class="pi pi-angle-right"></i>
-      </button>
-      <button
-        class="pagination-btn"
-        :disabled="currentPage === totalPages"
-        @click="goToPage(totalPages)"
-        :title="$t('common.last')"
-      >
-        <i class="pi pi-angle-double-right"></i>
-      </button>
-    </div>
+      <!-- Regular News -->
+      <div class="news-grid">
+        <NuxtLink v-for="news in newsItems" :key="news.news_id || news.id" :to="`/news/${news.news_id || news.id}`"
+          class="news-card">
+          <div class="news-image">
+            <img v-if="news.photo" :src="`${photoUrl}${news.photo}`" :alt="news.title" />
+            <div v-else class="news-placeholder">
+              <i class="pi pi-image"></i>
+            </div>
+          </div>
+          <div class="news-content">
+            <h3 class="news-title">{{ news.title }}</h3>
+            <p v-if="news.short_description" class="news-excerpt">
+              {{ news.short_description }}
+            </p>
+            <div v-if="news.publish_date" class="news-date">
+              <i class="pi pi-calendar"></i>
+              {{ formatDate(news.publish_date) }}
+            </div>
+          </div>
+        </NuxtLink>
+      </div>
+
+      <!-- Pagination Controls -->
+      <div v-if="totalPages > 1" class="pagination-controls">
+        <button class="pagination-btn" :disabled="currentPage === 1" @click="goToPage(1)" :title="$t('common.first')">
+          <i class="pi pi-angle-double-left"></i>
+        </button>
+        <button class="pagination-btn" :disabled="currentPage === 1" @click="goToPage(currentPage - 1)"
+          :title="$t('common.previous')">
+          <i class="pi pi-angle-left"></i>
+        </button>
+        <span class="pagination-info">{{ currentPage }} / {{ totalPages }}</span>
+        <button class="pagination-btn" :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)"
+          :title="$t('common.next')">
+          <i class="pi pi-angle-right"></i>
+        </button>
+        <button class="pagination-btn" :disabled="currentPage === totalPages" @click="goToPage(totalPages)"
+          :title="$t('common.last')">
+          <i class="pi pi-angle-double-right"></i>
+        </button>
+      </div>
+    </template>
 
     <div v-if="showMoreLink" class="section-footer">
       <NuxtLink :to="moreLink" class="view-more-link">
@@ -98,10 +83,9 @@
 </template>
 
 <script setup lang="ts">
-import type { News } from '~/types'
+import { parseNewsItem } from '~/composables/useNewsParser'
 
 interface Props {
-  items: News[]
   domainId: number
   contentId: number
   sectionTitle?: string
@@ -119,45 +103,55 @@ const config = useRuntimeConfig()
 const photoUrl = config.public.photoUrl
 const route = useRoute()
 const router = useRouter()
+const api = useApi()
 
-const itemsPerPage = 9
 const currentPage = ref(1)
+const totalPages = ref(1)
+const loading = ref(false)
+const newsItems = ref<any[]>([])
+const featureNews = ref<any[]>([])
 
-// Sort by date helper
-const sortByDate = (items: any[]) =>
-  [...items].sort((a, b) => {
-    const dateA = a.publish_date ? new Date(a.publish_date).getTime() : 0
-    const dateB = b.publish_date ? new Date(b.publish_date).getTime() : 0
-    return dateB - dateA
-  })
+const fetchNews = async (page: number = 1) => {
+  if (!props.contentId) return
+  loading.value = true
+  try {
+    const response = await api.get<any>(`/site/list-news/${props.contentId}?page=${page}`)
+    if (response.success && response.data) {
+      const data = response.data
+      const items = data.items || data
+      newsItems.value = (Array.isArray(items) ? items : []).map(parseNewsItem)
+      if (data.pagination) {
+        totalPages.value = data.pagination.totalPages || data.pagination.total_pages || 1
+      } else {
+        totalPages.value = 1
+      }
+    }
+  } catch (e) {
+    console.error('Failed to fetch news:', e)
+  } finally {
+    loading.value = false
+  }
+}
 
-// Feature news (priority === 1), sorted by date
-const featureNews = computed(() =>
-  sortByDate(props.items.filter((n: any) => n.priority === 1))
-)
+const fetchFeatureNews = async () => {
+  if (!props.contentId) return
+  try {
+    const response = await api.get<any>(`/site/feature-news/${props.contentId}`)
+    if (response.success && response.data) {
+      const data = response.data
+      const items = Array.isArray(data) ? data : data.items || []
+      featureNews.value = items.map(parseNewsItem)
+    }
+  } catch (e) {
+    console.error('Failed to fetch feature news:', e)
+  }
+}
 
-// Regular news (priority !== 1), sorted by date
-const regularNews = computed(() =>
-  sortByDate(props.items.filter((n: any) => n.priority !== 1))
-)
-
-// Calculate total pages (regular news only)
-const totalPages = computed(() => Math.ceil(regularNews.value.length / itemsPerPage))
-
-// Get items for current page (regular news)
-const paginatedItems = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage
-  const end = start + itemsPerPage
-  return regularNews.value.slice(start, end)
-})
-
-// Navigate to specific page
-const goToPage = (page: number) => {
+const goToPage = async (page: number) => {
   if (page >= 1 && page <= totalPages.value) {
     currentPage.value = page
-    // Update URL query param
     router.push({ query: { ...route.query, page: String(page) } })
-    // Scroll to top of news section
+    await fetchNews(page)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 }
@@ -167,23 +161,25 @@ const formatDate = (date: string | null) => {
   return new Date(date).toLocaleDateString()
 }
 
-// Initialize page from URL query param
-onMounted(() => {
+onMounted(async () => {
   const pageParam = route.query.page as string
   if (pageParam) {
     const page = parseInt(pageParam, 10)
-    if (page > 0) {
-      currentPage.value = page
-    }
+    if (page > 0) currentPage.value = page
   }
+
+  await Promise.all([
+    fetchFeatureNews(),
+    fetchNews(currentPage.value),
+  ])
 })
 
-// Watch for query param changes (browser back/forward)
-watch(() => route.query.page, (newPage) => {
+watch(() => route.query.page, async (newPage) => {
   if (newPage) {
     const page = parseInt(newPage as string, 10)
-    if (page > 0 && page <= totalPages.value) {
+    if (page > 0 && page !== currentPage.value) {
       currentPage.value = page
+      await fetchNews(page)
     }
   }
 })
@@ -195,12 +191,19 @@ watch(() => route.query.page, (newPage) => {
 }
 
 .section-title {
-  font-size: 1.5rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: #1a202c;
   margin: 0 0 1.5rem 0;
   text-align: center;
   font-family: var(--font-battambang);
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
 }
 
 /* ---- Feature News ---- */
@@ -267,7 +270,7 @@ watch(() => route.query.page, (newPage) => {
 }
 
 .feature-title {
-  font-size: 1.15rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: #1a202c;
   margin: 0 0 0.5rem 0;
@@ -350,8 +353,8 @@ watch(() => route.query.page, (newPage) => {
 }
 
 .news-title {
-  font-size: 1.125rem;
-  font-weight: 600;
+  font-size: 0.85rem;
+  font-weight: normal;
   color: #1a202c;
   margin: 0 0 0.5rem 0;
   font-family: var(--font-battambang);
@@ -453,7 +456,7 @@ watch(() => route.query.page, (newPage) => {
   }
 
   .feature-title {
-    font-size: 1rem;
+    font-size: 0.85rem;
   }
 }
 </style>

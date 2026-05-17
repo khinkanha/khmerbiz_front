@@ -69,24 +69,6 @@ const loading = ref(true)
 const contentSection = ref<ContentSection | null>(null)
 const menuItemName = ref('')
 
-// Parse news item: description may be JSON {title, shortdes, longdes, photo, publish}
-const parseNewsItem = (item: any) => {
-  if (!item.description || typeof item.description !== 'string') return item
-  try {
-    const parsed = JSON.parse(item.description)
-    return {
-      ...item,
-      title: parsed.title || item.title || '',
-      short_description: parsed.shortdes || item.short_description || '',
-      description: parsed.longdes || parsed.longdescription || item.description,
-      photo: parsed.photo || item.photo || null,
-      publish_date: parsed.publish || parsed.publish_date || item.publish_date || null,
-    }
-  } catch {
-    return item
-  }
-}
-
 onMounted(async () => {
   if (!domainStore.domain) {
     await domainStore.resolveDomain()
@@ -112,15 +94,12 @@ onMounted(async () => {
     if (response.success && response.data) {
       const data = response.data
       const raw = data.content || data
-      const news = (raw.newsItems || raw.news || []).map(parseNewsItem)
       contentSection.value = {
         content: {
           ...raw,
-          news,
           items: raw.items || [],
         },
         items: raw.items || [],
-        news,
       }
     }
   } catch (e) {
