@@ -119,17 +119,27 @@ onMounted(async () => {
     }
   }
 
-  // Fetch related news (latest news from the same domain)
+  // Fetch related news via /site/home — extract newsItems from all sections
   try {
     const domainStore = useDomainStore()
     const domainId = domainStore.domain?.domain_id
     if (domainId) {
-      const response = await api.get<any>(`/site/news/${domainId}`)
+      const response = await api.get<any[]>(`/site/home?domain_id=${domainId}`)
       if (response.success && response.data) {
-        const allNews = Array.isArray(response.data) ? response.data : [response.data]
+        const sections = Array.isArray(response.data) ? response.data : [response.data]
+        const allNews: any[] = []
+        for (const section of sections) {
+          const items = section?.content?.newsItems || section?.content?.news || []
+          allNews.push(...items)
+        }
         relatedNews.value = allNews
           .map(parseNewsItem)
           .filter((n: any) => String(n.news_id || n.id) !== String(newsId))
+          .sort((a: any, b: any) => {
+            const da = a.publish_date ? new Date(a.publish_date).getTime() : 0
+            const db = b.publish_date ? new Date(b.publish_date).getTime() : 0
+            return db - da
+          })
           .slice(0, 10)
       }
     }

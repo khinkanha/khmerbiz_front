@@ -280,11 +280,13 @@ const goToNews = (news: any) => {
   })
 }
 
-// Collect all news from all content sections
+// Collect feature news (priority === 1) from all content sections
 const allNews = computed(() => {
   const news: any[] = []
   props.contentSections.forEach(section => {
-    section.news.forEach(n => news.push(n))
+    section.news.forEach(n => {
+      if (n.priority === 1) news.push(n)
+    })
   })
   return news
 })

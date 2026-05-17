@@ -77,6 +77,15 @@ const mapSection = (s: any): ContentSection => ({
   news: parseNews(s.content.newsItems || s.content.news || []),
 })
 
+// Find the first leaf menu item (prefer childless root, else first child)
+const getFirstMenuId = (): number | null => {
+  const tree = domainStore.menuTree
+  if (!tree.length) return null
+  const first = tree[0]
+  if (first.children?.length) return first.children[0].item_id
+  return first.item_id
+}
+
 onMounted(async () => {
   if (!domainStore.domain) {
     await domainStore.resolveDomain()
@@ -116,8 +125,6 @@ onMounted(async () => {
         )
       )
 
-      console.log('API results:', JSON.stringify(results?.[0], null, 2))
-
       const sections: ContentSection[] = []
       for (const data of results) {
         if (!data) continue
@@ -127,8 +134,24 @@ onMounted(async () => {
           sections.push(mapSection(s))
         }
       }
-      console.log('sections:', sections.length, JSON.stringify(sections, null, 2))
       contentSections.value = sections
+    }
+  }
+
+  // Fallback: if no content loaded, fetch the first menu item's content
+  if (contentSections.value.length === 0) {
+    const domainId = domainStore.domain?.domain_id
+    const firstMenuId = getFirstMenuId()
+    if (domainId && firstMenuId) {
+      try {
+        const response = await api.get<any>(`/site/pages/${domainId}/${firstMenuId}`)
+        if (response.success && response.data) {
+          const raw = response.data.content || response.data
+          contentSections.value = [mapSection({ content: raw })]
+        }
+      } catch {
+        // Silently fail
+      }
     }
   }
 })

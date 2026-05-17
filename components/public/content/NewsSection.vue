@@ -1,6 +1,34 @@
 <template>
   <section class="news-section">
     <h2 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h2>
+
+    <!-- Feature News (priority=1) -->
+    <div v-if="featureNews.length > 0" class="feature-news">
+      <NuxtLink
+        v-for="news in featureNews"
+        :key="'feat-' + news.id"
+        :to="`/news/${news.id}`"
+        class="feature-card"
+      >
+        <div class="feature-badge">{{ $t('contentManager.featured') || 'Featured' }}</div>
+        <div class="feature-card-image">
+          <img v-if="news.photo" :src="`${photoUrl}${news.photo}`" :alt="news.title" />
+          <div v-else class="news-placeholder">
+            <i class="pi pi-image"></i>
+          </div>
+        </div>
+        <div class="feature-card-body">
+          <h3 class="feature-title">{{ news.title }}</h3>
+          <p v-if="news.short_description" class="feature-excerpt">{{ news.short_description }}</p>
+          <div v-if="news.publish_date" class="feature-date">
+            <i class="pi pi-calendar"></i>
+            {{ formatDate(news.publish_date) }}
+          </div>
+        </div>
+      </NuxtLink>
+    </div>
+
+    <!-- Regular News -->
     <div class="news-grid">
       <NuxtLink v-for="news in paginatedItems" :key="news.id" :to="`/news/${news.id}`"
         class="news-card">
@@ -95,23 +123,32 @@ const router = useRouter()
 const itemsPerPage = 9
 const currentPage = ref(1)
 
-// Sort items by publish_date DESC (newest first)
-const sortedItems = computed(() => {
-  return [...props.items].sort((a, b) => {
+// Sort by date helper
+const sortByDate = (items: any[]) =>
+  [...items].sort((a, b) => {
     const dateA = a.publish_date ? new Date(a.publish_date).getTime() : 0
     const dateB = b.publish_date ? new Date(b.publish_date).getTime() : 0
-    return dateB - dateA // Descending order
+    return dateB - dateA
   })
-})
 
-// Calculate total pages
-const totalPages = computed(() => Math.ceil(sortedItems.value.length / itemsPerPage))
+// Feature news (priority === 1), sorted by date
+const featureNews = computed(() =>
+  sortByDate(props.items.filter((n: any) => n.priority === 1))
+)
 
-// Get items for current page
+// Regular news (priority !== 1), sorted by date
+const regularNews = computed(() =>
+  sortByDate(props.items.filter((n: any) => n.priority !== 1))
+)
+
+// Calculate total pages (regular news only)
+const totalPages = computed(() => Math.ceil(regularNews.value.length / itemsPerPage))
+
+// Get items for current page (regular news)
 const paginatedItems = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage
   const end = start + itemsPerPage
-  return sortedItems.value.slice(start, end)
+  return regularNews.value.slice(start, end)
 })
 
 // Navigate to specific page
@@ -164,6 +201,101 @@ watch(() => route.query.page, (newPage) => {
   margin: 0 0 1.5rem 0;
   text-align: center;
   font-family: var(--font-battambang);
+}
+
+/* ---- Feature News ---- */
+.feature-news {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.feature-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  text-decoration: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  transition: box-shadow 0.3s, transform 0.3s;
+  border: 2px solid var(--primary-color, #3b82f6);
+}
+
+.feature-card:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  transform: translateY(-4px);
+}
+
+.feature-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 1;
+  background: var(--primary-color, #3b82f6);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.feature-card-image {
+  width: 100%;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.feature-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.feature-card:hover .feature-card-image img {
+  transform: scale(1.05);
+}
+
+.feature-card-body {
+  padding: 1.25rem;
+}
+
+.feature-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 0.5rem 0;
+  font-family: var(--font-battambang);
+  line-height: 1.5;
+}
+
+.feature-card:hover .feature-title {
+  color: var(--primary-color, #3b82f6);
+}
+
+.feature-excerpt {
+  font-size: 0.9rem;
+  color: #555;
+  margin: 0 0 0.75rem 0;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.feature-date {
+  font-size: 0.8rem;
+  color: #999;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 
 .news-grid {
@@ -313,5 +445,15 @@ watch(() => route.query.page, (newPage) => {
   font-weight: 500;
   min-width: 60px;
   text-align: center;
+}
+
+@media (max-width: 768px) {
+  .feature-news {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-title {
+    font-size: 1rem;
+  }
 }
 </style>

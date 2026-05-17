@@ -24,11 +24,12 @@
           <li v-for="item in menuTree" :key="item.item_id" class="nav-item"
             :class="{ 'has-dropdown': item.children && item.children.length > 0 }">
             <a v-if="isSinglePage" :href="`#section-${item.item_id}`" class="nav-link"
+              :class="{ active: activeMenuId === item.item_id }"
               @click.prevent="scrollToSection(item.item_id)">
               {{ item.item_name }}
             </a>
             <NuxtLink v-else :to="`/pages/${domain?.domain_id}/${item.item_id}`" class="nav-link"
-              :class="{ 'router-link-active': isMenuActive(item) }">
+              :class="{ active: isMenuActive(item) }">
               {{ item.item_name }}
             </NuxtLink>
 
@@ -79,7 +80,10 @@ const isAuthenticated = computed(() => authStore.isAuthenticated)
 const isSitebuilder = computed(() => (authStore.user?.sitebuilder ?? 0) !== 0)
 const isSinglePage = computed(() => settings.value?.page_style !== 0)
 
+const activeMenuId = ref<number | null>(null)
+
 const scrollToSection = (itemId: number) => {
+  activeMenuId.value = itemId
   const el = document.getElementById(`section-${itemId}`)
   if (el) {
     el.scrollIntoView({ behavior: 'smooth' })
@@ -228,9 +232,10 @@ const isChildActive = (childId: number) => {
   color: white;
 }
 
-.nav-link.router-link-active {
-  background-color: var(--primary-color, #3b82f6);
+.nav-link.active {
+  background-color: rgba(0, 0, 0, 0.2);
   color: white;
+  font-weight: 600;
 }
 
 /* Dropdown */
