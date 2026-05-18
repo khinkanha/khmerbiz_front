@@ -15,13 +15,6 @@
         <template v-else>
           <!-- News Section -->
           <section v-if="featuredNews.length > 0" class="section news-section">
-            <div class="section-header">
-              <h2 class="section-title">
-                <span class="title-bar"></span>
-                {{ $t('contentManager.latestNews') }}
-              </h2>
-            </div>
-
             <!-- Featured News: First 2 as large cards -->
             <div v-if="paginatedNews.length > 0" class="featured-grid">
               <a
@@ -129,20 +122,13 @@
           </section>
 
           <!-- Content Sections from Menu Tree -->
-          <template v-for="menuItem in menuTree" :key="menuItem.item_id">
+         <template v-for="menuItem in menuTree" :key="menuItem.item_id">
             <!-- Menu items with children -->
             <section
-              v-if="menuItem.children && menuItem.children.length > 0"
+              v-if="menuItem.children && menuItem.children.length > 0 && menuItem.children.some(child => getContentForMenuItem(child.item_id))"
               class="section"
               :id="`section-${menuItem.item_id}`"
             >
-              <div class="section-header">
-                <h2 class="section-title">
-                  <span class="title-bar"></span>
-                  {{ menuItem.item_name }}
-                </h2>
-              </div>
-
               <div
                 v-for="child in menuItem.children"
                 :key="child.item_id"
@@ -187,17 +173,10 @@
 
             <!-- Menu items without children -->
             <section
-              v-else
+              v-else-if="getContentForMenuItem(menuItem.item_id)"
               class="section"
               :id="`section-${menuItem.item_id}`"
             >
-              <div class="section-header">
-                <h2 class="section-title">
-                  <span class="title-bar"></span>
-                  {{ menuItem.item_name }}
-                </h2>
-              </div>
-
               <template v-if="getContentForMenuItem(menuItem.item_id)">
                 <NewsSection
                   v-if="getContentType(menuItem.item_id) === ContentType.NEWS"
@@ -227,7 +206,7 @@
               </template>
             </section>
           </template>
-
+        
           <!-- Social Media Links -->
           <section v-if="socialMedia.length > 0" class="section social-section">
             <div class="social-links-center">

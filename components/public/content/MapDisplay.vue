@@ -51,7 +51,7 @@ withDefaults(defineProps<Props>(), {
 }
 
 .section-title {
-  font-size: 1.5rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: #1a202c;
   margin: 0 0 1.5rem 0;

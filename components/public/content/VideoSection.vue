@@ -3,20 +3,12 @@
     <h2 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h2>
 
     <div class="video-grid">
-      <div
-        v-for="item in items"
-        :key="item.item_id"
-        class="video-item"
-      >
+      <div v-for="item in items" :key="item.item_id" class="video-item">
         <div class="video-wrapper">
-          <iframe
-            v-if="item.video_url && getEmbedUrl(item.video_url)"
-            :src="getEmbedUrl(item.video_url!) ?? undefined"
-            :title="item.title"
-            frameborder="0"
+          <iframe v-if="item.video_url && getEmbedUrl(item.video_url)" :src="getEmbedUrl(item.video_url!) ?? undefined"
+            :title="item.title" frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-          />
+            allowfullscreen />
           <div v-else class="video-placeholder">
             <i class="pi pi-video"></i>
             <p>Invalid video URL</p>
@@ -68,7 +60,7 @@ const getEmbedUrl = (url: string): string | null => {
 }
 
 .section-title {
-  font-size: 1.5rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: #1a202c;
   margin: 0 0 1.5rem 0;

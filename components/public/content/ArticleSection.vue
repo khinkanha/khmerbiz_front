@@ -1,7 +1,6 @@
 <template>
   <section class="article-section">
     <div v-if="content" class="article-container">
-      <h2 v-if="showTitle" class="article-title">{{ decodedTitle }}</h2>
       <div class="article-content" v-html="decodedDescription"></div>
     </div>
   </section>
@@ -50,7 +49,7 @@ const decodedDescription = computed(() => decoded.value.description)
 }
 
 .article-title {
-  font-size: 1.60rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: #1a202c;
   margin: 0 0 1rem 0;

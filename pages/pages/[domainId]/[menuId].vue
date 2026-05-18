@@ -8,37 +8,17 @@
 
       <template v-else-if="contentSection">
         <section class="section">
-          <div class="section-header">
-            <h2 class="section-title">{{ menuItemName }}</h2>
-          </div>
-
-          <NewsSection
-            v-if="contentSection.content.content_type === ContentType.NEWS"
-            :items="contentSection.news"
-            :domain-id="Number(domainId)"
-            :content-id="contentSection.content.content_id"
-          />
-          <PhotoGallery
-            v-else-if="contentSection.content.content_type === ContentType.PHOTO"
-            :items="contentSection.items"
-          />
-          <VideoSection
-            v-else-if="contentSection.content.content_type === ContentType.VIDEO"
-            :items="contentSection.items"
-          />
-          <MapDisplay
-            v-else-if="contentSection.content.content_type === ContentType.MAP"
-            :map-data="parseMapData(contentSection.content)"
-          />
-          <DocumentSection
-            v-else-if="contentSection.content.content_type === ContentType.DOCUMENT"
-            :items="contentSection.items"
-          />
-          <ArticleSection
-            v-else
-            :content="contentSection.content"
-            :show-title="true"
-          />
+          <NewsSection v-if="contentSection.content.content_type === ContentType.NEWS" :items="contentSection.news"
+            :domain-id="Number(domainId)" :content-id="contentSection.content.content_id" />
+          <PhotoGallery v-else-if="contentSection.content.content_type === ContentType.PHOTO"
+            :items="contentSection.items" />
+          <VideoSection v-else-if="contentSection.content.content_type === ContentType.VIDEO"
+            :items="contentSection.items" />
+          <MapDisplay v-else-if="contentSection.content.content_type === ContentType.MAP"
+            :map-data="parseMapData(contentSection.content)" />
+          <DocumentSection v-else-if="contentSection.content.content_type === ContentType.DOCUMENT"
+            :items="contentSection.items" />
+          <ArticleSection v-else :content="contentSection.content" :show-title="true" />
         </section>
       </template>
 
@@ -150,7 +130,7 @@ useHead({
 }
 
 .section-title {
-  font-size: 1.35rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--text-color, #1a202c);
   margin: 0;

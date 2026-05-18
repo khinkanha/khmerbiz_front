@@ -3,17 +3,8 @@
     <h2 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h2>
 
     <div class="gallery-grid">
-      <div
-        v-for="item in items"
-        :key="item.item_id"
-        class="gallery-item"
-        :class="{ featured: item.is_feature }"
-      >
-        <img
-          :src="`${photoUrl}${item.photo}`"
-          :alt="item.title"
-          @click="openLightbox(item)"
-        />
+      <div v-for="item in items" :key="item.item_id" class="gallery-item" :class="{ featured: item.is_feature }">
+        <img :src="`${photoUrl}${item.photo}`" :alt="item.title" @click="openLightbox(item)" />
         <div v-if="item.title" class="item-caption">
           <p>{{ item.title }}</p>
         </div>
@@ -21,20 +12,10 @@
     </div>
 
     <!-- Lightbox Dialog -->
-    <Dialog
-      v-model:visible="showLightbox"
-      :style="{ width: '90vw' }"
-      :modal="true"
-      :showHeader="false"
-      :closable="true"
-      contentClass="lightbox-dialog"
-    >
-      <img
-        v-if="currentItem"
-        :src="`${photoUrl}${currentItem.photo}`"
-        :alt="currentItem.title"
-        class="lightbox-image"
-      />
+    <Dialog v-model:visible="showLightbox" :style="{ width: '90vw' }" :modal="true" :showHeader="false" :closable="true"
+      contentClass="lightbox-dialog">
+      <img v-if="currentItem" :src="`${photoUrl}${currentItem.photo}`" :alt="currentItem.title"
+        class="lightbox-image" />
       <div v-if="currentItem?.title" class="lightbox-caption">
         {{ currentItem.title }}
       </div>
@@ -72,7 +53,7 @@ const openLightbox = (item: ContentItem) => {
 }
 
 .section-title {
-  font-size: 1.5rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: #1a202c;
   margin: 0 0 1.5rem 0;

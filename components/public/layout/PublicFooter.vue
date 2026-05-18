@@ -18,16 +18,6 @@
             <div v-if="settings?.footer" class="footer-text" v-html="settings.footer"></div>
           </div>
 
-          <!-- Quick Links -->
-          <div class="footer-section">
-            <h4 class="footer-heading">{{ $t('sidebar.menu') }}</h4>
-            <ul class="footer-links">
-              <li v-for="item in menuTree.slice(0, 8)" :key="item.item_id">
-                <NuxtLink :to="item.item_url || '#'">{{ item.item_name }}</NuxtLink>
-              </li>
-            </ul>
-          </div>
-
           <!-- Social Media -->
           <div class="footer-section">
             <h4 class="footer-heading">{{ $t('settings.socialMedia') }}</h4>
@@ -43,23 +33,6 @@
                 <i :class="social.icon_class"></i>
                 <span>{{ social.platform }}</span>
               </a>
-            </div>
-          </div>
-
-          <!-- Languages -->
-          <div class="footer-section">
-            <h4 class="footer-heading">{{ $t('settings.languageSetting') }}</h4>
-            <div class="language-links">
-              <button
-                v-for="lang in languages"
-                :key="lang.lang_id"
-                @click="setLanguage(lang.lang_id)"
-                class="language-link"
-                :class="{ active: currentLanguage?.lang_id === lang.lang_id }"
-              >
-                <img :src="`/flag/${flagMap(lang.flag)}`" :alt="lang.lang_name" />
-                {{ lang.lang_name }}
-              </button>
             </div>
           </div>
         </div>
@@ -82,27 +55,8 @@ const domainStore = useDomainStore()
 
 const settings = computed(() => domainStore.settings)
 const socialMedia = computed(() => domainStore.socialMedia)
-const languages = computed(() => domainStore.languages)
-const currentLanguage = computed(() => domainStore.currentLanguage)
-const menuTree = computed(() => domainStore.menuTree)
 
 const currentYear = new Date().getFullYear()
-
-const flagMap = (flag: number) => {
-  const flags: Record<number, string> = {
-    0: 'kh.svg',
-    1: 'en.svg',
-    2: 'ch.svg',
-    3: 'th.svg',
-    4: 'vn.svg',
-    5: 'fr.svg',
-  }
-  return flags[flag] || 'kh.svg'
-}
-
-const setLanguage = async (langId: number) => {
-  await domainStore.setLanguage(langId)
-}
 </script>
 
 <style scoped>
@@ -125,7 +79,7 @@ const setLanguage = async (langId: number) => {
 
 .footer-grid {
   display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  grid-template-columns: 1.5fr 1fr;
   gap: 2rem;
 }
 
@@ -183,30 +137,6 @@ const setLanguage = async (langId: number) => {
   font-family: var(--font-battambang);
 }
 
-/* Quick Links */
-.footer-links {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.footer-links a {
-  color: rgba(255, 255, 255, 0.65);
-  text-decoration: none;
-  font-size: 0.85rem;
-  transition: color 0.2s, padding-left 0.2s;
-  display: block;
-  padding: 0.15rem 0;
-}
-
-.footer-links a:hover {
-  color: white;
-  padding-left: 0.4rem;
-}
-
 /* Social Links */
 .social-links {
   display: flex;
@@ -245,41 +175,6 @@ const setLanguage = async (langId: number) => {
   background-color: var(--primary-color, #3b82f6);
 }
 
-/* Language Links */
-.language-links {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.language-link {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem 0.6rem;
-  background: none;
-  border: none;
-  border-radius: 4px;
-  color: rgba(255, 255, 255, 0.65);
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: left;
-  font-size: 0.85rem;
-}
-
-.language-link:hover,
-.language-link.active {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: white;
-}
-
-.language-link img {
-  width: 20px;
-  height: 14px;
-  object-fit: cover;
-  border-radius: 2px;
-}
-
 /* ---- Bottom Bar ---- */
 .footer-bottom {
   background-color: var(--primary-dark, #111827);
@@ -294,12 +189,6 @@ const setLanguage = async (langId: number) => {
 }
 
 /* ---- Responsive ---- */
-@media (max-width: 1024px) {
-  .footer-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
 @media (max-width: 768px) {
   .footer-grid {
     grid-template-columns: 1fr;

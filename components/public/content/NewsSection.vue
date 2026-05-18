@@ -11,7 +11,7 @@
       <div v-if="featureNews.length > 0" class="feature-news">
         <NuxtLink v-for="news in featureNews" :key="'feat-' + news.id" :to="`/news/${news.news_id || news.id}`"
           class="feature-card">
-          <div class="feature-badge">{{ $t('contentManager.featured') || 'Featured' }}</div>
+          <div class="feature-badge">Featured</div>
           <div class="feature-card-image">
             <img v-if="news.photo" :src="`${photoUrl}${news.photo}`" :alt="news.title" />
             <div v-else class="news-placeholder">

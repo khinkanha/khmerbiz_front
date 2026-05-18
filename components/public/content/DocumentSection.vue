@@ -48,7 +48,7 @@ const photoUrl = config.public.photoUrl || 'https://khmer.biz'
 }
 
 .section-title {
-  font-size: 1.5rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: #1a202c;
   margin: 0 0 1.5rem 0;
@@ -100,7 +100,7 @@ const photoUrl = config.public.photoUrl || 'https://khmer.biz'
 }
 
 .document-info h3 {
-  font-size: 1rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: #1a202c;
   margin: 0 0 0.25rem 0;
