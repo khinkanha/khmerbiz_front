@@ -1,16 +1,9 @@
 <template>
   <section class="document-section">
     <h2 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h2>
-
     <div class="document-list">
-      <a
-        v-for="item in items"
-        :key="item.item_id"
-        :href="`${photoUrl}${item.document_url}`"
-        :download="item.title"
-        class="document-item"
-        target="_blank"
-      >
+      <a v-for="item in items" :key="item.item_id" :href="`${photoUrl}${item.url}`" :download="item.title"
+        class="document-item" target="_blank">
         <div class="document-icon">
           <i class="pi pi-file-pdf" />
         </div>
@@ -39,7 +32,7 @@ withDefaults(defineProps<Props>(), {
 })
 
 const config = useRuntimeConfig()
-const photoUrl = config.public.photoUrl || 'https://khmer.biz'
+const photoUrl = config.public.photoUrl
 </script>
 
 <style scoped>

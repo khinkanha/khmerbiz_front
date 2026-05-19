@@ -49,26 +49,23 @@ const loading = ref(true)
 const contentSection = ref<ContentSection | null>(null)
 const menuItemName = ref('')
 
-onMounted(async () => {
-  if (!domainStore.domain) {
-    await domainStore.resolveDomain()
-  }
-
-  // Find menu item name from the menu tree
-  const findMenuItem = (items: readonly any[]): any => {
-    for (const item of items) {
-      if (String(item.item_id) === menuId) return item
-      if (item.children?.length) {
-        const found = findMenuItem(item.children)
-        if (found) return found
-      }
+const findMenuItem = (items: readonly any[]): any => {
+  for (const item of items) {
+    if (String(item.item_id) === menuId) return item
+    if (item.children?.length) {
+      const found = findMenuItem(item.children)
+      if (found) return found
     }
-    return null
   }
+  return null
+}
+
+const loadContent = async () => {
+  loading.value = true
+
   const menuItem = findMenuItem(domainStore.menuTree)
   menuItemName.value = menuItem?.item_name || ''
 
-  // Fetch content from API
   try {
     const response = await api.get<any>(`/site/pages/${domainId}/${menuId}`)
     if (response.success && response.data) {
@@ -86,6 +83,19 @@ onMounted(async () => {
     console.error('Failed to fetch page content:', e)
   } finally {
     loading.value = false
+  }
+}
+
+onMounted(async () => {
+  if (!domainStore.domain) {
+    await domainStore.resolveDomain()
+  }
+  await loadContent()
+})
+
+watch(() => domainStore.currentLanguage, async (newLang, oldLang) => {
+  if (newLang?.lang_id !== oldLang?.lang_id) {
+    await loadContent()
   }
 })
 

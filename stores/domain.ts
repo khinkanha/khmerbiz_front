@@ -72,7 +72,7 @@ export const useDomainStore = defineStore('domain', () => {
     }
 
     try {
-      const endpoint = domainId ? `/site/menu?domain_id=${domainId}` : '/site/menu'
+      const endpoint = domainId ? `/site/menu?domain_id=${domainId}&lang_id=${langId}` : `/site/menu?lang_id=${langId}`
       const response = await api.get<MenuItem[]>(endpoint)
       if (response.success && response.data) {
         const data = response.data

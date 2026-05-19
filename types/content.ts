@@ -23,8 +23,8 @@ export interface ContentItem {
   priority: number
   is_feature: boolean
   status: number
+  url: string | null
 }
-
 export interface News {
   id: number
   content_id: number

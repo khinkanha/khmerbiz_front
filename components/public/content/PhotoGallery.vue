@@ -1,10 +1,9 @@
 <template>
   <section class="photo-gallery-section">
     <h2 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h2>
-
     <div class="gallery-grid">
       <div v-for="item in items" :key="item.item_id" class="gallery-item" :class="{ featured: item.is_feature }">
-        <img :src="`${photoUrl}${item.photo}`" :alt="item.title" @click="openLightbox(item)" />
+        <img :src="`${photoUrl}${item.url}`" :alt="item.title" @click="openLightbox(item)" />
         <div v-if="item.title" class="item-caption">
           <p>{{ item.title }}</p>
         </div>
@@ -36,7 +35,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const config = useRuntimeConfig()
-const photoUrl = config.public.photoUrl || 'https://khmer.biz'
+const photoUrl = config.public.photoUrl
 
 const showLightbox = ref(false)
 const currentItem = ref<ContentItem | null>(null)

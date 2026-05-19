@@ -5,7 +5,7 @@
     <div class="video-grid">
       <div v-for="item in items" :key="item.item_id" class="video-item">
         <div class="video-wrapper">
-          <iframe v-if="item.video_url && getEmbedUrl(item.video_url)" :src="getEmbedUrl(item.video_url!) ?? undefined"
+          <iframe v-if="item.url && getEmbedUrl(item.url)" :src="getEmbedUrl(item.url!) ?? undefined"
             :title="item.title" frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen />

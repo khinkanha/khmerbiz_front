@@ -7,12 +7,7 @@
           <!-- About / Site Info -->
           <div class="footer-section footer-about">
             <div class="footer-brand">
-              <img
-                v-if="settings?.logo"
-                :src="settings.logo"
-                :alt="settings?.title || 'Logo'"
-                class="footer-logo"
-              />
+              <img v-if="settings?.logo" :src="settings.logo" :alt="settings?.title || 'Logo'" class="footer-logo" />
               <h3 v-if="settings?.title">{{ settings.title }}</h3>
             </div>
             <div v-if="settings?.footer" class="footer-text" v-html="settings.footer"></div>
@@ -22,16 +17,11 @@
           <div class="footer-section">
             <h4 class="footer-heading">{{ $t('settings.socialMedia') }}</h4>
             <div class="social-links">
-              <a
-                v-for="social in socialMedia"
-                :key="social.social_id"
-                :href="social.url"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="social-link"
-              >
-                <i :class="social.icon_class"></i>
-                <span>{{ social.platform }}</span>
+              <a v-for="social in socialMedia" :key="social.smid" :href="social.link" target="_blank"
+                rel="noopener noreferrer" class="social-link">
+
+                <i :class="getSocialIcon(social.stype)"></i>
+                
               </a>
             </div>
           </div>
@@ -50,6 +40,7 @@
 
 <script setup lang="ts">
 import { useDomainStore } from '~/stores/domain'
+import { getSocialIcon } from '~/types'
 
 const domainStore = useDomainStore()
 

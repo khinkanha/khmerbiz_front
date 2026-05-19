@@ -2,22 +2,16 @@
   <div class="scrolling-single-page">
     <!-- Hero Section -->
     <section class="hero-section" v-if="heroBanner || settings.background">
-      <div
-        class="hero-background"
-        :style="{ backgroundImage: heroBanner ? `url(${photoUrl}${heroBanner.photo})` : settings.background ? `url(${settings.background})` : '' }"
-      ></div>
+      <div class="hero-background"
+        :style="{ backgroundImage: heroBanner ? `url(${photoUrl}${heroBanner.photo})` : settings.background ? `url(${settings.background})` : '' }">
+      </div>
       <div class="hero-overlay"></div>
       <div class="hero-content">
         <h1 class="hero-title">{{ settings.title || settings.domain_name }}</h1>
         <p v-if="settings.company_desc" class="hero-subtitle">{{ settings.company_desc }}</p>
         <nav class="anchor-nav">
-          <a
-            v-for="menuItem in menuTree"
-            :key="menuItem.item_id"
-            :href="`#section-${menuItem.item_id}`"
-            class="anchor-link"
-            @click.prevent="scrollToSection(menuItem.item_id)"
-          >
+          <a v-for="menuItem in menuTree" :key="menuItem.item_id" :href="`#section-${menuItem.item_id}`"
+            class="anchor-link" @click.prevent="scrollToSection(menuItem.item_id)">
             {{ menuItem.item_name }}
           </a>
         </nav>
@@ -30,13 +24,9 @@
 
     <!-- Content Sections -->
     <main class="main-content">
-      <div
-        v-for="(menuItem, index) in menuTree"
-        :key="menuItem.item_id"
-        class="content-section-wrapper"
+      <div v-for="(menuItem, index) in menuTree" :key="menuItem.item_id" class="content-section-wrapper"
         :class="{ 'section-left': index % 2 === 0, 'section-right': index % 2 === 1 }"
-        :id="`section-${menuItem.item_id}`"
-      >
+        :id="`section-${menuItem.item_id}`">
         <div class="section-inner">
           <!-- Section number decoration -->
           <span class="section-number">{{ String(index + 1).padStart(2, '0') }}</span>
@@ -50,25 +40,15 @@
 
             <!-- Submenu items -->
             <div v-if="menuItem.children && menuItem.children.length > 0" class="submenu-grid">
-              <div
-                v-for="child in menuItem.children"
-                :key="child.item_id"
-                class="submenu-card"
-                :id="`subsection-${child.item_id}`"
-              >
-                <ContentRenderer
-                  :content="getContentForMenuItem(child.item_id)"
-                  :domain-id="domain.domain_id"
-                />
+              <div v-for="child in menuItem.children" :key="child.item_id" class="submenu-card"
+                :id="`subsection-${child.item_id}`">
+                <ContentRenderer :content="getContentForMenuItem(child.item_id)" :domain-id="domain.domain_id" />
               </div>
             </div>
 
             <!-- Single content -->
             <div v-else class="single-content">
-              <ContentRenderer
-                :content="getContentForMenuItem(menuItem.item_id)"
-                :domain-id="domain.domain_id"
-              />
+              <ContentRenderer :content="getContentForMenuItem(menuItem.item_id)" :domain-id="domain.domain_id" />
             </div>
           </div>
         </div>
@@ -79,6 +59,22 @@
         </div>
       </div>
     </main>
+
+    <!-- Social Media -->
+    <section v-if="socialMedia.length > 0" class="social-footer">
+      <div class="social-inner">
+        <a
+          v-for="social in socialMedia"
+          :key="social.smid"
+          :href="social.link"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="social-icon-link"
+        >
+          <i :class="getSocialIcon(social.stype)"></i>
+        </a>
+      </div>
+    </section>
 
     <!-- Back to top -->
     <transition name="fade">
@@ -91,6 +87,7 @@
 
 <script setup lang="ts">
 import type { MenuItem, Domain, Setting, Banner, SocialMedia, ContentSection, Language } from '~/types'
+import { getSocialIcon } from '~/types'
 
 interface Props {
   menuTree: MenuItem[]
@@ -105,7 +102,7 @@ interface Props {
 const props = defineProps<Props>()
 
 const config = useRuntimeConfig()
-const photoUrl = config.public.photoUrl || 'https://khmer.biz'
+const photoUrl = config.public.photoUrl
 
 const heroBanner = computed(() => props.banners[0] || null)
 const showBackToTop = ref(false)
@@ -177,8 +174,15 @@ onMounted(() => {
 }
 
 @keyframes heroFadeIn {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .hero-title {
@@ -246,15 +250,24 @@ onMounted(() => {
   transition: opacity 0.3s;
 }
 
-.scroll-indicator:hover { opacity: 1; }
+.scroll-indicator:hover {
+  opacity: 1;
+}
 
 .scroll-indicator i {
   animation: scrollBounce 2s ease-in-out infinite;
 }
 
 @keyframes scrollBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(8px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(8px);
+  }
 }
 
 /* ===== Sections ===== */
@@ -399,11 +412,46 @@ onMounted(() => {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.3s;
 }
-.fade-enter-from, .fade-leave-to {
+
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
+}
+
+/* ===== Social Footer ===== */
+.social-footer {
+  padding: 2rem 1rem;
+  text-align: center;
+  background: #f8fafc;
+}
+
+.social-inner {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.social-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 1.1rem;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.social-icon-link:hover {
+  background: var(--primary-color, #3b82f6);
+  color: white;
 }
 
 /* ===== Responsive ===== */

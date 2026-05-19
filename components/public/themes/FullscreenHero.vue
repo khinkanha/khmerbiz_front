@@ -78,6 +78,22 @@
       ></a>
     </div>
 
+    <!-- Social Media -->
+    <section v-if="socialMedia.length > 0" class="social-footer">
+      <div class="social-inner">
+        <a
+          v-for="social in socialMedia"
+          :key="social.smid"
+          :href="social.link"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="social-icon-link"
+        >
+          <i :class="getSocialIcon(social.stype)"></i>
+        </a>
+      </div>
+    </section>
+
     <!-- Back to top -->
     <transition name="fade">
       <button v-if="showBackToTop" class="back-to-top" @click="scrollToTop">
@@ -89,6 +105,7 @@
 
 <script setup lang="ts">
 import type { MenuItem, Domain, Setting, Banner, SocialMedia, ContentSection, Language } from '~/types'
+import { getSocialIcon } from '~/types'
 
 interface Props {
   menuTree: MenuItem[]
@@ -103,7 +120,7 @@ interface Props {
 const props = defineProps<Props>()
 
 const config = useRuntimeConfig()
-const photoUrl = config.public.photoUrl || 'https://khmer.biz'
+const photoUrl = config.public.photoUrl
 
 const heroBanner = computed(() => props.banners[0] || null)
 const activeSection = ref<number | null>(null)
@@ -443,6 +460,38 @@ onMounted(() => {
 }
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
+}
+
+/* ===== Social Footer ===== */
+.social-footer {
+  padding: 2rem 1rem;
+  text-align: center;
+  background: #f8fafc;
+}
+
+.social-inner {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.social-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 1.1rem;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.social-icon-link:hover {
+  background: var(--primary-color, #3b82f6);
+  color: white;
 }
 
 /* ===== Responsive ===== */

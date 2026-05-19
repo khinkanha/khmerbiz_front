@@ -7,17 +7,17 @@
     />
     <PhotoGallery
       v-else-if="content && content.content_type === ContentType.PHOTO"
-      :items="content.items || []"
+      :items="items"
       :section-title="showTitle ? content.title : ''"
     />
     <VideoSection
       v-else-if="content && content.content_type === ContentType.VIDEO"
-      :items="content.items || []"
+      :items="items"
       :section-title="showTitle ? content.title : ''"
     />
     <DocumentSection
       v-else-if="content && content.content_type === ContentType.DOCUMENT"
-      :items="content.items || []"
+      :items="items"
       :section-title="showTitle ? content.title : ''"
     />
     <NewsSection
@@ -36,11 +36,11 @@
 </template>
 
 <script setup lang="ts">
-import type { Content, ContentSection } from '~/types'
+import type { Content, ContentSection, ContentItem } from '~/types'
 import { ContentType } from '~/types'
 
 interface Props {
-  content: Content | ContentSection
+  content: Content | ContentSection | null
   domainId: number
   showTitle?: boolean
   compact?: boolean
@@ -51,21 +51,28 @@ const props = withDefaults(defineProps<Props>(), {
   compact: false,
 })
 
-const contentData = computed(() => {
-  if ('content' in props.content) {
+const isContentSection = (val: any): val is ContentSection => {
+  return val != null && 'content' in val && 'items' in val
+}
+
+const content = computed(() => {
+  if (isContentSection(props.content)) {
     return props.content.content
   }
-  return props.content
+  return props.content as Content | null
 })
 
-const content = computed(() => contentData.value)
+const items = computed<ContentItem[]>(() => {
+  if (isContentSection(props.content)) {
+    return props.content.items || []
+  }
+  return (props.content as Content)?.items || []
+})
 
 const mapData = ref<{ lat: number; lng: number; zoom: number; marker?: string } | null>(null)
 
-// Load map data if content type is MAP
 onMounted(async () => {
   if (content.value?.content_type === ContentType.MAP) {
-    // TODO: Fetch map data from API
     mapData.value = {
       lat: 11.5564,
       lng: 104.9282,

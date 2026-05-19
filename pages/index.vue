@@ -64,63 +64,55 @@ const getFirstMenuId = (): number | null => {
   return first.item_id
 }
 
-onMounted(async () => {
-  if (!domainStore.domain) {
-    await domainStore.resolveDomain()
-  }
+const loadContent = async () => {
+  const domainId = domainStore.domain?.domain_id
+  if (!domainId) return
 
   // For non-ClassicMultiPage themes, fetch home content
   if (domainStore.settings && domainStore.settings.page_style !== 0) {
-    const response = await api.get<any[]>(`/site/home?domain_id=${domainStore.domain.domain_id}`)
+    const response = await api.get<any[]>(`/site/home?domain_id=${domainId}`)
     if (response.success && response.data) {
       const items = Array.isArray(response.data) ? response.data : [response.data]
-      // Extract menus as menuTree
       homeMenuTree.value = items.map((s: any) => s.menu)
-      // Map API { menu, content } to ContentSection { content, items, news }
       contentSections.value = items
         .filter((s: any) => s.content)
         .map(mapSection)
     }
   } else if (domainStore.settings) {
-    const domainId = domainStore.domain?.domain_id
-    if (domainId) {
-      // Collect all menu item IDs (including children) for ClassicMultiPage
-      const allMenuIds: number[] = []
-      const collectIds = (items: readonly any[]) => {
-        for (const item of items) {
-          allMenuIds.push(item.item_id)
-          if (item.children?.length) collectIds(item.children)
-        }
+    // Collect all menu item IDs (including children) for ClassicMultiPage
+    const allMenuIds: number[] = []
+    const collectIds = (items: readonly any[]) => {
+      for (const item of items) {
+        allMenuIds.push(item.item_id)
+        if (item.children?.length) collectIds(item.children)
       }
-      collectIds(domainStore.menuTree)
-
-      // Fetch content for each menu item in parallel
-      const results = await Promise.all(
-        allMenuIds.map(menuId =>
-          api.get<any[]>(`/site/pages/${domainId}/${menuId}`)
-            .then(res => res.success && res.data ? res.data : null)
-            .catch(() => null)
-        )
-      )
-
-      const sections: ContentSection[] = []
-      for (const data of results) {
-        if (!data) continue
-        const items = Array.isArray(data) ? data : [data]
-        for (const s of items) {
-          if (!s.content) continue
-          sections.push(mapSection(s))
-        }
-      }
-      contentSections.value = sections
     }
+    collectIds(domainStore.menuTree)
+
+    const results = await Promise.all(
+      allMenuIds.map(menuId =>
+        api.get<any[]>(`/site/pages/${domainId}/${menuId}`)
+          .then(res => res.success && res.data ? res.data : null)
+          .catch(() => null)
+      )
+    )
+
+    const sections: ContentSection[] = []
+    for (const data of results) {
+      if (!data) continue
+      const items = Array.isArray(data) ? data : [data]
+      for (const s of items) {
+        if (!s.content) continue
+        sections.push(mapSection(s))
+      }
+    }
+    contentSections.value = sections
   }
 
   // Fallback: if no content loaded, fetch the first menu item's content
   if (contentSections.value.length === 0) {
-    const domainId = domainStore.domain?.domain_id
     const firstMenuId = getFirstMenuId()
-    if (domainId && firstMenuId) {
+    if (firstMenuId) {
       try {
         const response = await api.get<any>(`/site/pages/${domainId}/${firstMenuId}`)
         if (response.success && response.data) {
@@ -131,6 +123,19 @@ onMounted(async () => {
         // Silently fail
       }
     }
+  }
+}
+
+onMounted(async () => {
+  if (!domainStore.domain) {
+    await domainStore.resolveDomain()
+  }
+  await loadContent()
+})
+
+watch(() => domainStore.currentLanguage, async (newLang, oldLang) => {
+  if (newLang?.lang_id !== oldLang?.lang_id) {
+    await loadContent()
   }
 })
 

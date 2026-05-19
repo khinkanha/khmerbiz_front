@@ -8,14 +8,8 @@
           <p v-if="settings.company_desc" class="site-desc">{{ settings.company_desc }}</p>
         </div>
         <div v-if="banners.length > 0" class="banner-grid" :class="{ 'multi': banners.length > 1 }">
-          <img
-            v-for="(banner, i) in banners.slice(0, 3)"
-            :key="banner.banner_id"
-            :src="`${photoUrl}${banner.image}`"
-            :alt="banner.title"
-            class="banner-img"
-            :class="{ 'span-2': banners.length === 2 && i === 0 }"
-          />
+          <img v-for="(banner, i) in banners.slice(0, 3)" :key="banner.banner_id" :src="`${photoUrl}${banner.image}`"
+            :alt="banner.title" class="banner-img" :class="{ 'span-2': banners.length === 2 && i === 0 }" />
         </div>
       </div>
     </section>
@@ -25,12 +19,8 @@
       <div class="content-layout">
         <!-- Main Column -->
         <div class="content-main">
-          <div
-            v-for="(menuItem, index) in menuTree"
-            :key="menuItem.item_id"
-            class="magazine-section"
-            :id="`section-${menuItem.item_id}`"
-          >
+          <div v-for="(menuItem, index) in menuTree" :key="menuItem.item_id" class="magazine-section"
+            :id="`section-${menuItem.item_id}`">
             <!-- Section Header -->
             <div class="section-header">
               <h2 class="section-title">{{ menuItem.item_name }}</h2>
@@ -39,26 +29,15 @@
 
             <!-- Submenu grid -->
             <div v-if="menuItem.children && menuItem.children.length > 0" class="editorial-grid">
-              <div
-                v-for="(child, ci) in menuItem.children"
-                :key="child.item_id"
-                class="editorial-card"
-                :class="{ 'card-wide': ci === 0 }"
-                :id="`subsection-${child.item_id}`"
-              >
-                <ContentRenderer
-                  :content="getContentForMenuItem(child.item_id)"
-                  :domain-id="domain.domain_id"
-                />
+              <div v-for="(child, ci) in menuItem.children" :key="child.item_id" class="editorial-card"
+                :class="{ 'card-wide': ci === 0 }" :id="`subsection-${child.item_id}`">
+                <ContentRenderer :content="getContentForMenuItem(child.item_id)" :domain-id="domain.domain_id" />
               </div>
             </div>
 
             <!-- Single content -->
             <div v-else class="section-body">
-              <ContentRenderer
-                :content="getContentForMenuItem(menuItem.item_id)"
-                :domain-id="domain.domain_id"
-              />
+              <ContentRenderer :content="getContentForMenuItem(menuItem.item_id)" :domain-id="domain.domain_id" />
             </div>
           </div>
         </div>
@@ -81,14 +60,8 @@
           <div v-if="socialMedia && socialMedia.length > 0" class="sidebar-card">
             <h3 class="sidebar-title">Follow Us</h3>
             <div class="sidebar-social">
-              <a
-                v-for="social in socialMedia"
-                :key="social.social_id || social.smid"
-                :href="social.url || social.link"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="social-btn"
-              >
+              <a v-for="social in socialMedia" :key="social.smid" :href="social.link"
+                target="_blank" rel="noopener noreferrer" class="social-btn">
                 <i :class="getSocialIcon(social.stype)"></i>
               </a>
             </div>
@@ -111,6 +84,7 @@
 
 <script setup lang="ts">
 import type { MenuItem, Domain, Setting, Banner, SocialMedia, ContentSection, Language } from '~/types'
+import { getSocialIcon } from '~/types'
 
 interface Props {
   menuTree: MenuItem[]
@@ -125,7 +99,7 @@ interface Props {
 const props = defineProps<Props>()
 
 const config = useRuntimeConfig()
-const photoUrl = config.public.photoUrl || 'https://khmer.biz'
+const photoUrl = config.public.photoUrl
 
 const scrollToSection = (sectionId: number) => {
   const element = document.getElementById(`section-${sectionId}`)
@@ -138,16 +112,6 @@ const getContentForMenuItem = (menuItemId: number): ContentSection | null => {
   return props.contentSections.find(cs => cs.content.menu_id === menuItemId) || null
 }
 
-const getSocialIcon = (stype: number): string => {
-  const icons: Record<number, string> = {
-    1: 'pi pi-globe',
-    2: 'pi pi-facebook',
-    3: 'pi pi-youtube',
-    4: 'pi pi-linkedin',
-    5: 'pi pi-twitter',
-  }
-  return icons[stype] || 'pi pi-globe'
-}
 </script>
 
 <style scoped>

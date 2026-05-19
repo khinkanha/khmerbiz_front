@@ -62,12 +62,24 @@ export interface BannerForm {
 }
 
 export interface SocialMedia {
-  social_id: number
+  smid: number
   domain_id: number
-  platform: string
-  url: string
+  stype: number
+  link: string
   icon_class: string
   status: number
+}
+
+export const SOCIAL_ICONS: Record<number, string> = {
+  1: 'pi pi-google',
+  2: 'pi pi-facebook',
+  3: 'pi pi-youtube',
+  4: 'pi pi-linkedin',
+  5: 'pi pi-twitter',
+}
+
+export const getSocialIcon = (stype: number): string => {
+  return SOCIAL_ICONS[stype] || 'pi pi-globe'
 }
 
 export interface SocialMediaForm {

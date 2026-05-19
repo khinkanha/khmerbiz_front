@@ -218,7 +218,7 @@
                 rel="noopener noreferrer"
                 class="social-icon-link"
               >
-                <i :class="social.icon_class"></i>
+                <i :class="getSocialIcon(social.stype)"></i>
               </a>
             </div>
           </section>
@@ -230,7 +230,7 @@
 
 <script setup lang="ts">
 import type { MenuItem, Domain, Setting, Banner, SocialMedia, ContentSection, Language, ContentItem, Content } from '~/types'
-import { ContentType } from '~/types'
+import { ContentType, getSocialIcon } from '~/types'
 import { parseNewsItem } from '~/composables/useNewsParser'
 
 interface Props {
