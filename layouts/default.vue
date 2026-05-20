@@ -22,6 +22,7 @@ const themeClass = computed(() => {
 
 onMounted(async () => {
   if (!domainStore.domain) {
+    domainStore.hydrateFromServer()
     await domainStore.resolveDomain()
   }
 })

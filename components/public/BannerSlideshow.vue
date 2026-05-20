@@ -1,14 +1,15 @@
 <template>
   <div class="banner-slideshow">
+
     <Carousel :value="banners" :numVisible="1" :numScroll="1" :circular="true" :autoplayInterval="5000"
       class="banner-carousel">
       <template #item="{ data }">
         <div class="banner-slide">
           <a v-if="data.link" :href="data.link" target="_blank" rel="noopener noreferrer" class="banner-link">
-            <img v-if="data.photo" :src="`${photoUrl}${data.photo}`" :alt="data.title || 'Banner'"
+            <img v-if="data.image" :src="`${photoUrl}${data.image}`" :alt="data.title || 'Banner'"
               class="banner-image" />
           </a>
-          <img v-else-if="data.photo" :src="`${photoUrl}${data.photo}`" :alt="data.title || 'Banner'"
+          <img v-else-if="data.image" :src="`${photoUrl}${data.image}`" :alt="data.title || 'Banner'"
             class="banner-image" />
           <div v-if="data.title" class="banner-caption">
             <h2>{{ data.title }}</h2>

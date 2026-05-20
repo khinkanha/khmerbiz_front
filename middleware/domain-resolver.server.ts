@@ -24,6 +24,9 @@ export default defineEventHandler(async (event) => {
     event.context.languages = response.languages
     event.context.banners = response.banners
     event.context.socialMedia = response.socialMedia
+
+    // Pass server-fetched config to the client via Nuxt payload so it doesn't re-fetch
+    event.context.configPayload = response
   } catch (error) {
     console.error('Failed to resolve domain:', error)
   }

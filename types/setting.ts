@@ -51,6 +51,7 @@ export interface Banner {
   link: string | null
   banner_order: number
   status: number
+  image: string | null
 }
 
 export interface BannerForm {
@@ -59,6 +60,7 @@ export interface BannerForm {
   link: string
   banner_order: number
   status: number
+  image: string | null
 }
 
 export interface SocialMedia {
@@ -94,7 +96,7 @@ export interface Language {
   domain_id: number
   lang_code: string
   lang_name: string
-  flag_icon: string
+  flag: number
   status: number
   is_default: number
 }

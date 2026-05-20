@@ -212,8 +212,8 @@
             <div class="social-links-center">
               <a
                 v-for="social in socialMedia"
-                :key="social.social_id"
-                :href="social.url"
+                :key="social.smid"
+                :href="social.link"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="social-icon-link"

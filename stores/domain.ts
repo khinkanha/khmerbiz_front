@@ -15,7 +15,30 @@ export const useDomainStore = defineStore('domain', () => {
   const menuTree = ref<MenuItem[]>([])
   const menuCache = ref<Record<number, MenuItem[]>>({})
 
+  // Hydrate from server-injected config if available (avoids re-fetching on client)
+  const hydrateFromServer = (): boolean => {
+    if (import.meta.client && typeof window !== 'undefined' && (window as any).__NUXT_SITE_CONFIG__) {
+      const data = (window as any).__NUXT_SITE_CONFIG__
+      domain.value = data.domain
+      settings.value = data.settings
+      languages.value = data.languages
+      banners.value = data.banners
+      socialMedia.value = data.socialMedia
+      delete (window as any).__NUXT_SITE_CONFIG__
+      return true
+    }
+    return false
+  }
+
   const resolveDomain = async (domainId?: number) => {
+    // If data was already hydrated from server, only fetch menu tree
+    if (domain.value && !domainId) {
+      if (languages.value.length > 0) {
+        await setLanguage(languages.value[0].lang_id)
+      }
+      return
+    }
+
     try {
       let endpoint = domainId ? `/site/config?domain_id=${domainId}` : '/site/config'
       let response = await api.get<{
@@ -146,6 +169,7 @@ export const useDomainStore = defineStore('domain', () => {
     socialMedia: readonly(socialMedia),
     menuTree: readonly(menuTree),
     resolveDomain,
+    hydrateFromServer,
     setLanguage,
     fetchMenuTree,
     clearCache,

@@ -89,21 +89,26 @@ const loadContent = async () => {
     }
     collectIds(domainStore.menuTree)
 
-    const results = await Promise.all(
-      allMenuIds.map(menuId =>
-        api.get<any[]>(`/site/pages/${domainId}/${menuId}`)
-          .then(res => res.success && res.data ? res.data : null)
-          .catch(() => null)
-      )
-    )
-
+    // Fetch in batches of 4 to avoid overwhelming the browser/network
+    const batchSize = 4
     const sections: ContentSection[] = []
-    for (const data of results) {
-      if (!data) continue
-      const items = Array.isArray(data) ? data : [data]
-      for (const s of items) {
-        if (!s.content) continue
-        sections.push(mapSection(s))
+
+    for (let i = 0; i < allMenuIds.length; i += batchSize) {
+      const batch = allMenuIds.slice(i, i + batchSize)
+      const results = await Promise.all(
+        batch.map(menuId =>
+          api.get<any[]>(`/site/pages/${domainId}/${menuId}`)
+            .then(res => res.success && res.data ? res.data : null)
+            .catch(() => null)
+        )
+      )
+      for (const data of results) {
+        if (!data) continue
+        const items = Array.isArray(data) ? data : [data]
+        for (const s of items) {
+          if (!s.content) continue
+          sections.push(mapSection(s))
+        }
       }
     }
     contentSections.value = sections
@@ -128,6 +133,7 @@ const loadContent = async () => {
 
 onMounted(async () => {
   if (!domainStore.domain) {
+    domainStore.hydrateFromServer()
     await domainStore.resolveDomain()
   }
   await loadContent()
