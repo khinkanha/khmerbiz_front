@@ -3,6 +3,13 @@
     <div class="panel">
       <div class="panel-header">{{ $t('dashboard.quickActions') }}</div>
       <div class="panel-body">
+        <NuxtLink to="/admin/ai-chat" class="qbtn-link">
+          <div class="qbtn ai-chat-btn">
+            <div class="qbtn-icon">🤖</div>
+            <div class="qbtn-label">AI Assistant</div>
+          </div>
+        </NuxtLink>
+
         <NuxtLink v-if="!authStore.isSuperAdmin" to="/admin/settings" class="qbtn-link">
           <div class="qbtn">
             <div class="qbtn-icon">⚙️</div>
@@ -117,6 +124,17 @@ onMounted( async () => {
   align-items: center;
   gap: 8px;
   transition: transform 0.15s, background-color 0.15s;
+}
+
+.ai-chat-btn {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border-color: #6366f1;
+  color: white;
+  box-shadow: 0px 7px #6366f1;
+}
+
+.ai-chat-btn:hover {
+  background: linear-gradient(135deg, #5558e8 0%, #7c4fe8 100%);
 }
 
 .qbtn:hover {
