@@ -125,7 +125,7 @@ import { ref, computed, onMounted, nextTick, watch } from 'vue';
 import { useAIChat } from '~/composables/useAIChat';
 import { useAuthStore } from '~/stores/auth';
 
-const { sendMessage, loading, error, messages, hasMessages, usageInfo, canSendMessage, isLimitReached, getUsage, resetChat } = useAIChat();
+const { sendMessage, loading, error, messages, hasMessages, usageInfo, canSendMessage, isLimitReached, remainingQuestions, getUsage, resetChat } = useAIChat();
 const authStore = useAuthStore();
 
 const userInput = ref('');
@@ -202,13 +202,14 @@ const formatToolResult = (tool: any) => {
 .ai-chat-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 80%;
   background: white;
   border-radius: 8px;
   overflow: hidden;
 }
 
 .chat-header {
+  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -355,6 +356,7 @@ const formatToolResult = (tool: any) => {
 }
 
 .input-area {
+  flex-shrink: 0;
   padding: 1rem;
   border-top: 1px solid #e5e7eb;
   background: #f9fafb;

@@ -90,7 +90,7 @@ export const useApi = () => {
         }
       }
 
-      if (!response.ok) {
+      if (!response.ok || data.status === false) {
         return {
           success: false,
           message: data.message || 'An error occurred',

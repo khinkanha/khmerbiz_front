@@ -1,3 +1,4 @@
+import { storeToRefs } from 'pinia';
 import { useApi } from './useApi';
 import { useAIChatStore } from '~/stores/aiChat';
 import type { ToolCallResult, UsageInfo } from '~/types/ai';
@@ -23,6 +24,7 @@ export interface SendMessageResponse {
 export const useAIChat = () => {
   const api = useApi();
   const chatStore = useAIChatStore();
+  const { messages, hasMessages, loading, error, usageInfo, remainingQuestions, canSendMessage, isLimitReached } = storeToRefs(chatStore);
 
   const sendMessage = async (message: string, context?: { langId?: number }) => {
     try {
@@ -108,7 +110,7 @@ export const useAIChat = () => {
     try {
       const response = await api.get<UsageInfo>('/ai-chat/usage');
 
-      if (response.success && response.data) {
+      if (response.success && response.data && (response.data as any).remaining_questions !== undefined) {
         chatStore.setUsageInfo(response.data);
         return response.data;
       }
@@ -143,14 +145,15 @@ export const useAIChat = () => {
   };
 
   return {
-    // State access
-    messages: chatStore.messages,
-    loading: chatStore.loading,
-    error: chatStore.error,
-    usageInfo: chatStore.usageInfo,
-    remainingQuestions: chatStore.remainingQuestions,
-    canSendMessage: chatStore.canSendMessage,
-    isLimitReached: chatStore.isLimitReached,
+    // State access (via storeToRefs to preserve reactivity)
+    messages,
+    hasMessages,
+    loading,
+    error,
+    usageInfo,
+    remainingQuestions,
+    canSendMessage,
+    isLimitReached,
 
     // Actions
     sendMessage,

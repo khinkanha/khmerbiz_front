@@ -125,10 +125,13 @@ const resetTime = computed(() => {
   grid-template-columns: 1fr 300px;
   gap: 2rem;
   height: calc(100vh - 200px);
+  min-height: 0;
 }
 
 .chat-main {
   height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .chat-sidebar {

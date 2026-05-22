@@ -9,7 +9,8 @@
         <a href="https://t.me/cambodiawebhosting" target="_blank">
           <i class="fa-brands fa-telegram fa-lg"></i> cambodiawebhosting
         </a> |
-        <a href="https://www.youtube.com/watch?v=01OhUFUhQM8&list=PLFNGjBqsHQG0odXrXZeBUEaqJghiocvyX&index=6" target="_blank">
+        <a href="https://www.youtube.com/watch?v=01OhUFUhQM8&list=PLFNGjBqsHQG0odXrXZeBUEaqJghiocvyX&index=6"
+          target="_blank">
           <i class="fa-brands fa-youtube text-danger fa-lg"></i> Cambodia Web Hosting
         </a>
       </p>
@@ -19,7 +20,7 @@
 
 <style scoped>
 .admin-footer {
-  position: sticky;
+  position: fixed;
   bottom: 0;
   overflow: scroll;
   background-color: white;
@@ -28,6 +29,7 @@
   font-weight: bold;
   border-top: 1px solid #ddd;
   margin-top: 20px;
+  width: 100%;
 }
 
 .admin-footer p {

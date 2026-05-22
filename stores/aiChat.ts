@@ -54,20 +54,20 @@ export const useAIChatStore = defineStore('aiChat', () => {
     messages.value = [];
   }
 
-  function setLoading(loading: boolean) {
-    loading.value = loading;
+  function setLoading(val: boolean) {
+    loading.value = val;
   }
 
-  function setError(error: string | null) {
-    error.value = error;
+  function setError(val: string | null) {
+    error.value = val;
   }
 
-  function setUsageInfo(usage: UsageInfo) {
-    usageInfo.value = usage;
+  function setUsageInfo(val: UsageInfo) {
+    usageInfo.value = val;
   }
 
-  function setConversationId(id: string) {
-    conversationId.value = id;
+  function setConversationId(val: string) {
+    conversationId.value = val;
   }
 
   function resetConversation() {
