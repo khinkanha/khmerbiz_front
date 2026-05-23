@@ -79,10 +79,10 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({ layout: 'admin' });
+
 import { computed, onMounted } from 'vue';
 import { useAIChat } from '~/composables/useAIChat';
-
-definePageMeta({ layout: 'admin' });
 
 const { usageInfo, getUsage } = useAIChat();
 

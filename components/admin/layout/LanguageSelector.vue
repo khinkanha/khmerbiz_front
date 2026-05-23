@@ -28,6 +28,7 @@ defineProps<{
 }>()
 
 const domainStore = useDomainStore()
+const { locale } = useI18n()
 const menuRef = ref()
 
 const currentLanguage = computed(() => domainStore.currentLanguage)
@@ -55,7 +56,23 @@ const toggleMenu = (event: Event) => {
   menuRef.value?.toggle(event)
 }
 
+const flagToLocale: Record<number, string> = {
+  0: 'kh',
+  1: 'en',
+  2: 'ch',
+  3: 'th',
+  4: 'vn',
+  5: 'fr',
+}
+
 const setLanguage = async (langId: number) => {
+  const lang = domainStore.languages.find(l => l.lang_id === langId)
+  if (lang) {
+    const code = lang.lang_code || flagToLocale[lang.flag]
+    if (code) {
+      locale.value = code
+    }
+  }
   await domainStore.setLanguage(langId)
 }
 </script>

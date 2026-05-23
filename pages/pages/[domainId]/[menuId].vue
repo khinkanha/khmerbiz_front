@@ -30,13 +30,13 @@
 </template>
 
 <script setup lang="ts">
-import type { ContentSection } from '~/types'
-import { ContentType } from '~/types'
-import { useDomainStore } from '~/stores/domain'
-
 definePageMeta({
   layout: 'default',
 })
+
+import type { ContentSection } from '~/types'
+import { ContentType } from '~/types'
+import { useDomainStore } from '~/stores/domain'
 
 const route = useRoute()
 const api = useApi()

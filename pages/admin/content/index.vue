@@ -66,13 +66,13 @@
 </template>
 
 <script setup lang="ts">
-import { ContentType } from '~/types'
-import { useConfirm } from 'primevue/useconfirm'
-
 definePageMeta({
   layout: 'admin',
   middleware: 'auth',
 })
+
+import { ContentType } from '~/types'
+import { useConfirm } from 'primevue/useconfirm'
 
 const contentStore = useContentStore()
 const confirm = useConfirm()

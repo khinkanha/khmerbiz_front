@@ -174,12 +174,13 @@
 </template>
 
 <script setup lang="ts">
-import { useConfirm } from 'primevue/useconfirm'
-
 definePageMeta({
   layout: 'admin',
   middleware: 'auth',
 })
+
+import { useConfirm } from 'primevue/useconfirm'
+import { ContentType } from '~/types'
 
 const contentStore = useContentStore()
 const confirm = useConfirm()
@@ -323,7 +324,9 @@ const deleteNews = async (id: number) => {
 
 onMounted(async () => {
   await contentStore.fetchContent(contentId.value)
-  await contentStore.fetchNews(contentId.value)
+  if (contentStore.currentContent?.content_type === ContentType.NEWS) {
+    await contentStore.fetchNews(contentId.value)
+  }
 })
 </script>
 

@@ -39,17 +39,39 @@ export const useContentStore = defineStore('content', () => {
       const response = await api.get<PaginatedResponse<any>>(`/content?${params}`)
 
       if (response.success && response.data) {
-        contents.value = response.data.items
-        const pag = response.data.pagination
-        pagination.value = {
-          page: pag.page,
-          limit: pag.limit,
-          total: pag.total,
-          totalPages: pag.totalPages,
+        const d = response.data
+        let rawItems: any[] = []
+        if (d.items) {
+          rawItems = d.items
+          const pag = d.pagination
+          if (pag) {
+            pagination.value = {
+              page: pag.page,
+              limit: pag.limit,
+              total: pag.total,
+              totalPages: pag.totalPages,
+            }
+          }
+        } else if (Array.isArray(d)) {
+          rawItems = d
         }
+        contents.value = rawItems.map(parseContent)
       }
     } catch (error) {
       console.error('Failed to fetch contents:', error)
+    }
+  }
+
+  const parseContent = (raw: any) => {
+    let parsed: any = {}
+    if (raw.description && typeof raw.description === 'string') {
+      try {
+        parsed = JSON.parse(raw.description)
+      } catch {}
+    }
+    return {
+      ...raw,
+      title: parsed.title || raw.title || '',
     }
   }
 
@@ -58,8 +80,19 @@ export const useContentStore = defineStore('content', () => {
       const response = await api.get<any>(`/content/${id}`)
 
       if (response.success && response.data) {
-        currentContent.value = response.data
-        console.log('Fetched content:', response.data)
+        const raw = response.data
+        currentContent.value = parseContent(raw)
+
+        // Extract embedded news/items from content response
+        const newsData = raw.newsItems || raw.news || []
+        const itemsData = raw.items || []
+
+        if (Array.isArray(newsData)) {
+          newsList.value = newsData.map(parseNewsItem)
+        }
+        if (Array.isArray(itemsData)) {
+          contentItems.value = itemsData.map(parseItem)
+        }
       }
     } catch (error) {
       console.error('Failed to fetch content:', error)
@@ -108,12 +141,41 @@ export const useContentStore = defineStore('content', () => {
     }
   }
 
+  const parseItem = (raw: any) => {
+    let parsed: any = null
+    if (raw.description && typeof raw.description === 'string') {
+      try {
+        const test = JSON.parse(raw.description)
+        if (test && typeof test === 'object' && !Array.isArray(test)) {
+          parsed = test
+        }
+      } catch {}
+    }
+    return {
+      ...raw,
+      ...(parsed ? {
+        title: parsed.title || raw.title || '',
+        description: parsed.longdes || parsed.description || raw.description || '',
+        photo: parsed.photo || raw.photo || '',
+      } : {}),
+    }
+  }
+
   const fetchItems = async (contentId: number) => {
     try {
       const response = await api.get<any>(`/content/${contentId}/items`)
 
       if (response.success && response.data) {
-        contentItems.value = response.data.items || response.data
+        const d = response.data
+        let rawItems: any[] = []
+        if (d.items) {
+          rawItems = d.items
+        } else if (Array.isArray(d)) {
+          rawItems = d
+        } else if (d.data && Array.isArray(d.data)) {
+          rawItems = d.data
+        }
+        contentItems.value = rawItems.map(parseItem)
       }
     } catch (error) {
       console.error('Failed to fetch items:', error)
@@ -203,6 +265,33 @@ export const useContentStore = defineStore('content', () => {
     }
   }
 
+  const parseNewsItem = (raw: any) => {
+    let parsed: any = null
+    if (raw.description && typeof raw.description === 'string') {
+      try {
+        const test = JSON.parse(raw.description)
+        if (test && typeof test === 'object' && !Array.isArray(test)) {
+          parsed = test
+        }
+      } catch {}
+    }
+    return {
+      ...raw,
+      news_id: raw.id || raw.news_id,
+      ...(parsed ? {
+        title: parsed.title || raw.title || '',
+        short_description: parsed.shortdes || raw.short_description || '',
+        description: parsed.longdes || raw.description || '',
+        photo: parsed.photo || raw.photo || '',
+      } : {
+        title: raw.title || '',
+        short_description: raw.short_description || '',
+        description: raw.description || '',
+        photo: raw.photo || '',
+      }),
+    }
+  }
+
   const fetchNews = async (contentId: number, page: number = 1) => {
     try {
       const params = new URLSearchParams({
@@ -210,17 +299,35 @@ export const useContentStore = defineStore('content', () => {
         limit: String(pagination.value.limit),
       })
 
-      const response = await api.get<PaginatedResponse<News>>(`/content/${contentId}/news?${params}`)
+      const response = await api.get<any>(`/content/${contentId}/news?${params}`)
+      console.log('fetchNews raw response:', response)
+      console.log('fetchNews response.success:', response.success, 'response.data type:', typeof response.data, Array.isArray(response.data))
 
       if (response.success && response.data) {
-        newsList.value = response.data.items
-        const pag = response.data.pagination
-        pagination.value = {
-          page: pag.page,
-          limit: pag.limit,
-          total: pag.total,
-          totalPages: pag.totalPages,
+        const d = response.data
+        let rawItems: any[] = []
+        console.log('fetchNews d keys:', Object.keys(d))
+        if (Array.isArray(d)) {
+          rawItems = d
+        } else if (d.items) {
+          rawItems = d.items
+          const pag = d.pagination
+          if (pag) {
+            pagination.value = {
+              page: pag.page,
+              limit: pag.limit,
+              total: pag.total,
+              totalPages: pag.totalPages,
+            }
+          }
+        } else if (d.news) {
+          rawItems = d.news
+        } else if (d.data && Array.isArray(d.data)) {
+          rawItems = d.data
         }
+        console.log('fetchNews rawItems count:', rawItems.length, rawItems)
+        newsList.value = rawItems.map(parseNewsItem)
+        console.log('fetchNews newsList after parse:', newsList.value.length, newsList.value.map(n => ({ id: n.news_id, title: n.title })))
       }
     } catch (error) {
       console.error('Failed to fetch news:', error)

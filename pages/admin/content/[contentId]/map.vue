@@ -118,14 +118,14 @@
 </template>
 
 <script setup lang="ts">
-import { LMap, LTileLayer, LMarker, LPopup } from '@vue-leaflet/vue-leaflet'
-import 'leaflet/dist/leaflet.css'
-import L from 'leaflet'
-
 definePageMeta({
   layout: 'admin',
   middleware: 'auth',
 })
+
+import { LMap, LTileLayer, LMarker, LPopup } from '@vue-leaflet/vue-leaflet'
+import 'leaflet/dist/leaflet.css'
+import L from 'leaflet'
 
 const contentStore = useContentStore()
 const { t } = useI18n()

@@ -10,54 +10,56 @@
           </div>
         </NuxtLink>
 
-        <NuxtLink v-if="!authStore.isSuperAdmin" to="/admin/settings" class="qbtn-link">
-          <div class="qbtn">
-            <div class="qbtn-icon">⚙️</div>
-            <div class="qbtn-label">{{ $t('dashboard.settings') }}</div>
-          </div>
-        </NuxtLink>
+        <template v-if="authStore.user">
+          <NuxtLink v-if="!authStore.isSuperAdmin" to="/admin/settings" class="qbtn-link">
+            <div class="qbtn">
+              <div class="qbtn-icon">⚙️</div>
+              <div class="qbtn-label">{{ $t('dashboard.settings') }}</div>
+            </div>
+          </NuxtLink>
 
-        <NuxtLink v-if="!authStore.isSuperAdmin" to="/admin/content" class="qbtn-link">
-          <div class="qbtn">
-            <div class="qbtn-icon">📝</div>
-            <div class="qbtn-label">{{ $t('dashboard.manageContent') }}</div>
-          </div>
-        </NuxtLink>
+          <NuxtLink v-if="!authStore.isSuperAdmin" to="/admin/content" class="qbtn-link">
+            <div class="qbtn">
+              <div class="qbtn-icon">📝</div>
+              <div class="qbtn-label">{{ $t('dashboard.manageContent') }}</div>
+            </div>
+          </NuxtLink>
 
-        <NuxtLink v-if="!authStore.isSuperAdmin" to="/admin/media" class="qbtn-link">
-          <div class="qbtn">
-            <div class="qbtn-icon">🖼️</div>
-            <div class="qbtn-label">{{ $t('dashboard.uploadMedia') }}</div>
-          </div>
-        </NuxtLink>
+          <NuxtLink v-if="!authStore.isSuperAdmin" to="/admin/media" class="qbtn-link">
+            <div class="qbtn">
+              <div class="qbtn-icon">🖼️</div>
+              <div class="qbtn-label">{{ $t('dashboard.uploadMedia') }}</div>
+            </div>
+          </NuxtLink>
 
-        <NuxtLink v-if="!authStore.isSuperAdmin" to="/admin/users" class="qbtn-link">
-          <div class="qbtn">
-            <div class="qbtn-icon">👥</div>
-            <div class="qbtn-label">{{ $t('dashboard.userManagement') }}</div>
-          </div>
-        </NuxtLink>
+          <NuxtLink v-if="!authStore.isSuperAdmin" to="/admin/users" class="qbtn-link">
+            <div class="qbtn">
+              <div class="qbtn-icon">👥</div>
+              <div class="qbtn-label">{{ $t('dashboard.userManagement') }}</div>
+            </div>
+          </NuxtLink>
 
-        <NuxtLink v-if="authStore.isSuperAdmin" to="/admin/super/users" class="qbtn-link">
-          <div class="qbtn">
-            <div class="qbtn-icon">👥</div>
-            <div class="qbtn-label">{{ $t('dashboard.userManagement') }}</div>
-          </div>
-        </NuxtLink>
+          <NuxtLink v-if="authStore.isSuperAdmin" to="/admin/super/users" class="qbtn-link">
+            <div class="qbtn">
+              <div class="qbtn-icon">👥</div>
+              <div class="qbtn-label">{{ $t('dashboard.userManagement') }}</div>
+            </div>
+          </NuxtLink>
 
-        <NuxtLink v-if="authStore.isSuperAdmin" to="/admin/super/domains" class="qbtn-link">
-          <div class="qbtn">
-            <div class="qbtn-icon">🌐</div>
-            <div class="qbtn-label">{{ $t('sidebar.domains') }}</div>
-          </div>
-        </NuxtLink>
+          <NuxtLink v-if="authStore.isSuperAdmin" to="/admin/super/domains" class="qbtn-link">
+            <div class="qbtn">
+              <div class="qbtn-icon">🌐</div>
+              <div class="qbtn-label">{{ $t('sidebar.domains') }}</div>
+            </div>
+          </NuxtLink>
 
-        <NuxtLink v-if="authStore.isSuperAdmin" to="/admin/super/announcing" class="qbtn-link">
-          <div class="qbtn">
-            <div class="qbtn-icon">📢</div>
-            <div class="qbtn-label">{{ $t('sidebar.announce') }}</div>
-          </div>
-        </NuxtLink>
+          <NuxtLink v-if="authStore.isSuperAdmin" to="/admin/super/announcing" class="qbtn-link">
+            <div class="qbtn">
+              <div class="qbtn-icon">📢</div>
+              <div class="qbtn-label">{{ $t('sidebar.announce') }}</div>
+            </div>
+          </NuxtLink>
+        </template>
       </div>
     </div>
   </div>

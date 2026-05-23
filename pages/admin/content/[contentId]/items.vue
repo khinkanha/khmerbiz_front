@@ -9,8 +9,8 @@
       </div>
     </div>
     <div class="split-layout">
-      <!-- Left: Add/Edit Form -->
-      <Card class="form-card">
+      <!-- Left: Add/Edit Form (hidden until edit or add) -->
+      <Card v-if="showForm" class="form-card">
         <template #title>
           {{ editingItem ? $t('contentManager.edit') : $t('contentManager.addNew') }}
         </template>
@@ -29,24 +29,55 @@
 
             <div class="form-group">
               <label for="itemDescription">{{ $t('contentManager.description') }}</label>
-              <Textarea
-                id="itemDescription"
-                v-model="itemForm.description"
-                rows="3"
-                :placeholder="$t('contentManager.description')"
-              />
+              <ClientOnly>
+                <Editor
+                  v-model="itemForm.description"
+                  tinymceScriptSrc="/tinymce/tinymce.min.js"
+                  :init="{
+                    height: 300,
+                    menubar: 'tools',
+                    plugins: 'advlist autolink lists link image charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime media table paste',
+                    toolbar: 'undo redo | bold italic underline | forecolor backcolor | fontselect | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | fullscreen',
+                    branding: false,
+                    promotion: false,
+                  }"
+                />
+              </ClientOnly>
             </div>
 
             <div class="form-group">
-              <label for="itemPhoto">{{ $t('contentManager.primaryImage') }}</label>
-              <FileUpload
-                mode="basic"
-                :customUpload="true"
-                @select="handlePhotoSelect"
-                :auto="false"
-                accept="image/*"
-                chooseLabel="Choose Image"
-              />
+              <label>{{ $t('contentManager.primaryImage') }}</label>
+              <div class="image-input-tabs">
+                <Button
+                  :label="'Upload'"
+                  :outlined="imageInputMode !== 'upload'"
+                  size="small"
+                  @click="imageInputMode = 'upload'"
+                />
+                <Button
+                  :label="'URL'"
+                  :outlined="imageInputMode !== 'url'"
+                  size="small"
+                  @click="imageInputMode = 'url'"
+                />
+              </div>
+              <div v-if="imageInputMode === 'upload'">
+                <FileUpload
+                  mode="basic"
+                  :customUpload="true"
+                  @select="handlePhotoSelect"
+                  :auto="false"
+                  accept="image/*"
+                  chooseLabel="Choose Image"
+                />
+              </div>
+              <div v-else>
+                <InputText
+                  v-model="itemForm.photoUrl"
+                  placeholder="https://example.com/image.jpg"
+                  class="w-full"
+                />
+              </div>
               <div v-if="itemForm.photoPreview" class="photo-preview">
                 <img :src="itemForm.photoPreview" alt="Preview" />
                 <Button
@@ -82,7 +113,6 @@
 
             <div class="form-actions">
               <Button
-                v-if="editingItem"
                 type="button"
                 :label="$t('common.cancel')"
                 outlined
@@ -100,13 +130,21 @@
 
       <!-- Right: Items Table -->
       <Card class="table-card">
+        <template #header>
+          <div style="display:flex;justify-content:flex-end;padding:0.5rem 1rem;">
+            <Button :label="$t('contentManager.addNew')" icon="pi pi-plus" size="small" @click="addNewItem" />
+          </div>
+        </template>
         <template #content>
           <DataTable
-            :value="contentStore.contentItems"
+            :value="displayItems"
             :loading="loading"
+            :paginator="displayItems.length > 20"
+            :rows="20"
+            :rowsPerPageOptions="[10, 20, 50]"
             stripedRows
           >
-            <Column field="item_id" header="ID" :style="{ width: '60px' }" />
+            <Column :field="isNewsContent ? 'news_id' : 'item_id'" header="ID" :style="{ width: '60px' }" />
             <Column :header="$t('contentManager.primaryImage')" :style="{ width: '100px' }">
               <template #body="{ data }">
                 <img
@@ -153,13 +191,14 @@
 </template>
 
 <script setup lang="ts">
-import { ContentType } from '~/types'
-import { useConfirm } from 'primevue/useconfirm'
-
 definePageMeta({
   layout: 'admin',
   middleware: 'auth',
 })
+
+import { ContentType } from '~/types'
+import { useConfirm } from 'primevue/useconfirm'
+import Editor from '@tinymce/tinymce-vue'
 
 const contentStore = useContentStore()
 const confirm = useConfirm()
@@ -172,12 +211,15 @@ const photoUrl = config.public.photoUrl || 'https://khmer.biz'
 const loading = ref(false)
 const editingItem = ref<any>(null)
 const saving = ref(false)
+const showForm = ref(false)
+const imageInputMode = ref<'upload' | 'url'>('upload')
 const contentType = ref<ContentType>(ContentType.ARTICLE)
 
 const itemForm = ref({
   title: '',
   description: '',
   photo: null as File | null,
+  photoUrl: '',
   photoPreview: '',
   video_url: '',
   priority: 0,
@@ -205,20 +247,43 @@ const handlePhotoSelect = (event: any) => {
 
 const clearPhoto = () => {
   itemForm.value.photo = null
+  itemForm.value.photoUrl = ''
   itemForm.value.photoPreview = ''
+}
+
+const addNewItem = () => {
+  editingItem.value = null
+  itemForm.value = {
+    title: '',
+    description: '',
+    photo: null,
+    photoUrl: '',
+    photoPreview: '',
+    video_url: '',
+    priority: 0,
+    is_feature: false,
+  }
+  itemErrors.value = {}
+  imageInputMode.value = 'upload'
+  showForm.value = true
 }
 
 const editItem = (item: any) => {
   editingItem.value = item
+  const existingPhoto = item.photo ? `${photoUrl}${item.photo}` : ''
   itemForm.value = {
     title: item.title,
     description: item.description || '',
     photo: null,
-    photoPreview: item.photo ? `${photoUrl}${item.photo}` : '',
+    photoUrl: item.photo && !item.photo.startsWith('/') ? item.photo : '',
+    photoPreview: existingPhoto,
     video_url: item.video_url || '',
     priority: item.priority,
     is_feature: item.is_feature || false,
   }
+  itemErrors.value = {}
+  imageInputMode.value = existingPhoto ? 'url' : 'upload'
+  showForm.value = true
 }
 
 const cancelEdit = () => {
@@ -227,12 +292,14 @@ const cancelEdit = () => {
     title: '',
     description: '',
     photo: null,
+    photoUrl: '',
     photoPreview: '',
     video_url: '',
     priority: 0,
     is_feature: false,
   }
   itemErrors.value = {}
+  showForm.value = false
 }
 
 const handleSaveItem = async () => {
@@ -277,21 +344,42 @@ const confirmDelete = (item: any) => {
 }
 
 const deleteItem = async (id: number) => {
-  await contentStore.deleteItem(contentId.value, id)
+  if (contentType.value === ContentType.NEWS) {
+    await contentStore.deleteNews(contentId.value, id)
+  } else {
+    await contentStore.deleteItem(contentId.value, id)
+  }
 }
+
+const isNewsContent = computed(() => contentType.value === ContentType.NEWS)
+const displayItems = computed(() => isNewsContent.value ? contentStore.newsList : contentStore.contentItems)
 
 onMounted(async () => {
   await contentStore.fetchContent(contentId.value)
   if (contentStore.currentContent) {
     contentType.value = contentStore.currentContent.content_type
   }
-  loading.value = true
-  await contentStore.fetchItems(contentId.value)
-  loading.value = false
+  // fetchContent already populates newsList/items from embedded data
+  // Only fetch separately if no data was embedded
+  if (contentType.value === ContentType.NEWS && contentStore.newsList.length === 0) {
+    loading.value = true
+    await contentStore.fetchNews(contentId.value)
+    loading.value = false
+  } else if (contentType.value !== ContentType.NEWS && contentStore.contentItems.length === 0) {
+    loading.value = true
+    await contentStore.fetchItems(contentId.value)
+    loading.value = false
+  }
 })
 </script>
 
 <style scoped>
+.image-input-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
 .content-items-page {
   display: flex;
   flex-direction: column;

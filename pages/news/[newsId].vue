@@ -68,11 +68,11 @@
 </template>
 
 <script setup lang="ts">
-import { parseNewsItem } from '~/composables/useNewsParser'
-
 definePageMeta({
   layout: 'default',
 })
+
+import { parseNewsItem } from '~/composables/useNewsParser'
 
 const route = useRoute()
 const api = useApi()
