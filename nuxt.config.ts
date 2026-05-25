@@ -66,6 +66,11 @@ export default defineNuxtConfig(<any>{
   css: [
     '~/assets/css/fonts.css',
     '~/assets/css/themes/default.css',
+    '~/assets/css/themes/inverse.css',
+    '~/assets/css/themes/red.css',
+    '~/assets/css/themes/green.css',
+    '~/assets/css/themes/purple.css',
+    '~/assets/css/themes/yellow.css',
     '~/assets/css/admin.css',
     '@fortawesome/fontawesome-free/css/all.min.css',
     'primeicons/primeicons.css',

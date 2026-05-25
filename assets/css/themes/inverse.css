@@ -1,23 +1,28 @@
-/* Theme: Inverse (STYLE_INVERSE = 1) */
-:root {
-  --primary-color: #3b82f6;
-  --primary-dark: #1d4ed8;
+/* Theme: Inverse (dark) */
+.theme-inverse {
+  --primary-color: #60a5fa;
+  --primary-dark: #3b82f6;
   --primary-light: #93c5fd;
   --bg-color: #111827;
   --text-color: #f3f4f6;
   --header-bg: #1f2937;
   --footer-bg: #030712;
   --footer-text: #f3f4f6;
-  --nav-bg: #1f2937;
-  --nav-text: #f3f4f6;
-  --nav-hover: #374151;
+  --nav-bg: #222222;
+  --nav-text: #ffffff;
+  --nav-hover: #4C4C4C;
+  --nav-active: #4C4C4C;
+  --nav-dropdown-bg: #222222;
+  --nav-dropdown-text: #ffffff;
+  --nav-dropdown-hover: #4C4C4C;
+  --top-bar-border: #4C4C4C;
   --sidebar-bg: #030712;
   --sidebar-text: #f3f4f6;
   --sidebar-hover: #1f2937;
-  --sidebar-active: #3b82f6;
+  --sidebar-active: #60a5fa;
   --card-bg: #1f2937;
   --card-border: #374151;
   --input-bg: #1f2937;
   --input-border: #4b5563;
-  --input-focus: #3b82f6;
+  --input-focus: #60a5fa;
 }

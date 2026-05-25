@@ -136,8 +136,8 @@ const isChildActive = (childId: number) => {
 
 /* ---- Top Bar ---- */
 .top-bar {
-  background-color: white;
-  border-bottom: 3px solid var(--primary-color, #3b82f6);
+  background-color: var(--header-bg, white);
+  border-bottom: 3px solid var(--top-bar-border, var(--primary-color));
   padding: 1rem 0;
 }
 
@@ -233,7 +233,7 @@ const isChildActive = (childId: number) => {
 }
 
 .nav-link.active {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: var(--nav-active, rgba(0, 0, 0, 0.2));
   color: white;
   font-weight: 600;
 }
@@ -244,7 +244,7 @@ const isChildActive = (childId: number) => {
   top: 100%;
   left: 0;
   min-width: 220px;
-  background-color: white;
+  background-color: var(--nav-dropdown-bg, white);
   border-radius: 0 0 6px 6px;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
   opacity: 0;
@@ -267,7 +267,7 @@ const isChildActive = (childId: number) => {
 .dropdown-link {
   display: block;
   padding: 0.65rem 1.25rem;
-  color: #4a5568;
+  color: var(--nav-dropdown-text, #4a5568);
   text-decoration: none;
   font-size: 0.85rem;
   transition: background-color 0.15s, color 0.15s;
@@ -275,12 +275,12 @@ const isChildActive = (childId: number) => {
 }
 
 .dropdown-link:hover {
-  background-color: var(--primary-color, #3b82f6);
+  background-color: var(--nav-dropdown-hover, var(--primary-color));
   color: white;
 }
 
 .dropdown-link.active {
-  background-color: var(--primary-color, #3b82f6);
+  background-color: var(--nav-active, var(--primary-color));
   color: white;
   font-weight: 600;
 }

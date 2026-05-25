@@ -48,12 +48,12 @@
           <div class="form-group">
             <label>{{ $t('settings.themeStyle') }}</label>
             <select v-model="form.theme" class="form-control">
-              <option value="0">Default</option>
-              <option value="1">Dark</option>
-              <option value="2">Red</option>
-              <option value="3">Green</option>
-              <option value="4">Purple</option>
-              <option value="5">Yellow</option>
+              <option :value="0">Default</option>
+              <option :value="1">Dark</option>
+              <option :value="2">Red</option>
+              <option :value="3">Green</option>
+              <option :value="4">Purple</option>
+              <option :value="5">Yellow</option>
             </select>
           </div>
         </div>

@@ -1,23 +1,28 @@
-/* Theme: Red (STYLE_RED = 2) */
-:root {
-  --primary-color: #ef4444;
-  --primary-dark: #b91c1c;
-  --primary-light: #fca5a5;
+/* Theme: Red */
+.theme-red {
+  --primary-color: #C0392B;
+  --primary-dark: #A93226;
+  --primary-light: #E74C3C;
   --bg-color: #ffffff;
   --text-color: #1f2937;
   --header-bg: #ffffff;
   --footer-bg: #991b1b;
   --footer-text: #fef2f2;
-  --nav-bg: #ef4444;
+  --nav-bg: #C0392B;
   --nav-text: #ffffff;
-  --nav-hover: #dc2626;
+  --nav-hover: #CD6155;
+  --nav-active: #B22222;
+  --nav-dropdown-bg: #C0392B;
+  --nav-dropdown-text: #ffffff;
+  --nav-dropdown-hover: #CD6155;
+  --top-bar-border: #C0392B;
   --sidebar-bg: #7f1d1d;
   --sidebar-text: #fef2f2;
   --sidebar-hover: #991b1b;
-  --sidebar-active: #ef4444;
+  --sidebar-active: #C0392B;
   --card-bg: #ffffff;
   --card-border: #fecaca;
   --input-bg: #ffffff;
   --input-border: #d1d5db;
-  --input-focus: #ef4444;
+  --input-focus: #C0392B;
 }

@@ -20,11 +20,11 @@
 
 <style scoped>
 .admin-footer {
-  position: fixed;
+  position: inherit;
   bottom: 0;
   overflow: scroll;
   background-color: white;
-  padding: 12px;
+  padding: 5px;
   z-index: 12;
   font-weight: bold;
   border-top: 1px solid #ddd;

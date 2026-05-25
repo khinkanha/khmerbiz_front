@@ -207,6 +207,10 @@ const handleSave = async () => {
       result = await contentStore.updateContent(contentId.value!, {
         title: form.value.title,
         description: form.value.description,
+        content_type: form.value.content_type,
+        lang_id: form.value.lang_id!,
+        menu_id: form.value.menu_id!,
+        status: form.value.status,
       })
     }
 

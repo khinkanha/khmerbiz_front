@@ -1,23 +1,28 @@
-/* Theme: Yellow (STYLE_YELLOW = 5) */
-:root {
-  --primary-color: #eab308;
-  --primary-dark: #a16207;
-  --primary-light: #fde047;
+/* Theme: Yellow/Orange */
+.theme-yellow {
+  --primary-color: #EF7007;
+  --primary-dark: #cc5e00;
+  --primary-light: #F7B075;
   --bg-color: #ffffff;
   --text-color: #1f2937;
   --header-bg: #ffffff;
   --footer-bg: #713f12;
   --footer-text: #fefce8;
-  --nav-bg: #eab308;
-  --nav-text: #1f2937;
-  --nav-hover: #ca8a04;
+  --nav-bg: #EF7007;
+  --nav-text: #ffffff;
+  --nav-hover: #F7B075;
+  --nav-active: #FF8C00;
+  --nav-dropdown-bg: #EF7007;
+  --nav-dropdown-text: #ffffff;
+  --nav-dropdown-hover: #F7B075;
+  --top-bar-border: #EF7007;
   --sidebar-bg: #713f12;
   --sidebar-text: #fefce8;
   --sidebar-hover: #854d0e;
-  --sidebar-active: #eab308;
+  --sidebar-active: #EF7007;
   --card-bg: #ffffff;
   --card-border: #fef08a;
   --input-bg: #ffffff;
   --input-border: #d1d5db;
-  --input-focus: #eab308;
+  --input-focus: #EF7007;
 }

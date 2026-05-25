@@ -1,23 +1,28 @@
-/* Theme: Purple (STYLE_PURPIL = 4) */
-:root {
-  --primary-color: #a855f7;
-  --primary-dark: #7e22ce;
-  --primary-light: #d8b4fe;
+/* Theme: Purple */
+.theme-purple {
+  --primary-color: #780B83;
+  --primary-dark: #5c0866;
+  --primary-light: #a855f7;
   --bg-color: #ffffff;
   --text-color: #1f2937;
   --header-bg: #ffffff;
   --footer-bg: #581c87;
   --footer-text: #faf5ff;
-  --nav-bg: #a855f7;
+  --nav-bg: #780B83;
   --nav-text: #ffffff;
-  --nav-hover: #9333ea;
+  --nav-hover: #D5AADA;
+  --nav-active: #8B008B;
+  --nav-dropdown-bg: #780B83;
+  --nav-dropdown-text: #ffffff;
+  --nav-dropdown-hover: #D5AADA;
+  --top-bar-border: #780B83;
   --sidebar-bg: #581c87;
   --sidebar-text: #faf5ff;
   --sidebar-hover: #6b21a8;
-  --sidebar-active: #a855f7;
+  --sidebar-active: #780B83;
   --card-bg: #ffffff;
   --card-border: #e9d5ff;
   --input-bg: #ffffff;
   --input-border: #d1d5db;
-  --input-focus: #a855f7;
+  --input-focus: #780B83;
 }

@@ -1,5 +1,6 @@
-/* Theme: Default (STYLE_DEFAULT = 0) */
-:root {
+/* Theme: Default (blue) */
+:root,
+.theme-default {
   --primary-color: #3b82f6;
   --primary-dark: #1d4ed8;
   --primary-light: #93c5fd;
@@ -11,6 +12,11 @@
   --nav-bg: #3b82f6;
   --nav-text: #ffffff;
   --nav-hover: #2563eb;
+  --nav-active: #1d4ed8;
+  --nav-dropdown-bg: #ffffff;
+  --nav-dropdown-text: #4a5568;
+  --nav-dropdown-hover: #eff6ff;
+  --top-bar-border: #3b82f6;
   --sidebar-bg: #1f2937;
   --sidebar-text: #f3f4f6;
   --sidebar-hover: #374151;
@@ -22,17 +28,17 @@
   --input-focus: #3b82f6;
 }
 
-body {
+.theme-default body {
   background-color: var(--bg-color);
   color: var(--text-color);
   font-family: 'Battambang', system-ui, sans-serif;
 }
 
-a {
+.theme-default a {
   color: var(--primary-color);
   text-decoration: none;
 }
 
-a:hover {
+.theme-default a:hover {
   color: var(--primary-dark);
 }
