@@ -23,6 +23,20 @@
           </tbody>
         </table>
       </div>
+
+      <nav v-if="pagination.totalPages > 1" class="text-center">
+        <ul class="pagination">
+          <li :class="{ disabled: page <= 1 }">
+            <a href="#" @click.prevent="goPage(page - 1)">&laquo;</a>
+          </li>
+          <li v-for="p in pagination.totalPages" :key="p" :class="{ active: p === page }">
+            <a href="#" @click.prevent="goPage(p)">{{ p }}</a>
+          </li>
+          <li :class="{ disabled: page >= pagination.totalPages }">
+            <a href="#" @click.prevent="goPage(page + 1)">&raquo;</a>
+          </li>
+        </ul>
+      </nav>
     </div>
   </div>
 </template>
@@ -34,17 +48,32 @@ import { useApi } from '~/composables/useApi'
 
 const api = useApi()
 const domains = ref<any[]>([])
+const page = ref(1)
+const pagination = ref({ page: 1, limit: 10, total: 0, totalPages: 1 })
 
 const assignPermission = (id: number) => {
   navigateTo(`/admin/super/domains/${id}`)
 }
 
-onMounted(async () => {
+const loadDomains = async () => {
   try {
-    const res = await api.get('/domains')
-    domains.value = res.data || []
+    const res = await api.get(`/domains?page=${page.value}&limit=10`)
+    if (res.success) {
+      domains.value = res.data?.items || []
+      pagination.value = res.data?.pagination || { page: 1, limit: 10, total: 0, totalPages: 1 }
+    }
   } catch (e) {
     console.error(e)
   }
+}
+
+const goPage = (p: number) => {
+  if (p < 1 || p > pagination.value.totalPages) return
+  page.value = p
+  loadDomains()
+}
+
+onMounted(async () => {
+  await loadDomains()
 })
 </script>

@@ -26,7 +26,7 @@
           <div class="col-md-6">
             <div class="form-group">
               <label>Address</label>
-              <input type="text" v-model="form.address" class="form-control" placeholder="Company Address" />
+              <input type="text" v-model="form.company_address" class="form-control" placeholder="Company Address" />
             </div>
           </div>
           <div class="col-md-6">
@@ -46,7 +46,7 @@
           <div class="col-md-6">
             <div class="form-group">
               <label>Phone</label>
-              <input type="text" v-model="form.phone" class="form-control" placeholder="XXX-XXX-XXX" />
+              <input type="text" v-model="form.phone_number" class="form-control" placeholder="XXX-XXX-XXX" />
             </div>
           </div>
         </div>
@@ -69,9 +69,9 @@ const form = ref({
   domain_name: '',
   company_name: '',
   company_desc: '',
-  address: '',
+  company_address: '',
   email: '',
-  phone: '',
+  phone_number: '',
 })
 
 const handleSave = async () => {
