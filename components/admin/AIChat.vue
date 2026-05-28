@@ -26,13 +26,53 @@
       <div v-if="!hasMessages" class="empty-state">
         <i class="pi pi-android" style="font-size: 3rem; color: #6366f1;"></i>
         <h4>Ask AI anything about your website</h4>
-        <p>Try:</p>
-        <ul class="suggestions">
-          <li>"Change my theme to purple"</li>
-          <li>"Create a news article about..."</li>
-          <li>"Update my menu structure"</li>
-          <li>"Generate SEO keywords for my content"</li>
-        </ul>
+        <div class="ai-capabilities">
+          <div class="capability-group">
+            <div class="capability-title"><i class="pi pi-bolt"></i> Quick Setup</div>
+            <ul class="suggestions">
+              <li @click="useSuggestion('Create a fresh website for my business')">"Create a fresh website for my business"</li>
+              <li @click="useSuggestion('Apply a portfolio template to my site')">"Apply a portfolio template to my site"</li>
+            </ul>
+          </div>
+          <div class="capability-group">
+            <div class="capability-title"><i class="pi pi-palette"></i> Themes & Layout</div>
+            <ul class="suggestions">
+              <li @click="useSuggestion('Change my theme to purple')">"Change my theme to purple"</li>
+              <li @click="useSuggestion('Switch to magazine layout')">"Switch to magazine layout"</li>
+              <li @click="useSuggestion('Move the logo to the left and menu to the top')">"Move the logo to the left and menu to the top"</li>
+            </ul>
+          </div>
+          <div class="capability-group">
+            <div class="capability-title"><i class="pi pi-file"></i> Content & Articles</div>
+            <ul class="suggestions">
+              <li @click="useSuggestion('Create a new article about our services')">"Create a new article about our services"</li>
+              <li @click="useSuggestion('Update my home page content')">"Update my home page content"</li>
+              <li @click="useSuggestion('Create a new page called Team')">"Create a new page called Team"</li>
+            </ul>
+          </div>
+          <div class="capability-group">
+            <div class="capability-title"><i class="pi pi-bars"></i> Menu Management</div>
+            <ul class="suggestions">
+              <li @click="useSuggestion('Add a Services menu item')">"Add a Services menu item"</li>
+              <li @click="useSuggestion('Reorder my menu items')">"Reorder my menu items"</li>
+              <li @click="useSuggestion('Delete the Contact Us menu')">"Delete the Contact Us menu"</li>
+            </ul>
+          </div>
+          <div class="capability-group">
+            <div class="capability-title"><i class="pi pi-image"></i> Banners & News</div>
+            <ul class="suggestions">
+              <li @click="useSuggestion('Create a news article about our latest product launch')">"Create a news article about our latest product launch"</li>
+              <li @click="useSuggestion('Change the banner display style')">"Change the banner display style"</li>
+            </ul>
+          </div>
+          <div class="capability-group">
+            <div class="capability-title"><i class="pi pi-search"></i> SEO</div>
+            <ul class="suggestions">
+              <li @click="useSuggestion('Generate SEO keywords for my content')">"Generate SEO keywords for my content"</li>
+              <li @click="useSuggestion('Update SEO metadata for my home page')">"Update SEO metadata for my home page"</li>
+            </ul>
+          </div>
+        </div>
       </div>
 
       <div
@@ -130,6 +170,10 @@ const authStore = useAuthStore();
 
 const userInput = ref('');
 const messagesContainer = ref<HTMLElement | null>(null);
+
+const useSuggestion = (text: string) => {
+  userInput.value = text;
+};
 
 onMounted(async () => {
   await getUsage();
@@ -241,31 +285,64 @@ const formatToolResult = (tool: any) => {
 
 .empty-state {
   text-align: center;
-  padding: 3rem 1rem;
+  padding: 2rem 1rem;
   color: #6b7280;
 }
 
 .empty-state h4 {
-  margin: 1rem 0 0.5rem 0;
+  margin: 0.75rem 0 1rem 0;
   color: #374151;
+}
+
+.ai-capabilities {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  text-align: left;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 0 0.5rem;
+}
+
+.capability-group {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+
+.capability-title {
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: #4b5563;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.capability-title i {
+  color: #6366f1;
+  font-size: 0.85rem;
 }
 
 .suggestions {
   list-style: none;
   padding: 0;
-  margin: 1rem 0 0 0;
-  text-align: left;
-  display: inline-block;
+  margin: 0;
 }
 
 .suggestions li {
-  padding: 0.25rem 0;
+  padding: 0.3rem 0;
   color: #6366f1;
+  font-size: 0.8rem;
   cursor: pointer;
+  line-height: 1.4;
 }
 
 .suggestions li:hover {
   text-decoration: underline;
+  color: #4f46e5;
 }
 
 .message {

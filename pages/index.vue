@@ -106,8 +106,10 @@ const loadContent = async () => {
         if (!data) continue
         const items = Array.isArray(data) ? data : [data]
         for (const s of items) {
-          if (!s.content) continue
-          sections.push(mapSection(s))
+          // getSitePage returns raw content objects; getSiteHome returns { menu, content } sections
+          const section = s.content !== undefined ? s : { content: s }
+          if (!section.content) continue
+          sections.push(mapSection(section))
         }
       }
     }

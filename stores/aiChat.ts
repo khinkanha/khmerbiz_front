@@ -9,6 +9,7 @@ export interface ChatMessage {
   timestamp: string;
   toolCalls?: ToolCallResult[];
   loading?: boolean;
+  error?: string;
 }
 
 export const useAIChatStore = defineStore('aiChat', () => {

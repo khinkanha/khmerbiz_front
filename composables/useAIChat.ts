@@ -21,14 +21,82 @@ export interface SendMessageResponse {
   remainingQuestions: number;
 }
 
+export interface AsyncJobResponse {
+  jobId: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+}
+
+export interface JobStatusResponse {
+  jobId: string;
+  jobStatus: 'pending' | 'processing' | 'completed' | 'failed';
+  result?: SendMessageResponse;
+  error?: string;
+  remainingQuestions: number;
+}
+
 export const useAIChat = () => {
   const api = useApi();
   const chatStore = useAIChatStore();
   const { messages, hasMessages, loading, error, usageInfo, remainingQuestions, canSendMessage, isLimitReached } = storeToRefs(chatStore);
 
+  const pollJob = async (jobId: string, loadingMessageId: string): Promise<void> => {
+    const maxPolls = 120; // ~2 minutes at 1s interval
+    let pollCount = 0;
+
+    while (pollCount < maxPolls) {
+      pollCount++;
+      const response = await api.get<JobStatusResponse>(`/ai-chat/job/${jobId}`);
+
+      if (!response.success || !response.data) {
+        break;
+      }
+
+      const { jobStatus, result, error: jobError, remainingQuestions: remaining } = response.data;
+
+      // Update usage info on every poll
+      if (remaining !== undefined) {
+        chatStore.setUsageInfo({
+          remaining_questions: remaining,
+          daily_limit: 10,
+          questions_count: 10 - remaining,
+          reset_at: '',
+        });
+      }
+
+      if (jobStatus === 'completed' && result) {
+        chatStore.updateMessage(loadingMessageId, {
+          content: result.response,
+          toolCalls: result.toolCalls,
+          loading: false,
+        });
+        return;
+      }
+
+      if (jobStatus === 'failed') {
+        chatStore.updateMessage(loadingMessageId, {
+          content: '',
+          loading: false,
+          error: jobError || 'AI processing failed',
+        });
+        chatStore.setError(jobError || 'AI processing failed');
+        return;
+      }
+
+      // Wait 1s before next poll
+      await new Promise(r => setTimeout(r, 1000));
+    }
+
+    // Timeout
+    chatStore.updateMessage(loadingMessageId, {
+      content: '',
+      loading: false,
+      error: 'Request timed out. Please try again.',
+    });
+    chatStore.setError('Request timed out');
+  };
+
   const sendMessage = async (message: string, context?: { langId?: number }) => {
     try {
-      console.log('AI Chat: Sending message', { message, context });
       chatStore.setLoading(true);
       chatStore.setError(null);
 
@@ -45,62 +113,26 @@ export const useAIChat = () => {
         loading: true,
       });
 
-      const request: SendMessageRequest = {
-        message,
-        context,
-      };
+      const request: SendMessageRequest = { message, context };
 
-      console.log('AI Chat: Making API request', request);
-      const response = await api.post<SendMessageResponse>('/ai-chat/message', request);
-      console.log('AI Chat: API response', response);
+      // Send message — get jobId back immediately
+      const response = await api.post<AsyncJobResponse>('/ai-chat/message', request);
 
-      if (response.success && response.data) {
-        // Update loading message with actual response
-        chatStore.updateMessage(loadingMessageId, {
-          content: response.data.response,
-          toolCalls: response.data.toolCalls,
-          loading: false,
-        });
-
-        // Update usage info
-        if (response.data.remainingQuestions !== undefined) {
-          chatStore.setUsageInfo({
-            remaining_questions: response.data.remainingQuestions,
-            daily_limit: 10,
-            questions_count: 10 - response.data.remainingQuestions,
-            reset_at: '', // Will be set from usage endpoint
-          });
-        }
-
-        return {
-          success: true,
-          response: response.data.response,
-          toolCalls: response.data.toolCalls,
-          usage: response.data.usage,
-        };
+      if (response.success && response.data?.jobId) {
+        // Poll for result
+        await pollJob(response.data.jobId, loadingMessageId);
+        return { success: true };
       } else {
-        // Remove loading message
         chatStore.removeMessage(loadingMessageId);
-
         const errorMessage = response.message || 'Failed to send message';
         chatStore.setError(errorMessage);
-        console.error('AI Chat: Request failed', response);
-
-        return {
-          success: false,
-          error: errorMessage,
-        };
+        return { success: false, error: errorMessage };
       }
     } catch (error: any) {
       chatStore.setLoading(false);
       const errorMessage = error.message || 'Network error';
       chatStore.setError(errorMessage);
-      console.error('AI Chat: Exception caught', error);
-
-      return {
-        success: false,
-        error: errorMessage,
-      };
+      return { success: false, error: errorMessage };
     } finally {
       chatStore.setLoading(false);
     }

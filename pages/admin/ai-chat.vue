@@ -15,28 +15,53 @@
           <h3>What can AI do?</h3>
           <ul class="capability-list">
             <li>
-              <i class="pi pi-palette"></i>
-              <span>Change themes, layouts, and styling</span>
+              <i class="pi pi-bolt"></i>
+              <div>
+                <strong>Quick Website Setup</strong>
+                <p>Generate a complete website with pages, menus, and content from scratch</p>
+              </div>
             </li>
             <li>
-              <i class="pi pi-file-text"></i>
-              <span>Create and edit articles, news, documents</span>
+              <i class="pi pi-th-large"></i>
+              <div>
+                <strong>Apply Templates</strong>
+                <p>Business, portfolio, blog, or organization templates with matching themes</p>
+              </div>
+            </li>
+            <li>
+              <i class="pi pi-palette"></i>
+              <div>
+                <strong>Theme & Layout</strong>
+                <p>Change colors (6 themes), layouts (classic, single page, magazine, hero), logo &amp; menu positions</p>
+              </div>
+            </li>
+            <li>
+              <i class="pi pi-file"></i>
+              <div>
+                <strong>Create &amp; Edit Pages</strong>
+                <p>Create articles, update content, delete pages, add new menu sections</p>
+              </div>
             </li>
             <li>
               <i class="pi pi-bars"></i>
-              <span>Manage menus and navigation</span>
+              <div>
+                <strong>Menu Management</strong>
+                <p>Add, rename, reorder, or delete menu items and submenus</p>
+              </div>
             </li>
             <li>
               <i class="pi pi-image"></i>
-              <span>Handle banners and media</span>
+              <div>
+                <strong>Banners &amp; News</strong>
+                <p>Create news articles, manage banners, change display styles</p>
+              </div>
             </li>
             <li>
               <i class="pi pi-search"></i>
-              <span>Optimize SEO and metadata</span>
-            </li>
-            <li>
-              <i class="pi pi-bolt"></i>
-              <span>Quick setup website templates</span>
+              <div>
+                <strong>SEO Optimization</strong>
+                <p>Generate keywords, update meta titles &amp; descriptions</p>
+              </div>
             </li>
           </ul>
         </div>
@@ -161,15 +186,36 @@ const resetTime = computed(() => {
 
 .capability-list li {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.75rem;
-  padding: 0.5rem 0;
+  padding: 0.6rem 0;
   color: #374151;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.capability-list li:last-child {
+  border-bottom: none;
+}
+
+.capability-list li strong {
+  display: block;
+  font-size: 0.85rem;
+  color: #1f2937;
+  margin-bottom: 0.15rem;
+}
+
+.capability-list li p {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #6b7280;
+  line-height: 1.3;
 }
 
 .capability-list i {
   color: #6366f1;
-  font-size: 1.125rem;
+  font-size: 1rem;
+  margin-top: 0.15rem;
+  flex-shrink: 0;
 }
 
 .usage-info {
