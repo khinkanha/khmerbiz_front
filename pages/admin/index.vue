@@ -1,5 +1,18 @@
 <template>
   <div class="dashboard">
+    <!-- Setup Banner -->
+    <div v-if="needsSetup" class="setup-banner">
+      <div class="setup-banner-content">
+        <div class="setup-banner-text">
+          <i class="pi pi-exclamation-circle"></i>
+          <span>Your website isn't set up yet. Complete the Quick Setup to get started.</span>
+        </div>
+        <NuxtLink to="/admin/setup" class="setup-banner-btn">
+          Quick Setup <i class="pi pi-arrow-right"></i>
+        </NuxtLink>
+      </div>
+    </div>
+
     <div class="panel">
       <div class="panel-header">{{ $t('dashboard.quickActions') }}</div>
       <div class="panel-body">
@@ -69,14 +82,68 @@
 definePageMeta({ layout: 'admin' })
 import { useDomainStore } from '~/stores/domain'
 import { useAuthStore } from '~/stores/auth'
-const domainStore = useDomainStore()  
+import { useSetup } from '~/composables/useSetup'
+const domainStore = useDomainStore()
 const authStore = useAuthStore()
-onMounted( async () => {
-   await domainStore.resolveDomain(authStore.user?.domain_id)
+const { setupStatus, fetchStatus } = useSetup()
+
+const needsSetup = computed(() =>
+  authStore.isWebAdmin && setupStatus.value &&
+  (!setupStatus.value.hasLanguage || !setupStatus.value.hasMenus || !setupStatus.value.hasContent)
+)
+
+onMounted(async () => {
+  await domainStore.resolveDomain(authStore.user?.domain_id)
+  if (authStore.isWebAdmin) await fetchStatus()
 })
 </script>
 
 <style scoped>
+.setup-banner {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.5rem;
+}
+
+.setup-banner-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.setup-banner-text {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: white;
+  font-size: 0.95rem;
+}
+
+.setup-banner-text i {
+  font-size: 1.25rem;
+}
+
+.setup-banner-btn {
+  background: white;
+  color: #6366f1;
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.setup-banner-btn:hover {
+  background: #f0f0ff;
+}
+
 .dashboard {
   max-width: 1200px;
   margin: 0 auto;

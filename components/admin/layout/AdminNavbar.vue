@@ -17,6 +17,10 @@
             <NuxtLink to="/admin">{{ $t('sidebar.home') }}</NuxtLink>
           </li>
 
+          <li v-if="needsSetup" :class="{ active: currentTab === 'setup' }">
+            <NuxtLink to="/admin/setup"><i class="fa fa-bolt" style="margin-right: 4px;"></i> Quick Setup</NuxtLink>
+          </li>
+
           <!-- Super Admin -->
           <li v-if="authStore.isSuperAdmin" :class="{ active: currentTab === 'admin', dropdown: true }">
             <a class="dropdown-toggle" @click.prevent="adminDrop = !adminDrop">
@@ -75,8 +79,15 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
+import { useSetup } from '~/composables/useSetup'
 
 const authStore = useAuthStore()
+const { setupStatus, fetchStatus } = useSetup()
+
+const needsSetup = computed(() =>
+  authStore.isWebAdmin && setupStatus.value &&
+  (!setupStatus.value.hasLanguage || !setupStatus.value.hasMenus || !setupStatus.value.hasContent)
+)
 
 // Initialize from localStorage on client
 if (import.meta.client) {
@@ -101,6 +112,7 @@ const isSitebuilder = computed(() => (authStore.user?.sitebuilder ?? 0) !== 0)
 const currentTab = computed(() => {
   const path = route.path
   if (path === '/admin') return 'home'
+  if (path.startsWith('/admin/setup')) return 'setup'
   if (path.startsWith('/admin/settings')) return 'websetting'
   if (path.startsWith('/admin/menu')) return 'menu'
   if (path.startsWith('/admin/content')) return 'content'
@@ -125,8 +137,9 @@ const handleLogout = async () => {
 
 router.afterEach(() => closeMenus())
 
-onMounted(() => {
+onMounted(async () => {
   document.addEventListener('click', handleClickOutside)
+  if (authStore.isWebAdmin) await fetchStatus()
 })
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
