@@ -13,6 +13,9 @@
             <label for="password">{{ $t('auth.password') }}</label>
             <input type="password" id="password" v-model="form.password" class="form-control" :placeholder="$t('auth.password')" />
           </div>
+          <div class="form-group">
+            <div id="recaptcha-login"></div>
+          </div>
           <button type="submit" class="btn btn-danger" :disabled="loading">
             <i class="fa fa-sign-in-alt"></i> {{ $t('auth.login') }}
           </button>
@@ -31,9 +34,11 @@ definePageMeta({
 })
 
 import { useAuthStore } from '~/stores/auth'
+import { useRecaptcha } from '~/composables/useRecaptcha'
 
 const authStore = useAuthStore()
 const { t } = useI18n()
+const { render: renderRecaptcha, getResponse: getRecaptchaResponse, reset: resetRecaptcha } = useRecaptcha()
 
 const form = ref({
   username: '',
@@ -43,11 +48,21 @@ const form = ref({
 const loading = ref(false)
 const errorMessage = ref('')
 
+onMounted(() => {
+  renderRecaptcha('recaptcha-login')
+})
+
 const handleLogin = async () => {
   errorMessage.value = ''
 
   if (!form.value.username || !form.value.password) {
     errorMessage.value = t('validation.required')
+    return
+  }
+
+  const recaptchaToken = getRecaptchaResponse()
+  if (!recaptchaToken) {
+    errorMessage.value = 'Please complete the reCAPTCHA'
     return
   }
 
@@ -57,15 +72,18 @@ const handleLogin = async () => {
     const success = await authStore.login({
       username: form.value.username,
       password: form.value.password,
-    })
+      recaptchaToken,
+    } as any)
 
     if (success) {
       navigateTo('/admin')
     } else {
       errorMessage.value = t('auth.invalidCredentials')
+      resetRecaptcha()
     }
   } catch (error: any) {
     errorMessage.value = error.message || t('auth.loginError')
+    resetRecaptcha()
   } finally {
     loading.value = false
   }

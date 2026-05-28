@@ -21,8 +21,8 @@
       <div class="row">
         <div class="col-md-6">
           <div class="form-group">
-            <label for="phone">{{ $t('userManager.phone') }}</label>
-            <input type="text" id="phone" v-model="form.phone" class="form-control" :placeholder="$t('userManager.phone')" />
+            <label for="password">Password</label>
+            <input type="password" id="password" v-model="form.password" class="form-control" placeholder="Min 6 characters" />
           </div>
         </div>
         <div class="col-md-6">
@@ -32,9 +32,26 @@
           </div>
         </div>
       </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="phone">{{ $t('userManager.phone') }}</label>
+            <input type="text" id="phone" v-model="form.phone" class="form-control" :placeholder="$t('userManager.phone')" />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="domain_name">Website Domain</label>
+            <input type="text" id="domain_name" v-model="form.domain_name" class="form-control" placeholder="e.g. mycompany.khmerbiz-front.localhost" />
+            <small class="text-muted">This will be your website address</small>
+          </div>
+        </div>
+      </div>
       <button type="submit" class="btn btn-danger" :disabled="loading">
         <i class="fa fa-floppy-o"></i> {{ $t('auth.signup') }}
       </button>
+      &nbsp;
+      <NuxtLink to="/admin/login" class="btn btn-info">{{ $t('auth.login') }}</NuxtLink>
     </form>
   </div>
 </template>
@@ -56,6 +73,7 @@ const form = ref({
   phone: '',
   email: '',
   password: '',
+  domain_name: '',
 })
 
 const loading = ref(false)
@@ -66,25 +84,36 @@ const handleSignup = async () => {
   errorMessage.value = ''
   successMessage.value = ''
 
-  if (!form.value.username || !form.value.email || !form.value.full_name) {
+  if (!form.value.username || !form.value.email || !form.value.full_name || !form.value.password) {
     errorMessage.value = t('validation.required')
+    return
+  }
+
+  if (form.value.password.length < 6) {
+    errorMessage.value = 'Password must be at least 6 characters'
     return
   }
 
   loading.value = true
 
   try {
-    const success = await authStore.signup({
+    const result = await authStore.signup({
       username: form.value.username,
       email: form.value.email,
       full_name: form.value.full_name,
-      password: form.value.username + '123',
+      password: form.value.password,
       phone: form.value.phone,
-    })
+      domain_name: form.value.domain_name || undefined,
+    } as any)
 
-    if (success) {
-      successMessage.value = t('auth.signupSuccess')
-      setTimeout(() => navigateTo('/admin/login'), 1500)
+    if (result) {
+      if (form.value.domain_name) {
+        successMessage.value = 'Account created! Redirecting to setup...'
+        setTimeout(() => navigateTo('/admin/setup'), 1000)
+      } else {
+        successMessage.value = t('auth.signupSuccess')
+        setTimeout(() => navigateTo('/admin/login'), 1500)
+      }
     } else {
       errorMessage.value = t('auth.signupError')
     }

@@ -22,6 +22,7 @@ export default defineNuxtConfig(<any>{
     public: {
       apiBaseUrl: 'http://khmerbiz-api.localhost/api/v1',
       photoUrl: 'https://khmer.sgp1.digitaloceanspaces.com/',
+      recaptchaSiteKey: '6Lcn38oZAAAAAHXplGrr62pAKHTpdh7vsLy1OnMO',
     },
   },
 
@@ -59,6 +60,9 @@ export default defineNuxtConfig(<any>{
       viewport: 'width=device-width, initial-scale=1',
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      ],
+      script: [
+        { src: 'https://www.google.com/recaptcha/api.js?render=explicit', async: true, defer: true },
       ],
     },
   },
