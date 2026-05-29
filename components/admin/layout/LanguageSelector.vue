@@ -28,7 +28,7 @@ defineProps<{
 }>()
 
 const domainStore = useDomainStore()
-const { locale } = useI18n()
+const { locale, setLocaleCookie } = useI18n()
 const menuRef = ref()
 
 const currentLanguage = computed(() => domainStore.currentLanguage)
@@ -71,6 +71,7 @@ const setLanguage = async (langId: number) => {
     const code = lang.lang_code || flagToLocale[lang.flag]
     if (code) {
       locale.value = code
+      setLocaleCookie(code)
     }
   }
   await domainStore.setLanguage(langId)

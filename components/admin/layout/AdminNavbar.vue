@@ -27,9 +27,18 @@
               {{ $t('sidebar.admin') }} <b class="caret"></b>
             </a>
             <ul v-if="adminDrop" class="dropdown-menu">
-              <li><NuxtLink to="/admin/super/users" @click="closeMenus"><i class="fa fa-users"></i> {{ $t('sidebar.users') }}</NuxtLink></li>
-              <li><NuxtLink to="/admin/super/domains" @click="closeMenus"><i class="fa fa-globe"></i> {{ $t('userManager.domain') }}</NuxtLink></li>
-              <li><NuxtLink to="/admin/super/announcing" @click="closeMenus"><i class="fa fa-bullhorn"></i> {{ $t('sidebar.announce') }}</NuxtLink></li>
+              <li>
+                <NuxtLink to="/admin/super/users" @click="closeMenus"><i class="fa fa-users"></i> {{ $t('sidebar.users')
+                  }}</NuxtLink>
+              </li>
+              <li>
+                <NuxtLink to="/admin/super/domains" @click="closeMenus"><i class="fa fa-globe"></i> {{
+                  $t('userManager.domain') }}</NuxtLink>
+              </li>
+              <li>
+                <NuxtLink to="/admin/super/announcing" @click="closeMenus"><i class="fa fa-bullhorn"></i> {{
+                  $t('sidebar.announce') }}</NuxtLink>
+              </li>
             </ul>
           </li>
 
@@ -50,11 +59,10 @@
             <NuxtLink to="/admin/media">{{ $t('sidebar.media') }}</NuxtLink>
           </li>
 
-          <li v-if="authStore.isWebAdmin || (hasDomain && !isSitebuilder)" :class="{ active: currentTab === 'member' }">
+          <li v-if="!authStore.isNormalUser" :class="{ active: currentTab === 'member' }">
             <NuxtLink to="/admin/users">{{ $t('sidebar.users') }}</NuxtLink>
           </li>
         </ul>
-
         <!-- Right nav -->
         <ul class="nav navbar-nav navbar-right">
           <li v-if="!authStore.isAuthenticated">
@@ -65,10 +73,18 @@
               <i class="fa fa-user"></i> {{ userName }} <b class="caret"></b>
             </a>
             <ul v-if="userDrop" class="dropdown-menu">
-              <li><NuxtLink to="/admin/profile" @click="closeMenus"><i class="fa fa-user"></i> {{ $t('userManager.profileSetting') }}</NuxtLink></li>
-              <li><NuxtLink to="/admin/password" @click="closeMenus"><i class="fa fa-gear"></i> {{ $t('userManager.passwordSetting') }}</NuxtLink></li>
+              <li>
+                <NuxtLink to="/admin/profile" @click="closeMenus"><i class="fa fa-user"></i> {{
+                  $t('userManager.profileSetting')
+                  }}</NuxtLink>
+              </li>
+              <li>
+                <NuxtLink to="/admin/password" @click="closeMenus"><i class="fa fa-gear"></i> {{
+                  $t('userManager.passwordSetting') }}</NuxtLink>
+              </li>
               <li class="divider"></li>
-              <li><a href="#" @click.prevent="handleLogout"><i class="fa fa-power-off"></i> {{ $t('sidebar.logout') }}</a></li>
+              <li><a href="#" @click.prevent="handleLogout"><i class="fa fa-power-off"></i> {{ $t('sidebar.logout')
+                  }}</a></li>
             </ul>
           </li>
         </ul>
@@ -232,7 +248,7 @@ const handleClickOutside = (e: Event) => {
   align-items: stretch;
 }
 
-.navbar-nav > li > a {
+.navbar-nav>li>a {
   color: #9d9d9d;
   text-decoration: none;
   padding: 15px;
@@ -241,14 +257,14 @@ const handleClickOutside = (e: Event) => {
   cursor: pointer;
 }
 
-.navbar-inverse .navbar-nav > li > a:hover,
-.navbar-inverse .navbar-nav > li > a:focus {
+.navbar-inverse .navbar-nav>li>a:hover,
+.navbar-inverse .navbar-nav>li>a:focus {
   color: #fff;
   background-color: #4C4C4C;
 }
 
-.navbar-inverse .navbar-nav > li.active > a,
-.navbar-inverse .navbar-nav > li.active > a:hover {
+.navbar-inverse .navbar-nav>li.active>a,
+.navbar-inverse .navbar-nav>li.active>a:hover {
   color: #fff;
   background-color: #4C4C4C;
 }
@@ -324,11 +340,11 @@ const handleClickOutside = (e: Event) => {
     flex-direction: column;
   }
 
-  .navbar-nav > li {
+  .navbar-nav>li {
     float: none;
   }
 
-  .navbar-nav > li > a {
+  .navbar-nav>li>a {
     padding: 10px 15px;
   }
 
@@ -340,7 +356,8 @@ const handleClickOutside = (e: Event) => {
     box-shadow: none;
   }
 
-  .hidden-lg, .hidden-md {
+  .hidden-lg,
+  .hidden-md {
     display: block;
   }
 

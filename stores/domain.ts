@@ -30,11 +30,23 @@ export const useDomainStore = defineStore('domain', () => {
     return false
   }
 
+  const getSavedLangId = (): number | null => {
+    if (import.meta.client) {
+      const saved = localStorage.getItem('language')
+      if (saved) return parseInt(saved)
+    }
+    return null
+  }
+
   const resolveDomain = async (domainId?: number) => {
     // If data was already hydrated from server, only fetch menu tree
     if (domain.value && !domainId) {
       if (languages.value.length > 0) {
-        await setLanguage(languages.value[0].lang_id)
+        const savedLangId = getSavedLangId()
+        const langToUse = savedLangId && languages.value.find(l => l.lang_id === savedLangId)
+          ? savedLangId
+          : languages.value[0].lang_id
+        await setLanguage(langToUse)
       }
       return
     }
@@ -64,7 +76,11 @@ export const useDomainStore = defineStore('domain', () => {
         socialMedia.value = response.data.socialMedia
 
         if (languages.value.length > 0) {
-          await setLanguage(languages.value[0].lang_id)
+          const savedLangId = getSavedLangId()
+          const langToUse = savedLangId && languages.value.find(l => l.lang_id === savedLangId)
+            ? savedLangId
+            : languages.value[0].lang_id
+          await setLanguage(langToUse)
         }
       }
     } catch (error) {

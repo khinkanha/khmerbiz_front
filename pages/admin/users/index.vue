@@ -50,29 +50,19 @@
       </div>
     </div>
 
-    <div class="table-responsive">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>{{ $t('userManager.username') }}</th>
-            <th>{{ $t('userManager.fullName') }}</th>
-            <th>{{ $t('userManager.phone') }}</th>
-            <th>{{ $t('userManager.email') }}</th>
-            </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(user, i) in userStore.users" :key="user.userid">
-            <td>{{ i + 1 }}</td>
-            <td><a href="#" @click.prevent="openSetPassword(user)">{{ user.username }}</a></td>
-            <td>{{ user.full_name }}</td>
-            <td>{{ user.phone }}</td>
-            <td>{{ user.email }}</td>
-            
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <DataTable :value="userStore.users" :loading="loading" :paginator="true" :rows="pagination.limit"
+      :totalRecords="pagination.total" :lazy="true" @page="onPageChange" :rowsPerPageOptions="[10, 20, 50]"
+      stripedRows>
+      <Column field="userid" header="#" :style="{ width: '80px' }" />
+      <Column field="username" :header="$t('userManager.username')">
+        <template #body="{ data }">
+          <a href="#" @click.prevent="openSetPassword(data)">{{ data.username }}</a>
+        </template>
+      </Column>
+      <Column field="full_name" :header="$t('userManager.fullName')" />
+      <Column field="phone" :header="$t('userManager.phone')" />
+      <Column field="email" :header="$t('userManager.email')" />
+    </DataTable>
 
     <div v-if="showPasswordDialog" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center">
       <div class="panel panel-default" style="width:400px;margin:0">
@@ -106,6 +96,14 @@ const showPasswordDialog = ref(false)
 const selectedUser = ref<any>(null)
 const addForm = ref({ username: '', full_name: '', phone: '', email: '', password: '' })
 const passwordForm = ref({ new_password: '' })
+const loading = ref(false)
+
+const pagination = computed(() => userStore.pagination)
+
+const onPageChange = (event: any) => {
+  loading.value = true
+  userStore.fetchUsers(event.page + 1).finally(() => { loading.value = false })
+}
 
 const handleAdd = async () => {
   if (!addForm.value.username || addForm.value.username.length < 5) {
@@ -122,9 +120,7 @@ const handleAdd = async () => {
     showForm.value = false
     addForm.value = { username: '', full_name: '', phone: '', email: '', password: '' }
     await userStore.fetchUsers()
-    console.log('User created:', result)
   } else {
-    console.log('Failed to create user:', result)
     toast.add({ severity: 'error', summary: 'Error', detail: result.message || 'Failed to create user', life: 5000 })
   }
 }
@@ -147,7 +143,8 @@ const handleSetPassword = async () => {
 }
 
 onMounted(async () => {
+  loading.value = true
   await userStore.fetchUsers()
-  
+  loading.value = false
 })
 </script>

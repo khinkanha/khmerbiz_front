@@ -37,7 +37,7 @@ import { useI18n } from '#imports'
 
 const authStore = useAuthStore()
 const domainStore = useDomainStore()
-const { locale } = useI18n()
+const { locale, setLocaleCookie } = useI18n()
 const route = useRoute()
 
 const alertSuccess = ref('')
@@ -49,7 +49,9 @@ const domainName = computed(() => domainStore.domain?.domain_name || '')
 const currentLangText = computed(() => locale.value === 'en' ? 'EN' : 'ខ្មែរ')
 
 const toggleLang = () => {
-  locale.value = locale.value === 'en' ? 'kh' : 'en'
+  const newLocale = locale.value === 'en' ? 'kh' : 'en'
+  locale.value = newLocale
+  setLocaleCookie(newLocale)
 }
 
 const breadcrumbs = computed(() => {
@@ -73,6 +75,8 @@ const breadcrumbs = computed(() => {
     if (route.params.id && !route.params.contentId) crumbs.push({ label: 'Edit' })
   } else if (path.startsWith('/admin/media')) {
     crumbs.push({ label: 'Media' })
+  } else if (path.startsWith('/admin/ai-chat')) {
+    crumbs.push({ label: 'AI Chat' })
   } else if (path.startsWith('/admin/users')) {
     crumbs.push({ label: 'Users' })
   } else if (path.startsWith('/admin/super/domains')) {

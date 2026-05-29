@@ -1,4 +1,4 @@
-import type { MenuItem, MenuForm } from '~/types'
+import type { MenuItem, MenuForm, PaginatedResponse } from '~/types'
 import { acceptHMRUpdate, defineStore } from 'pinia'
 import { useApi} from '~/composables/useApi'
 
@@ -8,13 +8,28 @@ export const useMenuStore = defineStore('menu', () => {
   const menuItems = ref<MenuItem[]>([])
   const menuTree = ref<MenuItem[]>([])
   const menuCache = ref<Record<number, MenuItem[]>>({})
+  const pagination = ref({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 1,
+  })
 
-  const fetchMenuItems = async () => {
+  const fetchMenuItems = async (page: number = 1) => {
     try {
-      const response = await api.get<{items:MenuItem[]}>(`/menus`)
+      const response = await api.get<PaginatedResponse<MenuItem>>(`/menus?page=${page}&limit=${pagination.value.limit}`)
 
       if (response.success && response.data) {
         menuItems.value = response.data.items
+        const pag = response.data.pagination
+        if (pag) {
+          pagination.value = {
+            page: pag.page,
+            limit: pag.limit,
+            total: pag.total,
+            totalPages: pag.totalPages,
+          }
+        }
       }
     } catch (error) {
       console.error('Failed to fetch menu items:', error)
@@ -198,6 +213,7 @@ export const useMenuStore = defineStore('menu', () => {
     menuItems: readonly(menuItems),
     menuTree: readonly(menuTree),
     menuCache: readonly(menuCache),
+    pagination: readonly(pagination),
     fetchMenuItems,
     fetchMenuTree,
     fetchMenuItem,

@@ -28,7 +28,7 @@
         </NuxtLink>
       </li>
       <li>
-        <NuxtLink to="/admin/settings" class="sidebar-link" active-class="active" exact>
+        <NuxtLink to="/admin/settings" class="sidebar-link" exact-active-class="active">
           {{ $t('sidebar.otherSetting') }}
         </NuxtLink>
       </li>

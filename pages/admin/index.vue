@@ -45,7 +45,7 @@
             </div>
           </NuxtLink>
 
-          <NuxtLink v-if="!authStore.isSuperAdmin" to="/admin/users" class="qbtn-link">
+          <NuxtLink v-if="!authStore.isSuperAdmin && !authStore.isNormalUser" to="/admin/users" class="qbtn-link">
             <div class="qbtn">
               <div class="qbtn-icon">👥</div>
               <div class="qbtn-label">{{ $t('dashboard.userManagement') }}</div>

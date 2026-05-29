@@ -54,5 +54,8 @@ onMounted(async () => {
   max-width: 1170px;
   width: 100%;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 </style>

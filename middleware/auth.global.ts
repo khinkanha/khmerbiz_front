@@ -26,6 +26,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
     if (isSuperAdminRoute && !authStore.isSuperAdmin) {
       return navigateTo('/admin')
     }
+
+    // Users page requires web admin or super admin
+    if (to.path === '/admin/users' && authStore.isNormalUser) {
+      return navigateTo('/admin')
+    }
   }
 
   if (publicRoutes.includes(to.path) && authStore.isAuthenticated) {

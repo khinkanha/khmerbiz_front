@@ -65,30 +65,7 @@
             </li>
           </ul>
         </div>
-
-        <div class="sidebar-section">
-          <h3>Usage</h3>
-          <div class="usage-info">
-            <div class="usage-stat">
-              <span class="usage-label">Questions today:</span>
-              <span class="usage-value">{{ usageInfo?.questions_count || 0 }}/10</span>
-            </div>
-            <div class="usage-stat">
-              <span class="usage-label">Remaining:</span>
-              <span class="usage-value">{{ usageInfo?.remaining_questions || 10 }}</span>
-            </div>
-            <div class="usage-stat">
-              <span class="usage-label">Resets at:</span>
-              <span class="usage-value">{{ resetTime }}</span>
-            </div>
-          </div>
-          <div class="upgrade-notice" v-if="usageInfo && usageInfo.remaining_questions <= 2">
-            <i class="pi pi-exclamation-triangle"></i>
-            <span>Running low on questions! <a href="/pricing">Upgrade to Pro</a></span>
-          </div>
-        </div>
-
-        <div class="sidebar-section">
+    <div class="sidebar-section">
           <h3>Tips</h3>
           <ul class="tips-list">
             <li>Be specific about what you want</li>
@@ -127,6 +104,10 @@ const resetTime = computed(() => {
   max-width: 1400px;
   margin: 0 auto;
   padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 .page-header {
@@ -149,7 +130,7 @@ const resetTime = computed(() => {
   display: grid;
   grid-template-columns: 1fr 300px;
   gap: 2rem;
-  height: calc(100vh - 200px);
+  flex: 1;
   min-height: 0;
 }
 

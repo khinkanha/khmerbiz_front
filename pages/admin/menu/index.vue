@@ -18,49 +18,44 @@
         <NuxtLink to="/admin/menu/add" class="btn btn-success"><i class="fa fa-plus"></i></NuxtLink>
       </div>
 
-      <div class="form-group" style="margin-bottom:10px">
-        <label>{{ $t('menuManager.language') }}:</label>
-        <select v-model="selectedLangId" @change="handleLanguageChange" class="form-control" style="display:inline-block;width:auto">
-          <option v-for="lang in languageOptions" :key="lang.lang_id" :value="lang.lang_id">{{ lang.lang_name }}</option>
-        </select>
-      </div>
-
-      <div class="table-responsive">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>{{ $t('menuManager.menuName') }}</th>
-              <th>{{ $t('menuManager.language') }}</th>
-              <th>{{ $t('menuManager.parentMenu') }}</th>
-              <th>{{ $t('menuManager.menuOrder') }}</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item, i) in flatMenuItems" :key="item.item_id">
-              <td>{{ i + 1 }}</td>
-              <td>
-                <NuxtLink :to="`/admin/menu/${item.item_id}`" :style="{ paddingLeft: `${item._depth * 1.5}rem` }">
-                  <i v-if="item._depth > 0" class="fa fa-angle-right" style="color:#a0aec0;margin-right:4px"></i>
-                  {{ item.item_name }}
-                </NuxtLink>
-                <div v-if="item.content_title">
-                  <i class="fa fa-newspaper-o"></i> {{ item.content_title }}
-                </div>
-              </td>
-              <td>
-                <img v-if="getLanguageByLangId(item.lang_id)?.flag_icon" :src="`/flag/${getLanguageByLangId(item.lang_id)!.flag_icon}`" style="width:20px;height:14px;border-radius:2px" />
-              </td>
-              <td>{{ item.parent_name || '—' }}</td>
-              <td>{{ item.item_order }}</td>
-              <td>
-                <a href="#" @click.prevent="confirmDelete(item)" class="text-danger">{{ $t('menuManager.delete') }}</a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <DataTable :value="flatMenuItems" :loading="loading" :paginator="true" :rows="pagination.limit"
+        :totalRecords="pagination.total" :lazy="true" @page="onPageChange" :rowsPerPageOptions="[10, 20, 50]"
+        stripedRows>
+        <Column header="#" :style="{ width: '80px' }">
+          <template #body="{ index }">
+            {{ index + 1 }}
+          </template>
+        </Column>
+        <Column :header="$t('menuManager.menuName')">
+          <template #body="{ data }">
+            <NuxtLink :to="`/admin/menu/${data.item_id}`" :style="{ paddingLeft: `${data._depth * 1.5}rem` }">
+              <i v-if="data._depth > 0" class="fa fa-angle-right" style="color:#a0aec0;margin-right:4px"></i>
+              {{ data.item_name }}
+            </NuxtLink>
+            <div v-if="data.content_title">
+              <i class="fa fa-newspaper-o"></i> {{ data.content_title }}
+            </div>
+          </template>
+        </Column>
+        <Column :header="$t('menuManager.parentMenu')">
+          <template #body="{ data }">
+            {{ data.parent_name || '—' }}
+          </template>
+        </Column>
+        <Column field="item_order" :header="$t('menuManager.menuOrder')" :style="{ width: '100px' }" />
+        <Column :header="$t('menuManager.language')" :style="{ width: '80px' }">
+          <template #body="{ data }">
+            <img v-if="getLanguageByLangId(data.lang_id)"
+              :src="`/flag/${flagMap(getLanguageByLangId(data.lang_id).flag)}`"
+              style="width:20px;height:14px;border-radius:2px" />
+          </template>
+        </Column>
+        <Column :style="{ width: '80px' }">
+          <template #body="{ data }">
+            <a href="#" @click.prevent="confirmDelete(data)" class="text-danger">{{ $t('menuManager.delete') }}</a>
+          </template>
+        </Column>
+      </DataTable>
     </div>
   </div>
 </template>
@@ -80,6 +75,7 @@ const selectedLangId = ref<number>(0)
 const clearMsg = ref(false)
 
 const languageOptions = computed(() => domainStore.languages as Language[])
+const pagination = computed(() => menuStore.pagination)
 
 const flatMenuItems = computed(() => {
   const flatten = (items: any[], depth = 0): any[] => {
@@ -93,8 +89,25 @@ const flatMenuItems = computed(() => {
   return flatten([...menuStore.menuItems])
 })
 
+const flagMap = (flag: number) => {
+  const flags: Record<number, string> = {
+    0: 'kh.svg',
+    1: 'en.svg',
+    2: 'ch.svg',
+    3: 'th.svg',
+    4: 'vn.svg',
+    5: 'fr.svg',
+  }
+  return flags[flag] || 'kh.svg'
+}
+
 const getLanguageByLangId = (langId: number): Language | undefined => {
   return domainStore.languages.find(l => l.lang_id === langId)
+}
+
+const onPageChange = (event: any) => {
+  loading.value = true
+  menuStore.fetchMenuItems(event.page + 1).finally(() => { loading.value = false })
 }
 
 const handleLanguageChange = async () => {
@@ -121,10 +134,8 @@ const confirmDelete = async (item: any) => {
 }
 
 onMounted(async () => {
- 
-    loading.value = true
-    await menuStore.fetchMenuItems()
-    loading.value = false
- 
+  loading.value = true
+  await menuStore.fetchMenuItems()
+  loading.value = false
 })
 </script>

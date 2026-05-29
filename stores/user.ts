@@ -1,4 +1,4 @@
-import type { User } from '~/types'
+import type { User, PaginatedResponse } from '~/types'
 import { acceptHMRUpdate, defineStore } from 'pinia'
 import { useApi } from '~/composables/useApi'
 
@@ -6,12 +6,27 @@ export const useUserStore = defineStore('user', () => {
   const api = useApi()
 
   const users = ref<User[]>([])
+  const pagination = ref({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 1,
+  })
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (page: number = 1) => {
     try {
-      const response = await api.get<any>('/users')
+      const response = await api.get<PaginatedResponse<User>>(`/users?page=${page}&limit=${pagination.value.limit}`)
       if (response.success && response.data) {
-        users.value = response.data.items || response.data
+        users.value = response.data.items || []
+        const pag = response.data.pagination
+        if (pag) {
+          pagination.value = {
+            page: pag.page,
+            limit: pag.limit,
+            total: pag.total,
+            totalPages: pag.totalPages,
+          }
+        }
       }
     } catch (error) {
       console.error('Failed to fetch users:', error)
@@ -62,6 +77,7 @@ export const useUserStore = defineStore('user', () => {
 
   return {
     users: readonly(users),
+    pagination: readonly(pagination),
     fetchUsers,
     addUser,
     updateUser,

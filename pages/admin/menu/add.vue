@@ -88,9 +88,16 @@ const handleSave = async () => {
   }
 }
 
-onMounted(() => {
-  if (domainStore.languages.length > 0) {
-    form.value.lang_id = domainStore.languages[0].lang_id
+onMounted(async () => {
+  const defaultLang = languageOptions.value.find(l => l.is_default === 1)
+  if (defaultLang) {
+    form.value.lang_id = defaultLang.lang_id
+  } else if (languageOptions.value.length > 0) {
+    form.value.lang_id = languageOptions.value[0].lang_id
+  }
+
+  if (form.value.lang_id) {
+    await menuStore.fetchMenuTree(form.value.lang_id)
   }
 })
 </script>

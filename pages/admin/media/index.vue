@@ -25,31 +25,25 @@
         </form>
       </div>
     </div>
-    
-    <div class="table-responsive">
-      <table class="table table-hover">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th></th>
-            <th>{{ $t('contentManager.contentTitle') }}</th>
-            <th>{{ $t('mediaManager.url') }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(media, i) in mediaStore.mediaList" :key="media.photo_id">
-            <td>{{ i + 1 }}</td>
-            <td>
-              <a href="#" @click.prevent="previewUrl = photoUrl + media.file_name; showPreview = true">
-                <i class="fa fa-eye fa-lg"></i>
-              </a>
-            </td>
-            <td>{{ media.title }}</td>
-            <td><a :href="photoUrl + media.file_name" target="_blank">{{ media.file_name }}</a></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+
+    <DataTable :value="mediaStore.mediaList" :loading="loading" :paginator="true" :rows="pagination.limit"
+      :totalRecords="pagination.total" :lazy="true" @page="onPageChange" :rowsPerPageOptions="[10, 20, 50]"
+      stripedRows>
+      <Column field="photo_id" header="#" :style="{ width: '80px' }" />
+      <Column header="" :style="{ width: '60px' }">
+        <template #body="{ data }">
+          <a href="#" @click.prevent="previewUrl = photoUrl + data.file_name; showPreview = true">
+            <i class="fa fa-eye fa-lg"></i>
+          </a>
+        </template>
+      </Column>
+      <Column field="title" :header="$t('contentManager.contentTitle')" />
+      <Column field="file_name" :header="$t('mediaManager.url')">
+        <template #body="{ data }">
+          <a :href="photoUrl + data.file_name" target="_blank">{{ data.file_name }}</a>
+        </template>
+      </Column>
+    </DataTable>
 
     <div v-if="showPreview"
       style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.9);z-index:9999;display:flex;align-items:center;justify-content:center"
@@ -75,6 +69,14 @@ const showUpload = ref(false)
 const showPreview = ref(false)
 const previewUrl = ref('')
 const uploadForm = ref({ title: '', file: null as File | null })
+const loading = ref(false)
+
+const pagination = computed(() => mediaStore.pagination)
+
+const onPageChange = (event: any) => {
+  loading.value = true
+  mediaStore.fetchMedia(event.page + 1).finally(() => { loading.value = false })
+}
 
 const handleFileSelect = (e: Event) => {
   uploadForm.value.file = (e.target as HTMLInputElement).files?.[0] || null
@@ -90,6 +92,8 @@ const handleUpload = async () => {
 const handleSearch = () => { }
 
 onMounted(async () => {
+  loading.value = true
   await mediaStore.fetchMedia()
+  loading.value = false
 })
 </script>
