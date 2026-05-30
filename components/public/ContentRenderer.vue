@@ -21,7 +21,7 @@
       :section-title="showTitle ? content.title : ''"
     />
     <NewsSection
-      v-else-if="content && content.content_type === ContentType.NEWS"
+      v-else-if="content && content.content_type === ContentType.NEWS && isClassicTemplate"
       :domain-id="domainId"
       :content-id="content.content_id"
       :section-title="showTitle ? content.title : ''"
@@ -50,6 +50,9 @@ const props = withDefaults(defineProps<Props>(), {
   showTitle: true,
   compact: false,
 })
+
+const domainStore = useDomainStore()
+const isClassicTemplate = computed(() => domainStore.settings?.page_style === 0)
 
 const isContentSection = (val: any): val is ContentSection => {
   return val != null && 'content' in val && 'items' in val

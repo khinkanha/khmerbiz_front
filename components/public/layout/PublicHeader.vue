@@ -21,7 +21,7 @@
     <nav class="nav-bar">
       <div class="container nav-inner">
         <ul class="nav-list" :class="{ 'mobile-open': mobileMenuOpen }">
-          <li v-for="item in menuTree" :key="item.item_id" class="nav-item"
+          <li v-for="item in filteredMenuTree" :key="item.item_id" class="nav-item"
             :class="{ 'has-dropdown': item.children && item.children.length > 0 }">
             <a v-if="isSinglePage" :href="`#section-${item.item_id}`" class="nav-link"
               :class="{ active: activeMenuId === item.item_id }"
@@ -67,6 +67,7 @@
 import { useDomainStore } from '~/stores/domain'
 import { useAuthStore } from '~/stores/auth'
 import { navigateTo } from 'nuxt/app'
+import { ContentType } from '~/types'
 
 const domainStore = useDomainStore()
 const authStore = useAuthStore()
@@ -79,6 +80,17 @@ const menuTree = computed(() => domainStore.menuTree)
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 const isSitebuilder = computed(() => (authStore.user?.sitebuilder ?? 0) !== 0)
 const isSinglePage = computed(() => settings.value?.page_style !== 0)
+const isClassicTemplate = computed(() => settings.value?.page_style === 0)
+
+const filteredMenuTree = computed(() => {
+  if (isClassicTemplate.value) return menuTree.value
+  return menuTree.value
+    .filter(item => item.content_type !== ContentType.NEWS)
+    .map(item => ({
+      ...item,
+      children: item.children?.filter(child => child.content_type !== ContentType.NEWS) || []
+    }))
+})
 
 const activeMenuId = ref<number | null>(null)
 

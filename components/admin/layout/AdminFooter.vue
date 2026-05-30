@@ -3,7 +3,7 @@
     <div class="container text-center">
       <p>
         KHMER.BIZ |
-        <a href="/images/guideline.pdf" target="_blank">
+        <a href="/docs/USER_GUIDE.html" target="_blank">
           <i class="fa fa-book-open-reader fa-lg"></i> User Guide
         </a> |
         <a href="https://t.me/cambodiawebhosting" target="_blank">

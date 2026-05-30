@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KhmerBiz CMS — User Guide</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Battambang','Noto Sans Khmer',sans-serif;line-height:1.7;color:#1a202c;background:#f7fafc;padding:2rem 1rem}
+    .container{max-width:900px;margin:0 auto;background:#fff;padding:2rem 3rem;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+    h1{font-size:2rem;margin-bottom:.5rem;color:#1e3a5f;border-bottom:3px solid #1e3a5f;padding-bottom:.5rem}
+    h2{font-size:1.5rem;color:#1e3a5f;margin-top:2rem;margin-bottom:.75rem;padding-bottom:.3rem;border-bottom:1px solid #e2e8f0}
+    h3{font-size:1.15rem;color:#2d3748;margin-top:1.5rem;margin-bottom:.5rem}
+    h4{font-size:1rem;color:#4a5568;margin-top:1rem;margin-bottom:.4rem}
+    p{margin-bottom:.75rem}
+    ul,ol{margin:.5rem 0 .75rem 1.5rem}
+    li{margin-bottom:.35rem}
+    a{color:#3182ce;text-decoration:none}
+    a:hover{text-decoration:underline}
+    table{width:100%;border-collapse:collapse;margin:.75rem 0}
+    th,td{padding:.5rem .75rem;text-align:left;border:1px solid #e2e8f0}
+    th{background:#edf2f7;font-weight:600}
+    blockquote{border-left:4px solid #ed8936;padding:.5rem 1rem;margin:.75rem 0;background:#fffaf0;border-radius:0 4px 4px 0}
+    blockquote p{margin:0}
+    code{background:#edf2f7;padding:.15rem .4rem;border-radius:3px;font-size:.9em}
+    .toc{background:#f7fafc;padding:1rem 1.5rem;border-radius:6px;margin:1rem 0 2rem;border:1px solid #e2e8f0}
+    .toc-title{font-weight:700;font-size:1.1rem;margin-bottom:.5rem}
+    .toc ol{list-style:decimal}
+    .toc li{margin-bottom:.25rem}
+    .tip-box{background:#ebf8ff;border:1px solid #90cdf4;padding:.75rem 1rem;border-radius:4px;margin:.75rem 0}
+    .warn-box{background:#fffaf0;border:1px solid #fbd38d;padding:.75rem 1rem;border-radius:4px;margin:.75rem 0}
+    hr.guide-hr{margin:2rem 0 1rem;border:none;border-top:1px solid #e2e8f0}
+    .lang-switch{display:flex;justify-content:flex-end;gap:.5rem;margin-bottom:1rem}
+    .lang-btn{padding:.35rem 1rem;border:2px solid #1e3a5f;border-radius:20px;background:#fff;color:#1e3a5f;font-weight:600;cursor:pointer;font-size:.85rem;transition:all .2s}
+    .lang-btn:hover{background:#edf2f7}
+    .lang-btn.active{background:#1e3a5f;color:#fff}
+    .guide-footer{text-align:center;color:#718096;font-size:.85rem}
+    @media(max-width:768px){.container{padding:1rem 1.25rem}body{padding:.5rem}}
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="lang-switch">
+    <button class="lang-btn active" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('kh')">ខ្មែរ</button>
+  </div>
+
+  <div id="guide-content"></div>
+
+  <hr class="guide-hr">
+  <p class="guide-footer"><em data-i18n="footer">KhmerBiz CMS User Guide — Last updated: May 2026</em></p>
+
+</div>
+
+<script>
+const translations = {
+  en: {
+    footer: "KhmerBiz CMS User Guide — Last updated: May 2026",
+    content: `
+<h1>KhmerBiz CMS — Web Admin User Guide</h1>
+
+<div class="toc">
+  <div class="toc-title">Table of Contents</div>
+  <ol>
+    <li><a href="#getting-started">Getting Started</a></li>
+    <li><a href="#dashboard">Dashboard</a></li>
+    <li><a href="#content-management">Content Management</a></li>
+    <li><a href="#menu-management">Menu Management</a></li>
+    <li><a href="#media-library">Media Library</a></li>
+    <li><a href="#settings">Settings</a></li>
+    <li><a href="#ai-chat-assistant">AI Chat Assistant</a></li>
+    <li><a href="#quick-setup-wizard">Quick Setup Wizard</a></li>
+    <li><a href="#profile-password">Profile & Password</a></li>
+  </ol>
+</div>
+
+<h2 id="getting-started">1. Getting Started</h2>
+<h3>Logging In</h3>
+<ol>
+  <li>Go to your admin URL: <code>http://yourdomain.com/admin/login</code></li>
+  <li>Enter your <strong>username</strong> and <strong>password</strong></li>
+  <li>Click <strong>Login</strong></li>
+</ol>
+<h3>After Login</h3>
+<p>You'll land on the <strong>Dashboard</strong> — your central hub for managing the website. From here you can navigate to all management sections using the sidebar.</p>
+
+<h2 id="dashboard">2. Dashboard</h2>
+<p>The Dashboard provides an overview of your website and quick access to all management tools:</p>
+<ul>
+  <li><strong>Quick Actions</strong> — Shortcuts to common tasks (add content, manage menus, change settings)</li>
+  <li><strong>Statistics</strong> — Overview of your content, media, and users</li>
+  <li><strong>Recent Activity</strong> — Latest changes made to your site</li>
+</ul>
+
+<h2 id="content-management">3. Content Management</h2>
+<p>Content is the pages and sections of your website. Each piece of content is linked to a menu item and has a specific type.</p>
+
+<h3>Content Types</h3>
+<table>
+  <tr><th>Type</th><th>Description</th></tr>
+  <tr><td><strong>Article</strong></td><td>Rich text pages with HTML content (About Us, Services, etc.)</td></tr>
+  <tr><td><strong>Photo Gallery</strong></td><td>Image collections displayed in a grid with lightbox</td></tr>
+  <tr><td><strong>Video</strong></td><td>Embedded video links (YouTube, Vimeo, etc.)</td></tr>
+  <tr><td><strong>Document</strong></td><td>File attachments and document viewers</td></tr>
+  <tr><td><strong>Map</strong></td><td>Interactive map with a location marker</td></tr>
+  <tr><td><strong>News/Blog</strong></td><td>News articles with title, description, image, and publish date</td></tr>
+</table>
+
+<h3>Creating Content</h3>
+<ol>
+  <li>Go to <strong>Content</strong> in the sidebar</li>
+  <li>Click <strong>Add New</strong> or <strong>Create New</strong></li>
+  <li>Fill in the form:
+    <ul>
+      <li><strong>Title</strong> — The page/section heading</li>
+      <li><strong>Content Type</strong> — Select the type (Article, Photo, Video, etc.)</li>
+      <li><strong>Menu</strong> — Choose which menu item this content belongs to</li>
+      <li><strong>Language</strong> — Select the language for this content</li>
+      <li><strong>Description</strong> — Enter your content (rich text editor for articles)</li>
+    </ul>
+  </li>
+  <li>Click <strong>Save</strong></li>
+</ol>
+
+<h3>Editing Content</h3>
+<ol>
+  <li>Go to <strong>Content</strong> and find the item you want to edit</li>
+  <li>Click the <strong>pencil icon</strong> (✏️) on the right</li>
+  <li>Update the fields and click <strong>Save</strong></li>
+</ol>
+
+<h3>Deleting Content</h3>
+<ol>
+  <li>Click the <strong>trash icon</strong> (🗑️) on the content item</li>
+  <li>Confirm the deletion</li>
+</ol>
+<blockquote><p>⚠️ <strong>Warning:</strong> Deleted content cannot be recovered.</p></blockquote>
+
+<h3>Managing Content Items (Photo, Video, Document, News)</h3>
+<p>For gallery-type content, you can manage individual items within a content section:</p>
+<ol>
+  <li>Click on a content item to open its detail page</li>
+  <li>Use the <strong>Items</strong> tab to add, edit, or delete individual photos/videos/documents</li>
+  <li>Use the <strong>News</strong> tab (for news-type content) to manage news articles</li>
+</ol>
+
+<h3>Adding News Articles</h3>
+<ol>
+  <li>Open a <strong>News</strong> type content section</li>
+  <li>Click <strong>Add New</strong></li>
+  <li>Fill in:
+    <ul>
+      <li><strong>Title</strong> — News headline</li>
+      <li><strong>Short Description</strong> — Brief summary shown in listings</li>
+      <li><strong>Description</strong> — Full article content (rich text editor)</li>
+      <li><strong>Primary Image</strong> — Thumbnail/cover image</li>
+      <li><strong>Publish Date</strong> — When the article should appear</li>
+      <li><strong>Status</strong> — Toggle <strong>Show</strong> (visible) or <strong>Not Show</strong> (hidden)</li>
+      <li><strong>Priority</strong> — Mark as featured/highlighted</li>
+    </ul>
+  </li>
+  <li>Click <strong>Save</strong></li>
+</ol>
+
+<h3>Managing Map Content</h3>
+<ol>
+  <li>Open a <strong>Map</strong> type content section</li>
+  <li>Go to the <strong>Map</strong> tab</li>
+  <li>Set the <strong>latitude</strong> and <strong>longitude</strong> coordinates</li>
+  <li>Add a <strong>title</strong> and <strong>description</strong> for the marker</li>
+  <li>Toggle <strong>visible</strong> to show/hide the map</li>
+  <li>Click <strong>Save</strong></li>
+</ol>
+
+<h2 id="menu-management">4. Menu Management</h2>
+<p>Menus define your website's navigation structure. Each menu item links to a content page or external URL.</p>
+
+<h3>Understanding Menu Structure</h3>
+<ul>
+  <li><strong>Top-level items</strong> appear in the main navigation bar</li>
+  <li><strong>Sub-items</strong> (children) appear in dropdown menus under their parent</li>
+  <li>Menus are <strong>per-language</strong> — each language has its own menu tree</li>
+</ul>
+
+<h3>Creating a Menu Item</h3>
+<ol>
+  <li>Go to <strong>Menu</strong> in the sidebar</li>
+  <li>Click <strong>Add New</strong></li>
+  <li>Fill in:
+    <ul>
+      <li><strong>Menu Name</strong> — The text shown in navigation (e.g., "About Us")</li>
+      <li><strong>Menu URL</strong> — Optional link (leave blank if linking to content)</li>
+      <li><strong>Parent Menu</strong> — Select parent for sub-menus, or "None" for top-level</li>
+      <li><strong>Language</strong> — Which language this menu is for</li>
+      <li><strong>Order</strong> — Display position (lower numbers appear first)</li>
+    </ul>
+  </li>
+  <li>Click <strong>Save</strong></li>
+</ol>
+
+<h3>Reordering Menus</h3>
+<ol>
+  <li>Find the menu item in the list</li>
+  <li>Click the <strong>up/down arrows</strong> to move it higher or lower</li>
+</ol>
+
+<h3>Editing & Deleting</h3>
+<ul>
+  <li>Click the <strong>pencil icon</strong> (✏️) to edit a menu item</li>
+  <li>Click the <strong>trash icon</strong> (🗑️) to delete — confirm when prompted</li>
+</ul>
+<div class="warn-box">⚠️ <strong>Note:</strong> Deleting a menu item does <strong>not</strong> delete its linked content.</div>
+
+<h2 id="media-library">5. Media Library</h2>
+<p>The media library manages all images, videos, and documents uploaded to your website. Files are stored on cloud storage.</p>
+
+<h3>Uploading Files</h3>
+<ol>
+  <li>Go to <strong>Media</strong> in the sidebar</li>
+  <li>Click <strong>Choose File</strong> or drag and drop</li>
+  <li>Select your file(s) — supports images, videos, and documents</li>
+  <li>Wait for the upload to complete</li>
+  <li>The file appears in your media library with a shareable URL</li>
+</ol>
+
+<h3>Using Media in Content</h3>
+<p>When adding an image to content, reference the file URL from the media library. The URL format is:<br>
+<code>https://khmer.sgp1.digitaloceanspaces.com/your-file-path</code></p>
+
+<h3>Deleting Media</h3>
+<ol>
+  <li>Find the file in the media library</li>
+  <li>Click the <strong>trash icon</strong> (🗑️)</li>
+  <li>Confirm deletion</li>
+</ol>
+
+<h2 id="settings">6. Settings</h2>
+<p>Settings control the appearance and behavior of your public website.</p>
+
+<h3>6.1 General Settings</h3>
+<p>Go to <strong>Settings → General</strong></p>
+<ul>
+  <li><strong>Site Title</strong> — Your website name (shown in browser tab and header)</li>
+  <li><strong>Footer Text</strong> — Text displayed at the bottom of your site</li>
+</ul>
+
+<h4>Theme Colors</h4>
+<table>
+  <tr><th>Theme</th><th>Description</th></tr>
+  <tr><td>Default</td><td>Light/standard theme</td></tr>
+  <tr><td>Inverse</td><td>Dark mode theme</td></tr>
+  <tr><td>Red</td><td>Red color scheme</td></tr>
+  <tr><td>Green</td><td>Green color scheme</td></tr>
+  <tr><td>Purple</td><td>Purple color scheme</td></tr>
+  <tr><td>Yellow</td><td>Yellow color scheme</td></tr>
+</table>
+
+<h4>Page Layouts</h4>
+<table>
+  <tr><th>Layout</th><th>Description</th></tr>
+  <tr><td>Classic Multi-Page</td><td>Traditional website with separate pages per menu item</td></tr>
+  <tr><td>Scrolling Single Page</td><td>All content on one scrollable page</td></tr>
+  <tr><td>Magazine Grid</td><td>Card-based magazine style layout</td></tr>
+  <tr><td>Fullscreen Hero</td><td>Large hero image focused layout</td></tr>
+</table>
+
+<p>Additional settings: <strong>Background</strong> image/color, <strong>Google Analytics Tracking ID</strong>, and <strong>Chat Script</strong> embed code.</p>
+
+<h3>6.2 Logo Settings</h3>
+<p>Go to <strong>Settings → Logo</strong></p>
+<ul>
+  <li><strong>Logo Image</strong> — Upload or set your logo image URL</li>
+  <li><strong>Mobile Logo</strong> — Optional separate logo for mobile devices</li>
+  <li><strong>Logo Position</strong> — Left, Center, or Right</li>
+</ul>
+
+<h3>6.3 Banner Settings</h3>
+<p>Go to <strong>Settings → Banner</strong></p>
+<ul>
+  <li><strong>Banner Display</strong> — Enable/disable the banner slideshow</li>
+  <li>Add banner images with title and optional link</li>
+  <li>Reorder or delete banners</li>
+</ul>
+
+<h3>6.4 Social Media Links</h3>
+<p>Go to <strong>Settings → Social Media</strong></p>
+<p>Add links to your social profiles: Facebook, Google, YouTube, LinkedIn, Twitter.<br>
+Enter the full URL for each (e.g., <code>https://facebook.com/yourpage</code>).</p>
+
+<h3>6.5 Language Management</h3>
+<p>Go to <strong>Settings → Language</strong></p>
+<table>
+  <tr><th>Flag</th><th>Language</th></tr>
+  <tr><td>0</td><td>Khmer 🇰🇭</td></tr>
+  <tr><td>1</td><td>English 🇺🇸</td></tr>
+  <tr><td>2</td><td>Chinese 🇨🇳</td></tr>
+  <tr><td>3</td><td>Thai 🇹🇭</td></tr>
+  <tr><td>4</td><td>Vietnamese 🇻🇳</td></tr>
+</table>
+<div class="warn-box">⚠️ <strong>Important:</strong> Each language has its own set of menus and content. Adding a language means you'll need to create menus and content for it.</div>
+
+<h2 id="ai-chat-assistant">7. AI Chat Assistant</h2>
+<p>The AI assistant lets you manage your website using natural language — no technical knowledge required.</p>
+
+<h3>What You Can Ask</h3>
+<table>
+  <tr><th>Category</th><th>Example Commands</th></tr>
+  <tr><td><strong>Change Theme</strong></td><td>"Change theme to red", "Switch to dark mode"</td></tr>
+  <tr><td><strong>Change Layout</strong></td><td>"Change layout to magazine", "Use classic layout"</td></tr>
+  <tr><td><strong>Create Pages</strong></td><td>"Create a page called Services with content about web design"</td></tr>
+  <tr><td><strong>Create Menus</strong></td><td>"Add a menu item called Contact"</td></tr>
+  <tr><td><strong>Edit Content</strong></td><td>"Update the About Us page with new information"</td></tr>
+  <tr><td><strong>Delete Content</strong></td><td>"Delete the old news article"</td></tr>
+  <tr><td><strong>Setup Website</strong></td><td>"Help me set up my website" (for fresh sites)</td></tr>
+</table>
+
+<h3>Usage Limits</h3>
+<p><strong>10 questions per day</strong> per user. The AI will tell you how many questions you have remaining.</p>
+
+<h3>Tips for Best Results</h3>
+<div class="tip-box">
+  ✅ <strong>Be specific:</strong> "Create a page called 'Our Team' with content about our 5 team members"<br>
+  ✅ <strong>Mention language:</strong> "Create a page in Khmer called 'សេវាកម្ម'"<br>
+  ❌ <strong>Avoid vague requests:</strong> "Make it better" — specify what you want changed<br>
+  ❌ <strong>No file uploads:</strong> The AI cannot upload images; use the Media Library for that
+</div>
+
+<h2 id="quick-setup-wizard">8. Quick Setup Wizard</h2>
+<p>For new websites, the Setup Wizard guides you through initial configuration:</p>
+
+<h3>Step 1: Language</h3>
+<ol>
+  <li>Go to <strong>Admin → Setup</strong></li>
+  <li>Select your <strong>default language</strong> (Khmer, English, Chinese, Thai, or Vietnamese)</li>
+  <li>Click <strong>Next</strong></li>
+</ol>
+
+<h3>Step 2: Menus & Settings</h3>
+<ol>
+  <li>Enter your <strong>Site Title</strong></li>
+  <li>Choose to create <strong>default menus</strong> (Home, About Us, Service, Contact Us)</li>
+  <li>Click <strong>Next</strong></li>
+</ol>
+
+<h3>Step 3: First Content</h3>
+<ol>
+  <li>Select a <strong>menu page</strong> to add content to</li>
+  <li>Enter a <strong>title</strong> and <strong>description</strong></li>
+  <li>Click <strong>Finish</strong></li>
+</ol>
+<p>Your website is now live with basic content!</p>
+
+<h2 id="profile-password">9. Profile & Password</h2>
+
+<h3>Updating Your Profile</h3>
+<ol>
+  <li>Go to <strong>Profile</strong> in the sidebar</li>
+  <li>Update your <strong>Full Name</strong>, <strong>Email</strong>, or <strong>Phone Number</strong></li>
+  <li>Click <strong>Save</strong></li>
+</ol>
+
+<h3>Changing Your Password</h3>
+<ol>
+  <li>Go to <strong>Password</strong> in the sidebar</li>
+  <li>Enter your <strong>current password</strong></li>
+  <li>Enter your <strong>new password</strong> (minimum 6 characters)</li>
+  <li>Confirm the new password</li>
+  <li>Click <strong>Save</strong></li>
+</ol>
+`
+  },
+  kh: {
+    footer: "ខ្មែរប៊ីស របាយការណ៍ប្រើប្រាស់ — បានធ្វើបច្ចុប្បន្នភាព: ឧសភា ២០២៦",
+    content: `
+<h1>ខ្មែរប៊ីស CMS — ការណែនាំប្រើប្រាស់សម្រាប់អ្នកគ្រប់គ្រងវេបសាយ</h1>
+
+<div class="toc">
+  <div class="toc-title">តារាងមាតិកា</div>
+  <ol>
+    <li><a href="#getting-started">ការចាប់ផ្តើម</a></li>
+    <li><a href="#dashboard">ផ្ទាំងគ្រប់គ្រង</a></li>
+    <li><a href="#content-management">ការគ្រប់គ្រងមាតិកា</a></li>
+    <li><a href="#menu-management">ការគ្រប់គ្រងម៉ឺនុយ</a></li>
+    <li><a href="#media-library">បណ្ណាល័យមីឌៀ</a></li>
+    <li><a href="#settings">ការកំណត់</a></li>
+    <li><a href="#ai-chat-assistant">ជំនួយការ AI</a></li>
+    <li><a href="#quick-setup-wizard">ការដំឡើងរហ័ស</a></li>
+    <li><a href="#profile-password">ប្រូហ្វាល់ និងពាក្យសម្ងាត់</a></li>
+  </ol>
+</div>
+
+<h2 id="getting-started">១. ការចាប់ផ្តើម</h2>
+<h3>ការចូលប្រព័ន្ធ</h3>
+<ol>
+  <li>ចូលទៅកាន់ URL របស់អ្នកគ្រប់គ្រង: <code>http://yourdomain.com/admin/login</code></li>
+  <li>បញ្ចូល <strong>ឈ្មោះអ្នកប្រើ</strong> និង <strong>ពាក្យសម្ងាត់</strong></li>
+  <li>ចុច <strong>ចូល</strong></li>
+</ol>
+<h3>ក្រោយពីចូល</h3>
+<p>អ្នកនឹងទៅដល់ <strong>ផ្ទាំងគ្រប់គ្រង</strong> — ជាចំណុចកណ្តាលសម្រាប់គ្រប់គ្រងវេបសាយ។ ពីទីនេះ អ្នកអាចចូលទៅកាន់ផ្នែកគ្រប់គ្រងទាំងអស់តាមរយៈរបារចំហៀង។</p>
+
+<h2 id="dashboard">២. ផ្ទាំងគ្រប់គ្រង</h2>
+<p>ផ្ទាំងគ្រប់គ្រងផ្តល់នូវទិដ្ឋភាពរបស់វេបសាយ និងការចូលប្រើឧបករណ៍គ្រប់គ្រងទាំងអស់:</p>
+<ul>
+  <li><strong>សកម្មភាពរហ័ស</strong> — ផ្លូវកាត់ទៅកាន់ភារកិច្ចទូទៅ (បន្ថែមមាតិកា, គ្រប់គ្រងម៉ឺនុយ, ប្តូរការកំណត់)</li>
+  <li><strong>ស្ថិតិ</strong> — ទិដ្ឋភាពរបស់មាតិកា, មីឌៀ, និងអ្នកប្រើ</li>
+  <li><strong>សកម្មភាពថ្មីបំផុត</strong> — ការផ្លាស់ប្តូរចុងក្រោយបំផុតលើវេបសាយ</li>
+</ul>
+
+<h2 id="content-management">៣. ការគ្រប់គ្រងមាតិកា</h2>
+<p>មាតិកាគឺជាទំព័រ និងផ្នែកនៃវេបសាយរបស់អ្នក។ មាតិកានីមួយៗភ្ជាប់ជាមួយធាតុម៉ឺនុយ និងមានប្រភេទជាក់លាក់។</p>
+
+<h3>ប្រភេទមាតិកា</h3>
+<table>
+  <tr><th>ប្រភេទ</th><th>ការពិពណ៌នា</th></tr>
+  <tr><td><strong>អត្ថបទ</strong></td><td>ទំព័រអត្ថបទជាមួយ HTML (អំពីយើង, សេវាកម្ម ។ល។)</td></tr>
+  <tr><td><strong>វិចិត្រសាលរូបភាព</strong></td><td>សម្រាំងរូបភាពបង្ហាញជាក្រឡាចត្រង្គជាមួយ lightbox</td></tr>
+  <tr><td><strong>វីដេអូ</strong></td><td>តំណវីដេអូ (YouTube, Vimeo ។ល។)</td></tr>
+  <tr><td><strong>ឯកសារ</strong></td><td>ឯកសារភ្ជាប់ និងកម្មវិធីមើលឯកសារ</td></tr>
+  <tr><td><strong>ផែនទី</strong></td><td>ផែនទីអន្តរកម្មជាមួយស្លាកទីតាំង</td></tr>
+  <tr><td><strong>ព័ត៌មាន/ប្លុក</strong></td><td>អត្ថបទព័ត៌មានជាមួយចំណងជើង, ការពិពណ៌នា, រូបភាព និងថ្ងៃផ្សាយ</td></tr>
+</table>
+
+<h3>ការបង្កើតមាតិកា</h3>
+<ol>
+  <li>ចូលទៅ <strong>មាតិកា</strong> នៅក្នុងរបារចំហៀង</li>
+  <li>ចុច <strong>បន្ថែមថ្មី</strong></li>
+  <li>បំពេញទម្រង់:
+    <ul>
+      <li><strong>ចំណងជើង</strong> — ចំណងជើងទំព័រ/ផ្នែក</li>
+      <li><strong>ប្រភេទមាតិកា</strong> — ជ្រើសរើសប្រភេទ (អត្ថបទ, រូបភាព, វីដេអូ ។ល។)</li>
+      <li><strong>ម៉ឺនុយ</strong> — ជ្រើសរើសធាតុម៉ឺនុយដែលមាតិកានេះស្ថិតនៅ</li>
+      <li><strong>ភាសា</strong> — ជ្រើសរើសភាសាសម្រាប់មាតិកានេះ</li>
+      <li><strong>ការពិពណ៌នា</strong> — បញ្ចូលមាតិការបស់អ្នក (ឧបករណ៍កែសម្រួលអត្ថបទសម្រាប់អត្ថបទ)</li>
+    </ul>
+  </li>
+  <li>ចុច <strong>រក្សាទុក</strong></li>
+</ol>
+
+<h3>ការកែសម្រួលមាតិកា</h3>
+<ol>
+  <li>ចូលទៅ <strong>មាតិកា</strong> និងស្វែងរកធាតុដែលអ្នកចង់កែសម្រួល</li>
+  <li>ចុច <strong>រូបតំណាងប៊ីចង្កៀវ</strong> (✏️) នៅខាងស្តាំ</li>
+  <li>ធ្វើបច្ចុប្បន្នភាពវាល និងចុច <strong>រក្សាទុក</strong></li>
+</ol>
+
+<h3>ការលុបមាតិកា</h3>
+<ol>
+  <li>ចុច <strong>រូបតំណាងធុងសំរាម</strong> (🗑️) លើធាតុមាតិកា</li>
+  <li>បញ្ជាក់ការលុប</li>
+</ol>
+<blockquote><p>⚠️ <strong>ការព្រមាន:</strong> មាតិកាដែលបានលុបមិនអាចស្តារវិញបានទេ។</p></blockquote>
+
+<h3>ការគ្រប់គ្រងធាតុមាតិកា (រូបភាព, វីដេអូ, ឯកសារ, ព័ត៌មាន)</h3>
+<p>សម្រាប់មាតិកាប្រភេទវិចិត្រសាល អ្នកអាចគ្រប់គ្រងធាតុនីមួយៗក្នុងផ្នែកមាតិកា:</p>
+<ol>
+  <li>ចុចលើធាតុមាតិកាដើម្បីបើកទំព័រលម្អិត</li>
+  <li>ប្រើផ្ទាំង <strong>ធាតុ</strong> ដើម្បីបន្ថែម, កែសម្រួល ឬលុបរូបភាព/វីដេអូ/ឯកសារនីមួយៗ</li>
+  <li>ប្រើផ្ទាំង <strong>ព័ត៌មាន</strong> (សម្រាប់មាតិកាប្រភេទព័ត៌មាន) ដើម្បីគ្រប់គ្រងអត្ថបទព័ត៌មាន</li>
+</ol>
+
+<h3>ការបន្ថែមអត្ថបទព័ត៌មាន</h3>
+<ol>
+  <li>បើកផ្នែកមាតិកាប្រភេទ <strong>ព័ត៌មាន</strong></li>
+  <li>ចុច <strong>បន្ថែមថ្មី</strong></li>
+  <li>បំពេញ:
+    <ul>
+      <li><strong>ចំណងជើង</strong> — ចំណងជើងព័ត៌មាន</li>
+      <li><strong>ការពិពណ៌នាខ្លី</strong> — សេចក្តីសង្ខេបខ្លីសម្រាប់បង្ហាញក្នុងបញ្ជី</li>
+      <li><strong>ការពិពណ៌នា</strong> — មាតិកាអត្ថបទពេញលេញ (ឧបករណ៍កែសម្រួលអត្ថបទ)</li>
+      <li><strong>រូបភាពចម្បង</strong> — រូបភាពខ្លៅ/គ្រប់</li>
+      <li><strong>ថ្ងៃផ្សាយ</strong> — ពេលដែលអត្ថបទគួរបង្ហាញ</li>
+      <li><strong>ស្ថានភាព</strong> — បិទ/បើក <strong>បង្ហាញ</strong> (មើលឃើញ) ឬ <strong>មិនបង្ហាញ</strong> (លាក់)</li>
+      <li><strong>អាទិភាព</strong> — សម្គាល់ជាលក្ខណៈពិសេស</li>
+    </ul>
+  </li>
+  <li>ចុច <strong>រក្សាទុក</strong></li>
+</ol>
+
+<h3>ការគ្រប់គ្រងមាតិកាផែនទី</h3>
+<ol>
+  <li>បើកផ្នែកមាតិកាប្រភេទ <strong>ផែនទី</strong></li>
+  <li>ចូលទៅផ្ទាំង <strong>ផែនទី</strong></li>
+  <li>កំណត់កូអរដោនេ <strong>រយៈទទឹង</strong> និង <strong>រយៈបណ្តោយ</strong></li>
+  <li>បន្ថែម <strong>ចំណងជើង</strong> និង <strong>ការពិពណ៌នា</strong> សម្រាប់ស្លាក</li>
+  <li>បិទ/បើក <strong>មើលឃើញ</strong> ដើម្បីបង្ហាញ/លាក់ផែនទី</li>
+  <li>ចុច <strong>រក្សាទុក</strong></li>
+</ol>
+
+<h2 id="menu-management">៤. ការគ្រប់គ្រងម៉ឺនុយ</h2>
+<p>ម៉ឺនុយកំណត់រចនាសម្ព័ន្ធរុករកវេបសាយរបស់អ្នក។ ធាតុម៉ឺនុយនីមួយៗភ្ជាប់ទៅទំព័រមាតិកា ឬ URL ខាងក្រៅ។</p>
+
+<h3>ការយល់ដឹងអំពីរចនាសម្ព័ន្ធម៉ឺនុយ</h3>
+<ul>
+  <li><strong>ធាតុកម្រិតកំពូល</strong> បង្ហាញក្នុងរបាររុករកមុខ</li>
+  <li><strong>ធាតុរង</strong> (កូន) បង្ហាញក្នុងម៉ឺនុយទម្លាក់ចុះក្រោមឪពុករបស់វា</li>
+  <li>ម៉ឺនុយគឺ <strong>តាមភាសា</strong> — ភាសានីមួយៗមានមែកធាងម៉ឺនុយផ្ទាល់ខ្លួន</li>
+</ul>
+
+<h3>ការបង្កើតធាតុម៉ឺនុយ</h3>
+<ol>
+  <li>ចូលទៅ <strong>ម៉ឺនុយ</strong> នៅក្នុងរបារចំហៀង</li>
+  <li>ចុច <strong>បន្ថែមថ្មី</strong></li>
+  <li>បំពេញ:
+    <ul>
+      <li><strong>ឈ្មោះម៉ឺនុយ</strong> — អត្ថបទបង្ហាញក្នុងរុករក (ឧទាហរណ៍ "អំពីយើង")</li>
+      <li><strong>URL ម៉ឺនុយ</strong> — តំណជំរើស (ទុកទទេបើភ្ជាប់ទៅមាតិកា)</li>
+      <li><strong>ម៉ឺនុយមេ</strong> — ជ្រើសរើសមេសម្រាប់ម៉ឺនុយរង ឬ "គ្មាន" សម្រាប់កម្រិតកំពូល</li>
+      <li><strong>ភាសា</strong> — ភាសាសម្រាប់ម៉ឺនុយនេះ</li>
+      <li><strong>លំដាប់</strong> — ទីតាំងបង្ហាញ (លេខតូចបង្ហាញមុន)</li>
+    </ul>
+  </li>
+  <li>ចុច <strong>រក្សាទុក</strong></li>
+</ol>
+
+<h3>ការតំរៀបម៉ឺនុយឡើងវិញ</h3>
+<ol>
+  <li>ស្វែងរកធាតុម៉ឺនុយក្នុងបញ្ជី</li>
+  <li>ចុច <strong>ព្រួញឡើង/ចុះ</strong> ដើម្បីផ្លាស់ទីវា</li>
+</ol>
+
+<h3>ការកែសម្រួល និងលុប</h3>
+<ul>
+  <li>ចុច <strong>រូបតំណាងប៊ីចង្កៀវ</strong> (✏️) ដើម្បីកែសម្រួលធាតុម៉ឺនុយ</li>
+  <li>ចុច <strong>រូបតំណាងធុងសំរាម</strong> (🗑️) ដើម្បីលុប — បញ្ជាក់ពេលសួរ</li>
+</ul>
+<div class="warn-box">⚠️ <strong>ចំណាំ:</strong> ការលុបធាតុម៉ឺនុយ <strong>មិន</strong>លុបមាតិកាដែលភ្ជាប់របស់វាទេ។</div>
+
+<h2 id="media-library">៥. បណ្ណាល័យមីឌៀ</h2>
+<p>បណ្ណាល័យមីឌៀគ្រប់គ្រងរូបភាព, វីដេអូ និងឯកសារទាំងអស់ដែលបានផ្ទុកឡើងទៅវេបសាយរបស់អ្នក។ ឯកសារត្រូវបានរក្សាទុកលើកន្លែងផ្ទុកពពក។</p>
+
+<h3>ការផ្ទុកឯកសារឡើង</h3>
+<ol>
+  <li>ចូលទៅ <strong>មីឌៀ</strong> នៅក្នុងរបារចំហៀង</li>
+  <li>ចុច <strong>ជ្រើសរើសឯកសារ</strong> ឬអូសដាក់</li>
+  <li>ជ្រើសរើសឯកសាររបស់អ្នក — គាំទ្ររូបភាព, វីដេអូ និងឯកសារ</li>
+  <li>រង់ចាំការផ្ទុកឡើងរួចរាល់</li>
+  <li>ឯកសារបង្ហាញក្នុងបណ្ណាល័យមីឌៀជាមួយ URL ដែលអាចចែករំលែកបាន</li>
+</ol>
+
+<h3>ការប្រើមីឌៀក្នុងមាតិកា</h3>
+<p>ពេលបន្ថែមរូបភាពទៅមាតិកា សូមយោង URL ឯកសារពីបណ្ណាល័យមីឌៀ។ ទម្រង់ URL គឺ:<br>
+<code>https://khmer.sgp1.digitaloceanspaces.com/your-file-path</code></p>
+
+<h3>ការលុបមីឌៀ</h3>
+<ol>
+  <li>ស្វែងរកឯកសារក្នុងបណ្ណាល័យមីឌៀ</li>
+  <li>ចុច <strong>រូបតំណាងធុងសំរាម</strong> (🗑️)</li>
+  <li>បញ្ជាក់ការលុប</li>
+</ol>
+
+<h2 id="settings">៦. ការកំណត់</h2>
+<p>ការកំណត់គ្រប់គ្រងរចនាប័ទ្ម និងឥរិយាបថនៃវេបសាយសាធារណៈរបស់អ្នក។</p>
+
+<h3>៦.១ ការកំណត់ទូទៅ</h3>
+<p>ចូលទៅ <strong>ការកំណត់ → ទូទៅ</strong></p>
+<ul>
+  <li><strong>ចំណងជើងវេបសាយ</strong> — ឈ្មោះវេបសាយរបស់អ្នក (បង្ហាញក្នុងផ្ទាំងកម្មវិធីរុករក និងបឋមកថា)</li>
+  <li><strong>អត្ថបទជើងទំព័រ</strong> — អត្ថបទបង្ហាញនៅបាតវេបសាយ</li>
+</ul>
+
+<h4>ពណ៌ស្បែក</h4>
+<table>
+  <tr><th>ស្បែក</th><th>ការពិពណ៌នា</th></tr>
+  <tr><td>លំនាំដើម</td><td>ស្បែកពណ៌ស/ធម្មតា</td></tr>
+  <tr><td>បញ្ច្រាស</td><td>ស្បែកពណ៌ងងឹត</td></tr>
+  <tr><td>ក្រហម</td><td>ពណ៌ក្រហម</td></tr>
+  <tr><td>បៃតង</td><td>ពណ៌បៃតង</td></tr>
+  <tr><td>ស្វាយ</td><td>ពណ៌ស្វាយ</td></tr>
+  <tr><td>លឿង</td><td>ពណ៌លឿង</td></tr>
+</table>
+
+<h4>ប្លង់ទំព័រ</h4>
+<table>
+  <tr><th>ប្លង់</th><th>ការពិពណ៌នា</th></tr>
+  <tr><td>ពហុទំព័របុរាណ</td><td>វេបសាយបុរាណជាមួយទំព័រដាច់ដោយឡែកក្នុងមួយធាតុម៉ឺនុយ</td></tr>
+  <tr><td>ទំព័រតែមួយរំកិល</td><td>មាតិកាទាំងអស់នៅលើទំព័ររំកិលតែមួយ</td></tr>
+  <tr><td>ក្រឡាចត្រង្ហទស្សនាសារ</td><td>ប្លង់ស្ទីលទស្សនាសារជាក្រឡាចត្រង្គ</td></tr>
+  <tr><td>ហ៊ីរ៉ូពេញអេក្រង់</td><td>ប្លង់ផ្តោតលើរូបភាពហ៊ីរ៉ូធំ</td></tr>
+</table>
+
+<p>ការកំណត់បន្ថែម: <strong>ផ្ទៃខាងក្រោយ</strong>, <strong>លេខតាមដាន Google Analytics</strong> និង <strong>ស្គ្រីបជជែក</strong>។</p>
+
+<h3>៦.២ ការកំណត់ឡូហ្គោ</h3>
+<p>ចូលទៅ <strong>ការកំណត់ → ឡូហ្គោ</strong></p>
+<ul>
+  <li><strong>រូបភាពឡូហ្គោ</strong> — ផ្ទុកឡើង ឬកំណត់ URL រូបភាពឡូហ្គោ</li>
+  <li><strong>ឡូហ្គោទូរស័ព្ទ</strong> — ឡូហ្គោដាច់ដោយឡែកសម្រាប់ទូរស័ព្ទ (ជំរើស)</li>
+  <li><strong>ទីតាំងឡូហ្គោ</strong> — ឆ្វេង, កណ្តាល ឬ ស្តាំ</li>
+</ul>
+
+<h3>៦.៣ ការកំណត់ប័ណ្ណសារ</h3>
+<p>ចូលទៅ <strong>ការកំណត់ → ប័ណ្ណសារ</strong></p>
+<ul>
+  <li><strong>បង្ហាញប័ណ្ណសារ</strong> — បិទ/បើកស្លាយប័ណ្ណសារ</li>
+  <li>បន្ថែមរូបភាពប័ណ្ណសារជាមួយចំណងជើង និងតំណជំរើស</li>
+  <li>តំរៀបឡើងវិញ ឬលុបប័ណ្ណសារ</li>
+</ul>
+
+<h3>៦.៤ តំណបណ្ដាញសង្ខេប</h3>
+<p>ចូលទៅ <strong>ការកំណត់ → បណ្ដាញសង្ខេប</strong></p>
+<p>បន្ថែមតំណទៅគណនីបណ្ដាញសង្ខេបរបស់អ្នក: Facebook, Google, YouTube, LinkedIn, Twitter។<br>
+បញ្ចូល URL ពេញសម្រាប់គ្នា (ឧទាហរណ៍ <code>https://facebook.com/yourpage</code>)។</p>
+
+<h3>៦.៥ ការគ្រប់គ្រងភាសា</h3>
+<p>ចូលទៅ <strong>ការកំណត់ → ភាសា</strong></p>
+<table>
+  <tr><th>ទង់ជាតិ</th><th>ភាសា</th></tr>
+  <tr><td>០</td><td>ខ្មែរ 🇰🇭</td></tr>
+  <tr><td>១</td><td>អង់គ្លេស 🇺🇸</td></tr>
+  <tr><td>២</td><td>ចិន 🇨🇳</td></tr>
+  <tr><td>៣</td><td>ថៃ 🇹🇭</td></tr>
+  <tr><td>៤</td><td>វៀតណាម 🇻🇳</td></tr>
+</table>
+<div class="warn-box">⚠️ <strong>សំខាន់:</strong> ភាសានីមួយៗមានម៉ឺនុយ និងមាតិកាផ្ទាល់ខ្លួន។ ការបន្ថែមភាសាមានន័យថាអ្នកត្រូវបង្កើតម៉ឺនុយ និងមាតិកាសម្រាប់វា។</div>
+
+<h2 id="ai-chat-assistant">៧. ជំនួយការ AI</h2>
+<p>ជំនួយការ AI អនុញ្ញាតឱ្យអ្នកគ្រប់គ្រងវេបសាយដោយប្រើភាសាធម្មតា — មិនចាំបាច់មានចំណេះដឹងបច្ចេកទេសទេ។</p>
+
+<h3>អ្វីដែលអ្នកអាចសួរបាន</h3>
+<table>
+  <tr><th>ប្រភេទ</th><th>ពាក្យបញ្ជាឧទាហរណ៍</th></tr>
+  <tr><td><strong>ប្តូរស្បែក</strong></td><td>"ប្តូរស្បែកទៅក្រហម", "ប្តូរទៅពណ៌ងងឹត"</td></tr>
+  <tr><td><strong>ប្តូរប្លង់</strong></td><td>"ប្តូរប្លង់ទៅទស្សនាសារ", "ប្រើប្លង់បុរាណ"</td></tr>
+  <tr><td><strong>បង្កើតទំព័រ</strong></td><td>"បង្កើតទំព័រឈ្មោះសេវាកម្មជាមួយមាតិកាអំពីការរចនាវេប"</td></tr>
+  <tr><td><strong>បង្កើតម៉ឺនុយ</strong></td><td>"បន្ថែមធាតុម៉ឺនុយឈ្មោះទំនាក់ទំនង"</td></tr>
+  <tr><td><strong>កែសម្រួលមាតិកា</strong></td><td>"ធ្វើបច្ចុប្បន្នភាពទំព័រអំពីយើង"</td></tr>
+  <tr><td><strong>លុបមាតិកា</strong></td><td>"លុបអត្ថបទព័ត៌មានចាស់"</td></tr>
+  <tr><td><strong>ដំឡើងវេបសាយ</strong></td><td>"ជួយដំឡើងវេបសាយខ្ញុំ" (សម្រាប់វេបសាយថ្មី)</td></tr>
+</table>
+
+<h3>ដែនកំណត់ការប្រើប្រាស់</h3>
+<p><strong>សំណួរ ១០ ក្នុងមួយថ្ងៃ</strong> ក្នុងមួយអ្នកប្រើ។ AI នឹងប្រាប់អ្នកអំពីចំនួនសំណួរដែលនៅសល់។</p>
+
+<h3>គន្លឹះសម្រាប់លទ្ធផលល្អបំផុត</h3>
+<div class="tip-box">
+  ✅ <strong>ជាក់លាក់:</strong> "បង្កើតទំព័រឈ្មោះ 'ក្រុមយើង' ជាមួយមាតិកាអំពីសមាជិក ៥ របស់យើង"<br>
+  ✅ <strong>រៀបរាប់ពីភាសា:</strong> "បង្កើតទំព័រជាភាសាខ្មែរឈ្មោះ 'សេវាកម្ម'"<br>
+  ❌ <strong>ចៀសវាងសំណើមិនច្បាស់:</strong> "ធ្វើឱ្យប្រសើរឡើង" — បញ្ជាក់អ្វីដែលអ្នកចង់ប្តូរ<br>
+  ❌ <strong>មិនអាចផ្ទុកឯកសារ:</strong> AI មិនអាចផ្ទុករូបភាពឡើងបានទេ; ប្រើបណ្ណាល័យមីឌៀសម្រាប់រឿងនោះ
+</div>
+
+<h2 id="quick-setup-wizard">៨. ការដំឡើងរហ័ស</h2>
+<p>សម្រាប់វេបសាយថ្មី អ្នកជំនួយការដំឡើងនឹងណែនាំអ្នកតាមរយៈការកំណត់ដំបូង:</p>
+
+<h3>ជំហានទី ១: ភាសា</h3>
+<ol>
+  <li>ចូលទៅ <strong>គ្រប់គ្រង → ដំឡើង</strong></li>
+  <li>ជ្រើសរើស <strong>ភាសាលំនាំដើម</strong> (ខ្មែរ, អង់គ្លេស, ចិន, ថៃ ឬវៀតណាម)</li>
+  <li>ចុច <strong>បន្ទាប់</strong></li>
+</ol>
+
+<h3>ជំហានទី ២: ម៉ឺនុយ និងការកំណត់</h3>
+<ol>
+  <li>បញ្ចូល <strong>ចំណងជើងវេបសាយ</strong></li>
+  <li>ជ្រើសរើសដើម្បីបង្កើត <strong>ម៉ឺនុយលំនាំដើម</strong> (ទំព័រដើម, អំពីយើង, សេវាកម្ម, ទំនាក់ទំនង)</li>
+  <li>ចុច <strong>បន្ទាប់</strong></li>
+</ol>
+
+<h3>ជំហានទី ៣: មាតិកាដំបូង</h3>
+<ol>
+  <li>ជ្រើសរើស <strong>ទំព័រម៉ឺនុយ</strong> ដើម្បីបន្ថែមមាតិកា</li>
+  <li>បញ្ចូល <strong>ចំណងជើង</strong> និង <strong>ការពិពណ៌នា</strong></li>
+  <li>ចុច <strong>បញ្ចប់</strong></li>
+</ol>
+<p>វេបសាយរបស់អ្នកឥឡូវនេះបានផ្សាយជាមួយមាតិកាមូលដ្ឋានគ្រឹះហើយ!</p>
+
+<h2 id="profile-password">៩. ប្រូហ្វាល់ និងពាក្យសម្ងាត់</h2>
+
+<h3>ការធ្វើបច្ចុប្បន្នភាពប្រូហ្វាល់</h3>
+<ol>
+  <li>ចូលទៅ <strong>ប្រូហ្វាល់</strong> នៅក្នុងរបារចំហៀង</li>
+  <li>ធ្វើបច្ចុប្បន្នភាព <strong>ឈ្មោះពេញ</strong>, <strong>អ៊ីមែល</strong> ឬ <strong>លេខទូរស័ព្ទ</strong></li>
+  <li>ចុច <strong>រក្សាទុក</strong></li>
+</ol>
+
+<h3>ការប្តូរពាក្យសម្ងាត់</h3>
+<ol>
+  <li>ចូលទៅ <strong>ពាក្យសម្ងាត់</strong> នៅក្នុងរបារចំហៀង</li>
+  <li>បញ្ចូល <strong>ពាក្យសម្ងាត់បច្ចុប្បន្ន</strong></li>
+  <li>បញ្ចូល <strong>ពាក្យសម្ងាត់ថ្មី</strong> (យ៉ាងតិច ៦ តួអក្សរ)</li>
+  <li>បញ្ជាក់ពាក្យសម្ងាត់ថ្មី</li>
+  <li>ចុច <strong>រក្សាទុក</strong></li>
+</ol>
+`
+  }
+};
+
+function setLang(lang) {
+  document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
+  document.getElementById('guide-content').innerHTML = translations[lang].content;
+  document.querySelector('[data-i18n="footer"]').textContent = translations[lang].footer;
+  document.documentElement.lang = lang === 'kh' ? 'km' : 'en';
+  localStorage.setItem('guide-lang', lang);
+}
+
+// Restore saved language
+const savedLang = localStorage.getItem('guide-lang') || 'en';
+if (savedLang !== 'en') setLang(savedLang);
+else document.getElementById('guide-content').innerHTML = translations.en.content;
+</script>
+
+</body>
+</html>

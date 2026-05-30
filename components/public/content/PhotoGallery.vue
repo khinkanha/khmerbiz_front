@@ -11,12 +11,15 @@
     </div>
 
     <!-- Lightbox Dialog -->
-    <Dialog v-model:visible="showLightbox" :style="{ width: '90vw' }" :modal="true" :showHeader="false" :closable="true"
+    <Dialog v-model:visible="showLightbox" :style="{ width: '90vw', maxWidth: '1200px' }" :modal="true" :showHeader="false"
       contentClass="lightbox-dialog">
-      <img v-if="currentItem" :src="`${photoUrl}${currentItem.photo}`" :alt="currentItem.title"
-        class="lightbox-image" />
-      <div v-if="currentItem?.title" class="lightbox-caption">
-        {{ currentItem.title }}
+      <div class="lightbox-content" @click="showLightbox = false">
+        <Button icon="pi pi-times" rounded text severity="secondary" class="lightbox-close" @click.stop="showLightbox = false" />
+        <img v-if="currentItem" :src="`${photoUrl}${currentItem.url || currentItem.photo}`" :alt="currentItem.title"
+          class="lightbox-image" />
+        <div v-if="currentItem?.title" class="lightbox-caption">
+          {{ currentItem.title }}
+        </div>
       </div>
     </Dialog>
   </section>
@@ -116,6 +119,21 @@ const openLightbox = (item: ContentItem) => {
 :deep(.lightbox-dialog) {
   background: transparent;
   padding: 0;
+}
+
+.lightbox-content {
+  position: relative;
+  cursor: pointer;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  border: none;
 }
 
 .lightbox-image {
