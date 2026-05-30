@@ -182,30 +182,19 @@ export const useContentStore = defineStore('content', () => {
     }
   }
 
-  const saveItem = async (contentId: number, data: ItemForm): Promise<{ success: boolean; id?: number }> => {
+  const saveItem = async (contentId: number, data: any): Promise<{ success: boolean; id?: number }> => {
     try {
-      const formData = new FormData()
-      formData.append('title', data.title)
-      if (data.description) {
-        formData.append('description', data.description)
+      const payload: any = {
+        title: data.title,
+        description: data.description || '',
+        item_type: data.item_type,
       }
-      if (data.video_url) {
-        formData.append('video_url', data.video_url)
-      }
-      if (data.photo) {
-        formData.append('photo', data.photo)
-      }
-      if (data.document_url) {
-        formData.append('document_url', data.document_url)
-      }
-      if (data.priority !== undefined) {
-        formData.append('priority', String(data.priority))
-      }
-      if (data.is_feature !== undefined) {
-        formData.append('is_feature', String(data.is_feature ? 1 : 0))
-      }
+      if (data.video_url) payload.url = data.video_url
+      if (data.photoUrl) payload.url = data.photoUrl
+      if (data.priority !== undefined) payload.priority = data.priority
+      if (data.is_feature !== undefined) payload.is_feature = data.is_feature ? 1 : 0
 
-      const response = await api.post<{ item_id: number }>(`/content/${contentId}/items`, formData)
+      const response = await api.post<{ item_id: number }>(`/content/${contentId}/items`, payload)
 
       if (response.success && response.data) {
         return { success: true, id: response.data.item_id }
@@ -218,32 +207,19 @@ export const useContentStore = defineStore('content', () => {
     }
   }
 
-  const updateItem = async (contentId: number, id: number, data: Partial<ItemForm>): Promise<boolean> => {
+  const updateItem = async (contentId: number, id: number, data: any): Promise<boolean> => {
     try {
-      const formData = new FormData()
-      if (data.title) {
-        formData.append('title', data.title)
+      const payload: any = {
+        title: data.title,
+        description: data.description || '',
+        item_type: data.item_type,
       }
-      if (data.description !== undefined) {
-        formData.append('description', data.description)
-      }
-      if (data.video_url !== undefined) {
-        formData.append('video_url', data.video_url)
-      }
-      if (data.photo) {
-        formData.append('photo', data.photo)
-      }
-      if (data.document_url) {
-        formData.append('document_url', data.document_url)
-      }
-      if (data.priority !== undefined) {
-        formData.append('priority', String(data.priority))
-      }
-      if (data.is_feature !== undefined) {
-        formData.append('is_feature', String(data.is_feature ? 1 : 0))
-      }
+      if (data.video_url) payload.url = data.video_url
+      if (data.photoUrl) payload.url = data.photoUrl
+      if (data.priority !== undefined) payload.priority = data.priority
+      if (data.is_feature !== undefined) payload.is_feature = data.is_feature ? 1 : 0
 
-      const response = await api.put(`/content/${contentId}/items/${id}`, formData)
+      const response = await api.put(`/content/${contentId}/items/${id}`, payload)
       return response.success
     } catch (error) {
       console.error('Failed to update item:', error)
@@ -346,23 +322,39 @@ export const useContentStore = defineStore('content', () => {
     }
   }
 
-  const saveNews = async (contentId: number, data: NewsForm): Promise<{ success: boolean; id?: number }> => {
+  const saveNews = async (contentId: number, data: any): Promise<{ success: boolean; id?: number }> => {
     try {
-      const formData = new FormData()
-      formData.append('title', data.title)
-      formData.append('short_description', data.short_description)
-      formData.append('description', data.description)
+      const payload: any = {
+        title: data.title,
+        shortdes: data.short_description || data.shortdes || '',
+        longdes: data.description || data.longdes || '',
+      }
       if (data.photo) {
-        formData.append('photo', data.photo)
+        if (data.photo instanceof File) {
+          const formData = new FormData()
+          formData.append('title', payload.title)
+          formData.append('shortdes', payload.shortdes)
+          formData.append('longdes', payload.longdes)
+          formData.append('photo', data.photo)
+          if (data.publish_date) formData.append('publish', data.publish_date)
+          if (data.priority !== undefined) formData.append('priority', String(data.priority))
+          if (data.status !== undefined) formData.append('status', String(data.status))
+          const response = await api.post<{ news_id: number }>(`/content/${contentId}/news`, formData)
+          if (response.success && response.data) {
+            return { success: true, id: response.data.news_id || response.data.id }
+          }
+          return { success: false }
+        }
+        payload.photo = data.photo
       }
-      if (data.publish_date) {
-        formData.append('publish_date', data.publish_date)
-      }
+      if (data.publish_date) payload.publish = data.publish_date
+      if (data.priority !== undefined) payload.priority = data.priority
+      if (data.status !== undefined) payload.status = data.status
 
-      const response = await api.post<{ news_id: number }>(`/content/${contentId}/news`, formData)
+      const response = await api.post<{ news_id: number }>(`/content/${contentId}/news`, payload)
 
       if (response.success && response.data) {
-        return { success: true, id: response.data.news_id }
+        return { success: true, id: response.data.news_id || response.data.id }
       }
 
       return { success: false }
@@ -372,26 +364,33 @@ export const useContentStore = defineStore('content', () => {
     }
   }
 
-  const updateNews = async (contentId: number, id: number, data: Partial<NewsForm>): Promise<boolean> => {
+  const updateNews = async (contentId: number, id: number, data: any): Promise<boolean> => {
     try {
-      const formData = new FormData()
-      if (data.title) {
-        formData.append('title', data.title)
-      }
-      if (data.short_description !== undefined) {
-        formData.append('short_description', data.short_description)
-      }
-      if (data.description !== undefined) {
-        formData.append('description', data.description)
+      const payload: any = {
+        title: data.title,
+        shortdes: data.short_description || data.shortdes || '',
+        longdes: data.description || data.longdes || '',
       }
       if (data.photo) {
-        formData.append('photo', data.photo)
+        if (data.photo instanceof File) {
+          const formData = new FormData()
+          formData.append('title', payload.title)
+          formData.append('shortdes', payload.shortdes)
+          formData.append('longdes', payload.longdes)
+          formData.append('photo', data.photo)
+          if (data.publish_date) formData.append('publish', data.publish_date)
+          if (data.priority !== undefined) formData.append('priority', String(data.priority))
+          if (data.status !== undefined) formData.append('status', String(data.status))
+          const response = await api.put(`/content/${contentId}/news/${id}`, formData)
+          return response.success
+        }
+        payload.photo = data.photo
       }
-      if (data.publish_date !== undefined) {
-        formData.append('publish_date', data.publish_date)
-      }
+      if (data.publish_date) payload.publish = data.publish_date
+      if (data.priority !== undefined) payload.priority = data.priority
+      if (data.status !== undefined) payload.status = data.status
 
-      const response = await api.put(`/content/${contentId}/news/${id}`, formData)
+      const response = await api.put(`/content/${contentId}/news/${id}`, payload)
       return response.success
     } catch (error) {
       console.error('Failed to update news:', error)

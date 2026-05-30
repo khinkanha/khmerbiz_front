@@ -50,6 +50,18 @@
             </template>
           </Column>
           <Column
+            field="status"
+            :header="$t('contentManager.status') || 'Status'"
+            :style="{ width: '100px' }"
+          >
+            <template #body="{ data }">
+              <Tag
+                :value="data.status === 1 ? ($t('contentManager.notShow') || 'Not Show') : ($t('contentManager.show') || 'Show')"
+                :severity="data.status === 1 ? 'secondary' : 'success'"
+              />
+            </template>
+          </Column>
+          <Column
             :header="$t('contentManager.actions')"
             :style="{ width: '150px' }"
           >
@@ -110,12 +122,20 @@
 
         <div class="form-group">
           <label for="description">{{ $t('contentManager.description') }} *</label>
-          <Editor
-            id="description"
-            v-model="newsForm.description"
-            editorStyle="height: 200px"
-            :class="{ 'p-invalid': newsErrors.description }"
-          />
+          <ClientOnly>
+            <TinyMCEEditor
+              v-model="newsForm.description"
+              tinymceScriptSrc="/tinymce/tinymce.min.js"
+              :init="{
+                height: 300,
+                menubar: 'tools',
+                plugins: 'advlist autolink lists link image charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime media table paste',
+                toolbar: 'undo redo | bold italic underline | forecolor backcolor | fontselect | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | fullscreen',
+                branding: false,
+                promotion: false,
+              }"
+            />
+          </ClientOnly>
           <small v-if="newsErrors.description" class="p-error">{{ newsErrors.description }}</small>
         </div>
 
@@ -153,6 +173,17 @@
           />
         </div>
 
+        <div class="form-group">
+          <label for="newsStatus">{{ $t('contentManager.status') || 'Status' }}</label>
+          <div class="status-toggle">
+            <InputSwitch
+              id="newsStatus"
+              v-model="newsForm.status"
+            />
+            <span class="status-label">{{ newsForm.status ? $t('contentManager.show') || 'Show' : $t('contentManager.notShow') || 'Not Show' }}</span>
+          </div>
+        </div>
+
         <div class="form-actions">
           <Button
             type="button"
@@ -181,6 +212,7 @@ definePageMeta({
 
 import { useConfirm } from 'primevue/useconfirm'
 import { ContentType } from '~/types'
+import TinyMCEEditor from '@tinymce/tinymce-vue'
 
 const contentStore = useContentStore()
 const confirm = useConfirm()
@@ -203,6 +235,7 @@ const newsForm = ref({
   photo: null as File | null,
   photoPreview: '',
   publish_date: new Date(),
+  status: true,
 })
 
 const newsErrors = ref<Record<string, string>>({})
@@ -254,6 +287,7 @@ const editNews = (news: any) => {
     photo: null,
     photoPreview: news.photo ? `${photoUrl}${news.photo}` : '',
     publish_date: news.publish_date ? new Date(news.publish_date) : new Date(),
+    status: news.status !== 1,
   }
   showAddDialog.value = true
 }
@@ -268,6 +302,7 @@ const closeDialog = () => {
     photo: null,
     photoPreview: '',
     publish_date: new Date(),
+    status: true,
   }
   newsErrors.value = {}
 }
@@ -290,6 +325,7 @@ const handleSaveNews = async () => {
       description: newsForm.value.description,
       photo: newsForm.value.photo,
       publish_date: publishDate,
+      status: newsForm.value.status ? 0 : 1,
     }
 
     let result: boolean | { success: boolean; id?: number }
@@ -383,6 +419,17 @@ onMounted(async () => {
   font-weight: 500;
   color: #4a5568;
   font-size: 0.875rem;
+}
+
+.status-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.status-label {
+  font-size: 0.875rem;
+  color: #4a5568;
 }
 
 .photo-preview {

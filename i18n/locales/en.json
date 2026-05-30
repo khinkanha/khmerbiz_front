@@ -20,6 +20,8 @@
     "btnsearch": "Search",
     "filter": "Filter",
     "status": "Status",
+    "show": "Show",
+    "notShow": "Not Show",
     "published": "Published",
     "draft": "Draft",
     "actions": "Actions",

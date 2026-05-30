@@ -50,7 +50,7 @@
               <div class="action-buttons">
                 <Button icon="pi pi-pencil" rounded text @click="$router.push(`/admin/content/${data.content_id}`)"
                   v-tooltip.top="$t('contentManager.edit')" />
-                <Button icon="pi pi-list" rounded text @click="$router.push(`/admin/content/${data.content_id}/items`)"
+                <Button v-if="data.content_type !== ContentType.ARTICLE" icon="pi pi-list" rounded text @click="$router.push(`/admin/content/${data.content_id}/items`)"
                   v-tooltip.top="$t('contentManager.list')" />
                 <Button icon="pi pi-trash" rounded text severity="danger" @click="confirmDelete(data)"
                   v-tooltip.top="$t('contentManager.delete')" />

@@ -20,6 +20,8 @@
     "btnsearch": "搜索",
     "filter": "筛选",
     "status": "状态",
+    "show": "显示",
+    "notShow": "不显示",
     "published": "已发布",
     "draft": "草稿",
     "actions": "操作",

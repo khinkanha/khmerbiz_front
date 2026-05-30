@@ -32,9 +32,9 @@
               <i v-if="data._depth > 0" class="fa fa-angle-right" style="color:#a0aec0;margin-right:4px"></i>
               {{ data.item_name }}
             </NuxtLink>
-            <div v-if="data.content_title">
-              <i class="fa fa-newspaper-o"></i> {{ data.content_title }}
-            </div>
+            <NuxtLink v-if="data.content_id" :to="`/admin/content/${data.content_id}`" style="margin-left:6px">
+              <i class="fa fa-eye" style="color:#3b82f6"></i>
+            </NuxtLink>
           </template>
         </Column>
         <Column :header="$t('menuManager.parentMenu')">

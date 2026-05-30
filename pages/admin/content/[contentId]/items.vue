@@ -27,10 +27,21 @@
               <small v-if="itemErrors.title" class="p-error">{{ itemErrors.title }}</small>
             </div>
 
+            <div class="form-group" v-if="isNewsContent">
+              <label for="shortDescription">{{ $t('contentManager.shortDescription') }}</label>
+              <Textarea
+                id="shortDescription"
+                v-model="itemForm.short_description"
+                rows="3"
+                :placeholder="$t('contentManager.shortDescription')"
+              />
+            </div>
+
             <div class="form-group">
               <label for="itemDescription">{{ $t('contentManager.description') }}</label>
               <ClientOnly>
-                <Editor
+                <TinyMCEEditor
+                  v-if="isNewsContent"
                   v-model="itemForm.description"
                   tinymceScriptSrc="/tinymce/tinymce.min.js"
                   :init="{
@@ -43,9 +54,10 @@
                   }"
                 />
               </ClientOnly>
+              <textarea v-if="!isNewsContent" v-model="itemForm.description" class="form-control" rows="4" :placeholder="$t('contentManager.description')"></textarea>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" v-if="contentType !== ContentType.VIDEO">
               <label>{{ $t('contentManager.primaryImage') }}</label>
               <div class="image-input-tabs">
                 <Button
@@ -100,14 +112,37 @@
               />
             </div>
 
-            <div class="form-row">
+            <div class="form-row" v-if="isNewsContent">
               <div class="form-group">
                 <label for="priority">{{ $t('contentManager.priority') }}</label>
-                <InputNumber id="priority" v-model="itemForm.priority" :min="0" />
+                <Checkbox id="priority" v-model="itemForm.priority" :binary="true" :trueValue="1" :falseValue="0" />
               </div>
               <div class="form-group">
                 <label for="isFeature">{{ $t('contentManager.featureItem') }}</label>
                 <ToggleSwitch id="isFeature" v-model="itemForm.is_feature" />
+              </div>
+            </div>
+
+            <div class="form-row" v-if="isNewsContent">
+              <div class="form-group">
+                <label for="publishDate">{{ $t('contentManager.publishDate') }}</label>
+                <Calendar
+                  id="publishDate"
+                  v-model="itemForm.publish_date"
+                  showTime
+                  hourFormat="12"
+                  dateFormat="yy-mm-dd"
+                />
+              </div>
+              <div class="form-group">
+                <label for="newsStatus">{{ $t('contentManager.status') || 'Status' }}</label>
+                <div class="status-toggle">
+                  <InputSwitch
+                    id="newsStatus"
+                    v-model="itemForm.status"
+                  />
+                  <span class="status-label">{{ itemForm.status ? $t('contentManager.show') || 'Show' : $t('contentManager.notShow') || 'Not Show' }}</span>
+                </div>
               </div>
             </div>
 
@@ -157,7 +192,7 @@
               </template>
             </Column>
             <Column field="title" :header="$t('contentManager.contentTitle')" />
-            <Column :header="$t('contentManager.priority')" :style="{ width: '80px' }" field="priority" />
+            <Column v-if="isNewsContent" :header="$t('contentManager.priority')" :style="{ width: '80px' }" field="priority" />
             <Column :header="$t('contentManager.actions')" :style="{ width: '120px' }">
               <template #body="{ data }">
                 <div class="action-buttons">
@@ -198,7 +233,7 @@ definePageMeta({
 
 import { ContentType } from '~/types'
 import { useConfirm } from 'primevue/useconfirm'
-import Editor from '@tinymce/tinymce-vue'
+import TinyMCEEditor from '@tinymce/tinymce-vue'
 
 const contentStore = useContentStore()
 const confirm = useConfirm()
@@ -217,6 +252,7 @@ const contentType = ref<ContentType>(ContentType.ARTICLE)
 
 const itemForm = ref({
   title: '',
+  short_description: '',
   description: '',
   photo: null as File | null,
   photoUrl: '',
@@ -224,6 +260,8 @@ const itemForm = ref({
   video_url: '',
   priority: 0,
   is_feature: false,
+  publish_date: new Date() as Date | null,
+  status: true,
 })
 
 const itemErrors = ref<Record<string, string>>({})
@@ -255,6 +293,7 @@ const addNewItem = () => {
   editingItem.value = null
   itemForm.value = {
     title: '',
+    short_description: '',
     description: '',
     photo: null,
     photoUrl: '',
@@ -262,6 +301,8 @@ const addNewItem = () => {
     video_url: '',
     priority: 0,
     is_feature: false,
+    publish_date: new Date(),
+    status: true,
   }
   itemErrors.value = {}
   imageInputMode.value = 'upload'
@@ -272,14 +313,17 @@ const editItem = (item: any) => {
   editingItem.value = item
   const existingPhoto = item.photo ? `${photoUrl}${item.photo}` : ''
   itemForm.value = {
-    title: item.title,
-    description: item.description || '',
+    title: item.title || '',
+    short_description: item.short_description || '',
+    description: item.description || item.longdes || '',
     photo: null,
     photoUrl: item.photo && !item.photo.startsWith('/') ? item.photo : '',
     photoPreview: existingPhoto,
     video_url: item.video_url || '',
-    priority: item.priority,
+    priority: item.priority || 0,
     is_feature: item.is_feature || false,
+    publish_date: item.publish_date ? new Date(item.publish_date) : new Date(),
+    status: item.status !== 1,
   }
   itemErrors.value = {}
   imageInputMode.value = existingPhoto ? 'url' : 'upload'
@@ -290,6 +334,7 @@ const cancelEdit = () => {
   editingItem.value = null
   itemForm.value = {
     title: '',
+    short_description: '',
     description: '',
     photo: null,
     photoUrl: '',
@@ -297,6 +342,8 @@ const cancelEdit = () => {
     video_url: '',
     priority: 0,
     is_feature: false,
+    publish_date: new Date(),
+    status: true,
   }
   itemErrors.value = {}
   showForm.value = false
@@ -308,24 +355,64 @@ const handleSaveItem = async () => {
   saving.value = true
 
   try {
-    const data = {
-      title: itemForm.value.title,
-      description: itemForm.value.description,
-      video_url: itemForm.value.video_url,
-      photo: itemForm.value.photo,
-      priority: itemForm.value.priority,
-      is_feature: itemForm.value.is_feature,
-    }
-
     let result: boolean | { success: boolean; id?: number }
-    if (editingItem.value) {
-      result = await contentStore.updateItem(contentId.value, editingItem.value.item_id, data)
+
+    if (isNewsContent.value) {
+      // News uses /news endpoint with different field names
+      const publishDate = itemForm.value.publish_date
+        ? itemForm.value.publish_date.toISOString().slice(0, 19).replace('T', ' ')
+        : undefined
+
+      const newsData: any = {
+        title: itemForm.value.title,
+        shortdes: itemForm.value.short_description || '',
+        longdes: itemForm.value.description || '',
+        priority: itemForm.value.priority ? 1 : 0,
+        publish: publishDate,
+        status: itemForm.value.status ? 0 : 1,
+      }
+      if (itemForm.value.photo) {
+        newsData.photo = itemForm.value.photo
+      }
+      if (itemForm.value.photoUrl) {
+        newsData.photo = itemForm.value.photoUrl
+      }
+
+      if (editingItem.value) {
+        result = await contentStore.updateNews(contentId.value, editingItem.value.news_id || editingItem.value.id, newsData)
+      } else {
+        result = await contentStore.saveNews(contentId.value, newsData)
+      }
     } else {
-      result = await contentStore.saveItem(contentId.value, data)
+      // Other types use /items endpoint
+      const data: any = {
+        title: itemForm.value.title,
+        description: itemForm.value.description,
+        item_type: contentType.value === ContentType.PHOTO ? 1
+          : contentType.value === ContentType.VIDEO ? 2
+          : contentType.value === ContentType.DOCUMENT ? 3
+          : contentType.value,
+        video_url: itemForm.value.video_url,
+        photoUrl: itemForm.value.photoUrl,
+      }
+
+      if (itemForm.value.photo) {
+        data.photo = itemForm.value.photo
+      }
+
+      if (editingItem.value) {
+        result = await contentStore.updateItem(contentId.value, editingItem.value.item_id, data)
+      } else {
+        result = await contentStore.saveItem(contentId.value, data)
+      }
     }
 
     if (result === true || (typeof result === 'object' && result.success)) {
-      await contentStore.fetchItems(contentId.value)
+      if (isNewsContent.value) {
+        await contentStore.fetchNews(contentId.value)
+      } else {
+        await contentStore.fetchItems(contentId.value)
+      }
       cancelEdit()
     }
   } finally {
@@ -344,7 +431,7 @@ const confirmDelete = (item: any) => {
 }
 
 const deleteItem = async (id: number) => {
-  if (contentType.value === ContentType.NEWS) {
+  if (isNewsContent.value) {
     await contentStore.deleteNews(contentId.value, id)
   } else {
     await contentStore.deleteItem(contentId.value, id)
@@ -359,17 +446,13 @@ onMounted(async () => {
   if (contentStore.currentContent) {
     contentType.value = contentStore.currentContent.content_type
   }
-  // fetchContent already populates newsList/items from embedded data
-  // Only fetch separately if no data was embedded
-  if (contentType.value === ContentType.NEWS && contentStore.newsList.length === 0) {
-    loading.value = true
+  loading.value = true
+  if (isNewsContent.value) {
     await contentStore.fetchNews(contentId.value)
-    loading.value = false
-  } else if (contentType.value !== ContentType.NEWS && contentStore.contentItems.length === 0) {
-    loading.value = true
+  } else {
     await contentStore.fetchItems(contentId.value)
-    loading.value = false
   }
+  loading.value = false
 })
 </script>
 
@@ -445,6 +528,17 @@ onMounted(async () => {
   font-weight: 500;
   color: #4a5568;
   font-size: 0.875rem;
+}
+
+.status-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.status-label {
+  font-size: 0.875rem;
+  color: #4a5568;
 }
 
 .form-row {
