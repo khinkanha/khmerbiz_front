@@ -1,0 +1,1 @@
+var O=(E=>(E[E.ARTICLE=0]="ARTICLE",E[E.PHOTO=1]="PHOTO",E[E.VIDEO=2]="VIDEO",E[E.DOCUMENT=3]="DOCUMENT",E[E.NEWS=4]="NEWS",E[E.MAP=5]="MAP",E))(O||{});export{O as C};

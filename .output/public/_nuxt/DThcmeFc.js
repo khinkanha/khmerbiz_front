@@ -1,0 +1,1 @@
+const o=s=>{if(!s.description||typeof s.description!="string")return s;try{const t=JSON.parse(s.description);return{...s,title:t.title||s.title||"",short_description:t.shortdes||s.short_description||"",description:t.longdes||t.longdescription||s.description,photo:t.photo||s.photo||null,publish_date:t.publish||t.publish_date||s.publish_date||null}}catch{return s}};export{o as p};
