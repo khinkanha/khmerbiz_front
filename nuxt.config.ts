@@ -20,7 +20,7 @@ export default defineNuxtConfig(<any>{
   },
   runtimeConfig: {
     public: {
-      apiBaseUrl: 'http://khmerbiz-api.localhost/api/v1',
+      apiBaseUrl: 'https://khmerbizapi.s2.web141.com/api/v1',
       photoUrl: 'https://khmer.sgp1.digitaloceanspaces.com/',
       recaptchaSiteKey: '6Lcn38oZAAAAAHXplGrr62pAKHTpdh7vsLy1OnMO',
     },

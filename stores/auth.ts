@@ -50,7 +50,7 @@ export const useAuthStore = defineStore('auth', () => {
         accessToken: string
         refreshToken: string
       }>('/auth/login', credentials)
-
+console.log(login, 'Login response:', response)
       if (response.success && response.data) {
         const { user: userData, accessToken: access, refreshToken: refresh } = response.data
         setTokens(access, refresh)

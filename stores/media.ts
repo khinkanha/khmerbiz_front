@@ -1,6 +1,6 @@
 import type { Media, PaginatedResponse } from '~/types'
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { useApi} from '~/composables/useApi'
+import { useApi } from '~/composables/useApi'
 import { useUpload } from '~/composables/useUpload'
 
 export const useMediaStore = defineStore('media', () => {
@@ -39,52 +39,16 @@ export const useMediaStore = defineStore('media', () => {
     }
   }
 
-  const getPresignedUrl = async (fileName: string, fileType: string, folder: string = 'uploads') => {
-    try {
-      const response = await api.post<{
-        uploadUrl: string
-        key: string
-      }>('/media/upload-url', {
-        fileName,
-        fileType,
-        folder,
-      })
-
-      if (response.success && response.data) {
-        return response.data
-      }
-
-      return null
-    } catch (error) {
-      console.error('Failed to get presigned URL:', error)
-      return null
-    }
-  }
-
   const uploadMedia = async (
     file: File,
     folder: string = 'uploads',
     onProgress?: (progress: number) => void
   ): Promise<number | null> => {
-    return uploadFile(file, folder, onProgress)
-  }
-
-  const confirmUpload = async (key: string, originalName: string): Promise<number | null> => {
-    try {
-      const response = await api.post<{ media_id: number }>('/media/confirm', {
-        key,
-        originalName,
-      })
-
-      if (response.success && response.data) {
-        return response.data.media_id
-      }
-
-      return null
-    } catch (error) {
-      console.error('Failed to confirm upload:', error)
-      return null
+    const mediaId = await uploadFile(file, folder, onProgress)
+    if (mediaId) {
+      await fetchMedia()
     }
+    return mediaId
   }
 
   const deleteMedia = async (id: number): Promise<boolean> => {
@@ -121,9 +85,7 @@ export const useMediaStore = defineStore('media', () => {
     uploads,
     isUploading,
     fetchMedia,
-    getPresignedUrl,
     uploadMedia,
-    confirmUpload,
     deleteMedia,
     searchMedia,
   }

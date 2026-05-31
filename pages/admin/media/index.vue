@@ -84,7 +84,7 @@ const handleFileSelect = (e: Event) => {
 
 const handleUpload = async () => {
   if (!uploadForm.value.file) return
-  await mediaStore.uploadMedia({ title: uploadForm.value.title, file: uploadForm.value.file })
+  await mediaStore.uploadMedia(uploadForm.value.file)
   showUpload.value = false
   uploadForm.value = { title: '', file: null }
 }
