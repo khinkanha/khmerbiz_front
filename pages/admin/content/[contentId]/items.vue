@@ -183,8 +183,8 @@
             <Column :header="$t('contentManager.primaryImage')" :style="{ width: '100px' }">
               <template #body="{ data }">
                 <img
-                  v-if="data.photo"
-                  :src="`${photoUrl}${data.photo}`"
+                  v-if="data.photo || data.url"
+                  :src="`${photoUrl}${data.photo || data.url}`"
                   :alt="data.title"
                   class="item-thumb"
                 />
