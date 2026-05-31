@@ -184,6 +184,24 @@ export const useContentStore = defineStore('content', () => {
 
   const saveItem = async (contentId: number, data: any): Promise<{ success: boolean; id?: number }> => {
     try {
+      if (data.photo && data.photo instanceof File) {
+        const formData = new FormData()
+        formData.append('title', data.title || '')
+        formData.append('description', data.description || '')
+        formData.append('item_type', String(data.item_type ?? 0))
+        formData.append('image', data.photo)
+        if (data.video_url) formData.append('url', data.video_url)
+        if (data.photoUrl) formData.append('url', data.photoUrl)
+        if (data.priority !== undefined) formData.append('priority', String(data.priority))
+        if (data.is_feature !== undefined) formData.append('is_feature', String(data.is_feature ? 1 : 0))
+
+        const response = await api.post<{ item_id: number }>(`/content/${contentId}/items`, formData)
+        if (response.success && response.data) {
+          return { success: true, id: response.data.item_id }
+        }
+        return { success: false }
+      }
+
       const payload: any = {
         title: data.title,
         description: data.description || '',
@@ -209,6 +227,21 @@ export const useContentStore = defineStore('content', () => {
 
   const updateItem = async (contentId: number, id: number, data: any): Promise<boolean> => {
     try {
+      if (data.photo && data.photo instanceof File) {
+        const formData = new FormData()
+        formData.append('title', data.title || '')
+        formData.append('description', data.description || '')
+        formData.append('item_type', String(data.item_type ?? 0))
+        formData.append('image', data.photo)
+        if (data.video_url) formData.append('url', data.video_url)
+        if (data.photoUrl) formData.append('url', data.photoUrl)
+        if (data.priority !== undefined) formData.append('priority', String(data.priority))
+        if (data.is_feature !== undefined) formData.append('is_feature', String(data.is_feature ? 1 : 0))
+
+        const response = await api.put(`/content/${contentId}/items/${id}`, formData)
+        return response.success
+      }
+
       const payload: any = {
         title: data.title,
         description: data.description || '',
