@@ -1342,49 +1342,49 @@ const _routes = [
     name: "admin-ai-chat",
     path: "/admin/ai-chat",
     meta: __nuxt_page_meta$w || {},
-    component: () => import('./ai-chat-D0_5SF0w.mjs')
+    component: () => import('./ai-chat-B_Ucz_BH.mjs')
   },
   {
     name: "admin-content-contentId-items",
     path: "/admin/content/:contentId()/items",
     meta: __nuxt_page_meta$v || {},
-    component: () => import('./items-B4gLheWn.mjs')
+    component: () => import('./items-DXC_eYCz.mjs')
   },
   {
     name: "admin-content-contentId-map",
     path: "/admin/content/:contentId()/map",
     meta: __nuxt_page_meta$u || {},
-    component: () => import('./map-CAKz5Ccy.mjs')
+    component: () => import('./map-ClGV4nNW.mjs')
   },
   {
     name: "admin-content-contentId-news",
     path: "/admin/content/:contentId()/news",
     meta: __nuxt_page_meta$t || {},
-    component: () => import('./news-oA7J5FK2.mjs')
+    component: () => import('./news-DwFFLHsH.mjs')
   },
   {
     name: "admin-content-id",
     path: "/admin/content/:id()",
     meta: __nuxt_page_meta$s || {},
-    component: () => import('./_id_-BeW-F8-j.mjs')
+    component: () => import('./_id_-Cx5KgZuJ.mjs')
   },
   {
     name: "admin-content",
     path: "/admin/content",
     meta: __nuxt_page_meta$r || {},
-    component: () => import('./index-DMlpSn3P.mjs')
+    component: () => import('./index-4quIB__Z.mjs')
   },
   {
     name: "admin",
     path: "/admin",
     meta: __nuxt_page_meta$q || {},
-    component: () => import('./index-DI0rCDUL.mjs')
+    component: () => import('./index-BAV7UQq1.mjs')
   },
   {
     name: "admin-login",
     path: "/admin/login",
     meta: __nuxt_page_meta$p || {},
-    component: () => import('./login-Bd0hCff6.mjs')
+    component: () => import('./login-DtCEyd1U.mjs')
   },
   {
     name: "admin-media",
@@ -1414,13 +1414,13 @@ const _routes = [
     name: "admin-password",
     path: "/admin/password",
     meta: __nuxt_page_meta$k || {},
-    component: () => import('./password-BlMj1FRM.mjs')
+    component: () => import('./password-BcSxRGtQ.mjs')
   },
   {
     name: "admin-profile",
     path: "/admin/profile",
     meta: __nuxt_page_meta$j || {},
-    component: () => import('./profile-DSxC5z27.mjs')
+    component: () => import('./profile-DjR_sRC1.mjs')
   },
   {
     name: __nuxt_page_meta$c == null ? void 0 : __nuxt_page_meta$c.name,
@@ -1470,13 +1470,13 @@ const _routes = [
     name: "admin-setup",
     path: "/admin/setup",
     meta: __nuxt_page_meta$b || {},
-    component: () => import('./setup-BeLCYgb1.mjs')
+    component: () => import('./setup-BVPzCzCB.mjs')
   },
   {
     name: "admin-signup",
     path: "/admin/signup",
     meta: __nuxt_page_meta$a || {},
-    component: () => import('./signup-kpTlt76g.mjs')
+    component: () => import('./signup-Br3mc9Wm.mjs')
   },
   {
     name: "admin-super-announcing",
@@ -2034,9 +2034,9 @@ const globalMiddleware = [
   auth_45global
 ];
 const namedMiddleware = {
-  auth: () => import('./auth-fjZ-b24i.mjs'),
+  auth: () => import('./auth-DUV2_0-n.mjs'),
   "domain-resolver-server": () => import('./domain-resolver.server-CHShnYX3.mjs'),
-  guest: () => import('./guest-DpSNLZrH.mjs')
+  guest: () => import('./guest-CH_PLUZc.mjs')
 };
 const plugin$1 = /* @__PURE__ */ defineNuxtPlugin({
   name: "nuxt:router",
@@ -36310,9 +36310,9 @@ const plugins = [
   primevue_7rYYRZQLyx
 ];
 const layouts = {
-  admin: defineAsyncComponent(() => import('./admin-DJVgH1_R.mjs')),
+  admin: defineAsyncComponent(() => import('./admin-EOS8NQfJ.mjs')),
   blank: defineAsyncComponent(() => import('./blank-CPiFi3ag.mjs')),
-  default: defineAsyncComponent(() => import('./default-xRPYk5R4.mjs'))
+  default: defineAsyncComponent(() => import('./default-bAC8gwkV.mjs'))
 };
 const LayoutLoader = defineComponent({
   name: "LayoutLoader",
