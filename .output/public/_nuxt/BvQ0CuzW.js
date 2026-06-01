@@ -1,0 +1,1 @@
+import{_ as t,o as a,c as o,am as s}from"./CX33R5lR.js";const c={},n={class:"blank-layout"};function r(e,_){return a(),o("div",n,[s(e.$slots,"default",{},void 0,!0)])}const l=t(c,[["render",r],["__scopeId","data-v-08224c30"]]);export{l as default};

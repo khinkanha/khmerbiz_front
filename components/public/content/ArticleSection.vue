@@ -34,7 +34,6 @@ const decodeContentDescription = (content: Content) => {
 }
 
 const decoded = computed(() => decodeContentDescription(props.content))
-const decodedTitle = computed(() => decoded.value.title)
 const decodedDescription = computed(() => decoded.value.description)
 </script>
 
