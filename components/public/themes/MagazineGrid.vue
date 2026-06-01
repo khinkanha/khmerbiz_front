@@ -241,6 +241,28 @@ const getContentForMenuItem = (menuItemId: number): ContentSection | null => {
   overflow: hidden;
   border: 1px solid #e2e8f0;
   transition: box-shadow 0.3s, transform 0.3s;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+.editorial-card :deep(table) {
+  display: block;
+  width: 100% !important;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.editorial-card :deep(td),
+.editorial-card :deep(th) {
+  word-break: break-word;
+}
+
+.editorial-card :deep(div),
+.editorial-card :deep(section),
+.editorial-card :deep(article),
+.editorial-card :deep(figure) {
+  max-width: 100% !important;
+  box-sizing: border-box;
 }
 
 .editorial-card:hover {
@@ -257,6 +279,35 @@ const getContentForMenuItem = (menuItemId: number): ContentSection | null => {
   border-radius: 10px;
   border: 1px solid #e2e8f0;
   padding: 1.5rem;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* Force AI-generated content to be mobile-responsive */
+.section-body :deep(table) {
+  display: block;
+  width: 100% !important;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.section-body :deep(td),
+.section-body :deep(th) {
+  word-break: break-word;
+}
+
+.section-body :deep(div),
+.section-body :deep(section),
+.section-body :deep(article),
+.section-body :deep(figure) {
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+.section-body :deep(pre),
+.section-body :deep(code) {
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .magazine-section {

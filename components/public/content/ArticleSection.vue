@@ -59,6 +59,36 @@ const decodedDescription = computed(() => decoded.value.description)
 .article-content {
   line-height: 1.8;
   color: #4a5568;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* Force all AI-generated content to be mobile-responsive */
+.article-content :deep(table) {
+  display: block;
+  width: 100% !important;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.article-content :deep(td),
+.article-content :deep(th) {
+  word-break: break-word;
+}
+
+.article-content :deep(div),
+.article-content :deep(section),
+.article-content :deep(article),
+.article-content :deep(main),
+.article-content :deep(figure) {
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+.article-content :deep(pre),
+.article-content :deep(code) {
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .article-content :deep(h1),
