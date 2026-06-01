@@ -12,6 +12,8 @@
               <option value="5">Twitter</option>
               <option value="4">LinkedIn</option>
               <option value="1">Google</option>
+              <option value="6">Telegram</option>
+              <option value="7">Instagram</option>
             </select>
           </div>
         </div>
@@ -59,6 +61,8 @@ const socialLabels: Record<number, string> = {
   3: 'YouTube',
   4: 'LinkedIn',
   5: 'Twitter',
+  6: 'Telegram',
+  7: 'Instagram',
 }
 
 const socialForm = ref({ stype: '', link: '' })

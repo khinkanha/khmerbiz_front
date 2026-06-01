@@ -67,25 +67,18 @@ console.log(login, 'Login response:', response)
   }
 
   const signup = async (data: SignupForm): Promise<boolean> => {
-    try {
-      const response = await api.post<{
-        user: User
-        accessToken: string
-        refreshToken: string
-      }>('/auth/signup', data)
+    const response = await api.post<{
+      userid: number
+      domain_name?: string
+    }>('/auth/signup', data)
 
-      if (response.success && response.data) {
-        const { user: userData, accessToken: access, refreshToken: refresh } = response.data
-        setTokens(access, refresh)
-        setUser(userData)
-        return true
-      }
-
-      return false
-    } catch (error) {
-      console.error('Signup failed:', error)
-      return false
+    if (response.success) {
+      return true
     }
+
+    const error: any = new Error(response.message || 'Signup failed')
+    error.errors = response.errors || []
+    throw error
   }
 
   const logout = async () => {

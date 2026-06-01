@@ -1,6 +1,11 @@
 <template>
   <div class="container">
-    <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+    <div v-if="errorMessage" class="alert alert-danger">
+      {{ errorMessage }}
+      <ul v-if="fieldErrors.length" style="margin-top:5px;margin-bottom:0">
+        <li v-for="err in fieldErrors" :key="err">{{ err }}</li>
+      </ul>
+    </div>
     <div v-if="successMessage" class="alert alert-success">{{ successMessage }}</div>
 
     <form @submit.prevent="handleSignup">
@@ -78,10 +83,12 @@ const form = ref({
 
 const loading = ref(false)
 const errorMessage = ref('')
+const fieldErrors = ref<string[]>([])
 const successMessage = ref('')
 
 const handleSignup = async () => {
   errorMessage.value = ''
+  fieldErrors.value = []
   successMessage.value = ''
 
   if (!form.value.username || !form.value.email || !form.value.full_name || !form.value.password) {
@@ -119,6 +126,9 @@ const handleSignup = async () => {
     }
   } catch (error: any) {
     errorMessage.value = error.message || t('auth.signupError')
+    if (error.errors?.length) {
+      fieldErrors.value = error.errors
+    }
   } finally {
     loading.value = false
   }

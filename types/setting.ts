@@ -76,6 +76,8 @@ export const SOCIAL_ICONS: Record<number, string> = {
   3: 'pi pi-youtube',
   4: 'pi pi-linkedin',
   5: 'pi pi-twitter',
+  6: 'pi pi-telegram',
+  7: 'pi pi-instagram',
 }
 
 export const getSocialIcon = (stype: number): string => {
