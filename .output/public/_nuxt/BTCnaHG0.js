@@ -1,1 +1,0 @@
-import{g as s,c as a,a as t,o,_ as n}from"./BMSrBDop.js";const c={class:"test-page"},p=s({__name:"index",setup(d){return(r,e)=>(o(),a("div",c,[...e[0]||(e[0]=[t("h1",null,"Test Page",-1),t("p",null,"This is a test page to verify the layout and components. And It protected by authentication.",-1)])]))}}),i=n(p,[["__scopeId","data-v-340d3752"]]);export{i as default};

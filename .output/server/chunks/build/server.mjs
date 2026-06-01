@@ -1462,7 +1462,7 @@ const _routes = [
         name: "admin-settings-social",
         path: "social",
         meta: __nuxt_page_meta$d || {},
-        component: () => import('./social-CemfzoA7.mjs')
+        component: () => import('./social-B8Baj1MB.mjs')
       }
     ]
   },

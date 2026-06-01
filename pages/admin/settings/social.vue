@@ -5,22 +5,20 @@
         <div class="col-md-6">
           <div class="form-group">
             <label>{{ $t('settings.socialMedia') }}</label>
-            <select v-model="socialForm.platform" class="form-control">
+            <select v-model="socialForm.stype" class="form-control">
               <option value="">-- Select --</option>
-              <option value="facebook">Facebook</option>
-              <option value="youtube">Youtube</option>
-              <option value="twitter">Twitter</option>
-              <option value="linkedin">LinkedIn</option>
-              <option value="google">Google+</option>
-              <option value="telegram">Telegram</option>
-              <option value="instagram">Instagram</option>
+              <option value="2">Facebook</option>
+              <option value="3">YouTube</option>
+              <option value="5">Twitter</option>
+              <option value="4">LinkedIn</option>
+              <option value="1">Google</option>
             </select>
           </div>
         </div>
         <div class="col-md-6">
           <div class="form-group">
             <label>{{ $t('settings.link') }}</label>
-            <input type="text" v-model="socialForm.url" class="form-control" placeholder="https://..." />
+            <input type="text" v-model="socialForm.link" class="form-control" placeholder="https://..." />
           </div>
         </div>
       </div>
@@ -35,11 +33,11 @@
           <tr><th></th><th></th><th></th><th></th></tr>
         </thead>
         <tbody>
-          <tr v-for="(social, i) in settingStore.socialMedia" :key="social.social_id">
+          <tr v-for="(social, i) in settingStore.socialMedia" :key="social.smid">
             <td>{{ i + 1 }}</td>
-            <td>{{ social.platform }}</td>
-            <td>{{ social.url }}</td>
-            <td><a href="#" @click.prevent="handleDelete(social.social_id)" class="text-danger">{{ $t('settings.removeImage') }}</a></td>
+            <td>{{ socialLabels[social.stype] || 'Unknown' }}</td>
+            <td>{{ social.link }}</td>
+            <td><a href="#" @click.prevent="handleDelete(social.smid)" class="text-danger">{{ $t('settings.removeImage') }}</a></td>
           </tr>
         </tbody>
       </table>
@@ -55,19 +53,25 @@ import { useSettingStore } from '~/stores/setting'
 const settingStore = useSettingStore()
 const adding = ref(false)
 
-const socialForm = ref({ platform: '', url: '' })
+const socialLabels: Record<number, string> = {
+  1: 'Google',
+  2: 'Facebook',
+  3: 'YouTube',
+  4: 'LinkedIn',
+  5: 'Twitter',
+}
+
+const socialForm = ref({ stype: '', link: '' })
 
 const handleAddSocial = async () => {
-  if (!socialForm.value.platform || !socialForm.value.url) return
+  if (!socialForm.value.stype || !socialForm.value.link) return
   adding.value = true
   try {
     await settingStore.addSocialMedia({
-      platform: socialForm.value.platform,
-      url: socialForm.value.url,
-      icon_class: socialForm.value.platform,
-      status: 1,
+      stype: Number(socialForm.value.stype),
+      link: socialForm.value.link,
     })
-    socialForm.value = { platform: '', url: '' }
+    socialForm.value = { stype: '', link: '' }
   } finally {
     adding.value = false
   }

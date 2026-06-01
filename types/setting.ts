@@ -68,8 +68,6 @@ export interface SocialMedia {
   domain_id: number
   stype: number
   link: string
-  icon_class: string
-  status: number
 }
 
 export const SOCIAL_ICONS: Record<number, string> = {
@@ -85,10 +83,8 @@ export const getSocialIcon = (stype: number): string => {
 }
 
 export interface SocialMediaForm {
-  platform: string
-  url: string
-  icon_class: string
-  status: number
+  stype: number
+  link: string
 }
 
 export interface Language {
