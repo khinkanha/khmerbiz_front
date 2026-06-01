@@ -309,13 +309,9 @@ export const useContentStore = defineStore('content', () => {
       })
 
       const response = await api.get<any>(`/content/${contentId}/news?${params}`)
-      console.log('fetchNews raw response:', response)
-      console.log('fetchNews response.success:', response.success, 'response.data type:', typeof response.data, Array.isArray(response.data))
-
       if (response.success && response.data) {
         const d = response.data
         let rawItems: any[] = []
-        console.log('fetchNews d keys:', Object.keys(d))
         if (Array.isArray(d)) {
           rawItems = d
         } else if (d.items) {
@@ -334,9 +330,8 @@ export const useContentStore = defineStore('content', () => {
         } else if (d.data && Array.isArray(d.data)) {
           rawItems = d.data
         }
-        console.log('fetchNews rawItems count:', rawItems.length, rawItems)
         newsList.value = rawItems.map(parseNewsItem)
-        console.log('fetchNews newsList after parse:', newsList.value.length, newsList.value.map(n => ({ id: n.news_id, title: n.title })))
+        
       }
     } catch (error) {
       console.error('Failed to fetch news:', error)

@@ -187,23 +187,17 @@ watch(messages, async () => {
 
 const handleSendMessage = async () => {
   if (!userInput.value.trim() || !canSendMessage.value) {
-    console.log('Send blocked:', {
-      hasInput: !!userInput.value.trim(),
-      canSendMessage: canSendMessage.value,
-      loading: loading.value,
-      remainingQuestions: remainingQuestions.value
-    });
     return;
   }
 
   const message = userInput.value.trim();
   userInput.value = '';
 
-  console.log('Sending message to AI:', message);
+  
   const result = await sendMessage(message, {
     langId: authStore.user?.lang_id,
   });
-  console.log('AI response:', result);
+  
 };
 
 const handleReset = () => {

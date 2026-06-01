@@ -232,7 +232,6 @@ onMounted(async () => {
 
 
   await contentStore.fetchContent(contentId.value!)
-console.log('Fetched content:', contentStore.currentContent)
   if (contentStore.currentContent) {
     const raw = contentStore.currentContent as any
     const desc1 = JSON.parse(raw.description)
