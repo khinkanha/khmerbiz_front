@@ -1,7 +1,7 @@
 <template>
-  <div class="magazine-grid">
+  <div class="magazine-grid" :class="containerClass">
     <!-- Top Banner Bar -->
-    <section class="banner-bar" v-if="settings">
+    <section class="banner-bar" v-if="settings && showBanners" :class="bannerPosClass">
       <div class="banner-bar-inner">
         <div class="banner-bar-text">
           <h1 class="site-title">{{ settings.title || settings.domain_name }}</h1>
@@ -100,6 +100,34 @@ const props = defineProps<Props>()
 
 const config = useRuntimeConfig()
 const photoUrl = config.public.photoUrl
+const route = useRoute()
+
+const isHomePage = computed(() => route.path === '/')
+
+// banner_mode: 0=off, 1=on
+const bannerMode = computed(() => Number(props.settings?.banner_mode) !== 0)
+
+// banner_display: 0=homepage only, 1=all pages
+const bannerDisplayAll = computed(() => Number(props.settings?.banner_display) === 1)
+
+const showBanners = computed(() => {
+  if (!bannerMode.value) return false
+  if (props.banners.length === 0) return false
+  return bannerDisplayAll.value || isHomePage.value
+})
+
+// banner_position: 1=Top, 2=Middle, 3=Bottom
+const bannerPosClass = computed(() => {
+  const pos = Number(props.settings?.banner_pos) || 1
+  if (pos === 2) return 'banner-pos-middle'
+  if (pos === 3) return 'banner-pos-bottom'
+  return ''
+})
+
+// screen_mode: 1=full screen, 2=boxed
+const containerClass = computed(() => {
+  return Number(props.settings?.screen_mode) === 2 ? 'screen-boxed' : ''
+})
 
 const scrollToSection = (sectionId: number) => {
   const element = document.getElementById(`section-${sectionId}`)
@@ -447,4 +475,11 @@ const getContentForMenuItem = (menuItemId: number): ContentSection | null => {
     display: none;
   }
 }
+
+/* Screen mode: boxed */
+.screen-boxed .container { max-width: 960px; }
+
+/* Banner positions */
+.banner-pos-middle { padding: 2rem 0; }
+.banner-pos-bottom { order: 999; }
 </style>

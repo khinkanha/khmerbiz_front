@@ -1,7 +1,7 @@
 <template>
-  <div class="classic-multi-page">
+  <div class="classic-multi-page" :class="containerClass">
     <!-- Banner Slideshow -->
-    <BannerSlideshow v-if="banners.length > 0" :banners="banners" />
+    <BannerSlideshow v-if="showBanners" :banners="banners" :class="bannerPosClass" />
 
     <!-- Main Content -->
     <main class="main-content">
@@ -248,6 +248,34 @@ const props = defineProps<Props>()
 const config = useRuntimeConfig()
 const photoUrl = config.public.photoUrl
 const api = useApi()
+const route = useRoute()
+
+const isHomePage = computed(() => route.path === '/')
+
+// banner_mode: 0=off, 1=on
+const bannerMode = computed(() => Number(props.settings?.banner_mode) !== 0)
+
+// banner_display: 0=homepage only, 1=all pages
+const bannerDisplayAll = computed(() => Number(props.settings?.banner_display) === 1)
+
+const showBanners = computed(() => {
+  if (!bannerMode.value) return false
+  if (props.banners.length === 0) return false
+  return bannerDisplayAll.value || isHomePage.value
+})
+
+// banner_position: 1=Top, 2=Middle, 3=Bottom
+const bannerPosClass = computed(() => {
+  const pos = Number(props.settings?.banner_pos) || 1
+  if (pos === 2) return 'banner-pos-middle'
+  if (pos === 3) return 'banner-pos-bottom'
+  return ''
+})
+
+// screen_mode: 1=full screen, 2=boxed
+const containerClass = computed(() => {
+  return Number(props.settings?.screen_mode) === 2 ? 'screen-boxed' : ''
+})
 
 const loading = ref(false)
 const currentPage = ref(1)
@@ -677,5 +705,22 @@ const parseMapData = (content: Content): MapData => {
   .featured-card-body .media-heading {
     font-size: 0.9rem;
   }
+}
+
+/* Screen mode: boxed */
+.screen-boxed .container {
+  max-width: 960px;
+}
+
+/* Banner positions */
+.banner-pos-middle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.banner-pos-bottom {
+  order: 999;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
-  <div class="scrolling-single-page">
+  <div class="scrolling-single-page" :class="containerClass">
     <!-- Hero Section -->
-    <section class="hero-section" v-if="heroBanner || settings.background">
+    <section class="hero-section" v-if="showBanners && (heroBanner || settings.background)" :class="bannerPosClass">
       <div class="hero-background"
         :style="{ backgroundImage: heroBanner ? `url(${photoUrl}${heroBanner.photo})` : settings.background ? `url(${settings.background})` : '' }">
       </div>
@@ -103,6 +103,34 @@ const props = defineProps<Props>()
 
 const config = useRuntimeConfig()
 const photoUrl = config.public.photoUrl
+const route = useRoute()
+
+const isHomePage = computed(() => route.path === '/')
+
+// banner_mode: 0=off, 1=on
+const bannerMode = computed(() => Number(props.settings?.banner_mode) !== 0)
+
+// banner_display: 0=homepage only, 1=all pages
+const bannerDisplayAll = computed(() => Number(props.settings?.banner_display) === 1)
+
+const showBanners = computed(() => {
+  if (!bannerMode.value) return false
+  if (props.banners.length === 0) return false
+  return bannerDisplayAll.value || isHomePage.value
+})
+
+// banner_position: 1=Top, 2=Middle, 3=Bottom
+const bannerPosClass = computed(() => {
+  const pos = Number(props.settings?.banner_pos) || 1
+  if (pos === 2) return 'banner-pos-middle'
+  if (pos === 3) return 'banner-pos-bottom'
+  return ''
+})
+
+// screen_mode: 1=full screen, 2=boxed
+const containerClass = computed(() => {
+  return Number(props.settings?.screen_mode) === 2 ? 'screen-boxed' : ''
+})
 
 const heroBanner = computed(() => props.banners[0] || null)
 const showBackToTop = ref(false)
@@ -478,4 +506,11 @@ onMounted(() => {
     grid-template-columns: 1fr;
   }
 }
+
+/* Screen mode: boxed */
+.screen-boxed .container { max-width: 960px; }
+
+/* Banner positions */
+.banner-pos-middle { padding: 2rem 0; }
+.banner-pos-bottom { order: 999; }
 </style>

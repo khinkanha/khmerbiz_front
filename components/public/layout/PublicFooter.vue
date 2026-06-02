@@ -7,10 +7,10 @@
           <!-- About / Site Info -->
           <div class="footer-section footer-about">
             <div class="footer-brand">
-              <img v-if="settings?.logo" :src="settings.logo" :alt="settings?.title || 'Logo'" class="footer-logo" />
+              <img v-if="settings?.logo" :src="photoUrl + settings.logo" :alt="settings?.title || 'Logo'" class="footer-logo" />
               <h3 v-if="settings?.title">{{ settings.title }}</h3>
             </div>
-            <div v-if="settings?.footer" class="footer-text" v-html="settings.footer"></div>
+            <div v-if="settings?.footer" class="footer-text" :class="footerAlignClass" v-html="settings.footer"></div>
           </div>
 
           <!-- Social Media -->
@@ -43,11 +43,21 @@ import { useDomainStore } from '~/stores/domain'
 import { getSocialIcon } from '~/types'
 
 const domainStore = useDomainStore()
+const config = useRuntimeConfig()
+const photoUrl = config.public.photoUrl || ''
 
 const settings = computed(() => domainStore.settings)
 const socialMedia = computed(() => domainStore.socialMedia)
 
 const currentYear = new Date().getFullYear()
+
+// footer_align: 1=Left, 2=Center, 3=Right
+const footerAlignClass = computed(() => {
+  const align = Number(settings.value?.footer_align) || 2
+  if (align === 1) return 'text-left'
+  if (align === 3) return 'text-right'
+  return 'text-center'
+})
 </script>
 
 <style scoped>
@@ -106,6 +116,10 @@ const currentYear = new Date().getFullYear()
   font-size: 0.875rem;
   line-height: 1.7;
 }
+
+.footer-text.text-left { text-align: left; }
+.footer-text.text-center { text-align: center; }
+.footer-text.text-right { text-align: right; }
 
 .footer-text :deep(p) {
   margin: 0;

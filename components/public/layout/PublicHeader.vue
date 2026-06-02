@@ -1,11 +1,17 @@
 <template>
   <header class="public-header" :class="headerClass">
-    <!-- Top Bar -->
-    <div class="top-bar">
+    <!-- Top Bar (hidden when logo_position=bottom) -->
+    <div v-if="logoPos !== 3" class="top-bar">
       <div class="container top-bar-inner">
         <div class="brand" @click="goHome">
-          <img v-if="settings?.logo" :src="config.photoUrl + settings.logo" :alt="settings?.title || 'Logo'"
-            class="brand-logo" />
+          <!-- Desktop logo -->
+          <img v-if="settings?.logo && !settings?.mobile_logo" :src="config.photoUrl + settings.logo"
+            :alt="settings?.title || 'Logo'" class="brand-logo" />
+          <template v-else-if="settings?.logo">
+            <img :src="config.photoUrl + settings.logo" :alt="settings?.title || 'Logo'" class="brand-logo desktop-logo" />
+            <img v-if="settings?.mobile_logo" :src="config.photoUrl + settings.mobile_logo"
+              :alt="settings?.title || 'Logo'" class="brand-logo mobile-logo" />
+          </template>
           <div v-if="settings?.title" class="brand-title">
             <h1>{{ settings.title }}</h1>
           </div>
@@ -20,7 +26,13 @@
     <!-- Navigation Bar -->
     <nav class="nav-bar">
       <div class="container nav-inner">
-        <ul class="nav-list" :class="{ 'mobile-open': mobileMenuOpen }">
+        <!-- Logo inside nav when logo_position=middle -->
+        <div v-if="logoPos === 2" class="brand brand-inline" @click="goHome">
+          <img v-if="settings?.logo" :src="config.photoUrl + settings.logo"
+            :alt="settings?.title || 'Logo'" class="brand-logo brand-logo-small" />
+        </div>
+
+        <ul class="nav-list" :class="navListClass">
           <li v-for="item in filteredMenuTree" :key="item.item_id" class="nav-item"
             :class="{ 'has-dropdown': item.children && item.children.length > 0 }">
             <a v-if="isSinglePage" :href="`#section-${item.item_id}`" class="nav-link"
@@ -35,17 +47,21 @@
 
             <div v-if="item.children && item.children.length > 0" class="dropdown-menu">
               <div class="dropdown-inner">
-                <a v-if="isSinglePage" v-for="child in item.children" :key="child.item_id"
-                  :href="`#section-${child.item_id}`" class="dropdown-link"
-                  @click.prevent="scrollToSection(child.item_id)">
-                  {{ child.item_name }}
-                </a>
-                <NuxtLink v-else v-for="child in item.children" :key="child.item_id"
-                  :to="`/pages/${domain?.domain_id}/${child.item_id}`"
-                  class="dropdown-link"
-                  :class="{ active: isChildActive(child.item_id) }">
-                  {{ child.item_name }}
-                </NuxtLink>
+                <template v-if="isSinglePage">
+                  <a v-for="child in item.children" :key="child.item_id"
+                    :href="`#section-${child.item_id}`" class="dropdown-link"
+                    @click.prevent="scrollToSection(child.item_id)">
+                    {{ child.item_name }}
+                  </a>
+                </template>
+                <template v-else>
+                  <NuxtLink v-for="child in item.children" :key="child.item_id"
+                    :to="`/pages/${domain?.domain_id}/${child.item_id}`"
+                    class="dropdown-link"
+                    :class="{ active: isChildActive(child.item_id) }">
+                    {{ child.item_name }}
+                  </NuxtLink>
+                </template>
               </div>
             </div>
           </li>
@@ -60,6 +76,22 @@
         </button>
       </div>
     </nav>
+
+    <!-- Bottom bar for logo_position=bottom -->
+    <div v-if="logoPos === 3" class="top-bar bottom-bar">
+      <div class="container top-bar-inner">
+        <div class="brand" @click="goHome">
+          <img v-if="settings?.logo" :src="config.photoUrl + settings.logo"
+            :alt="settings?.title || 'Logo'" class="brand-logo" />
+          <div v-if="settings?.title" class="brand-title">
+            <h1>{{ settings.title }}</h1>
+          </div>
+        </div>
+        <div class="top-actions">
+          <LanguageSelector />
+        </div>
+      </div>
+    </div>
   </header>
 </template>
 
@@ -78,7 +110,6 @@ const settings = computed(() => domainStore.settings)
 const domain = computed(() => domainStore.domain)
 const menuTree = computed(() => domainStore.menuTree)
 const isAuthenticated = computed(() => authStore.isAuthenticated)
-const isSitebuilder = computed(() => (authStore.user?.sitebuilder ?? 0) !== 0)
 const isSinglePage = computed(() => settings.value?.page_style !== 0)
 const isClassicTemplate = computed(() => settings.value?.page_style === 0)
 
@@ -105,7 +136,39 @@ const scrollToSection = (itemId: number) => {
 
 const headerClass = computed(() => {
   const style = settings.value?.theme ?? 0
-  return `theme-${style}`
+  const classes = [`theme-${style}`]
+
+  // logo_align: 1=Left, 2=Center, 3=Right
+  const logoAlign = Number(settings.value?.logo_align) || 2
+  if (logoAlign === 1) classes.push('logo-align-left')
+  else if (logoAlign === 3) classes.push('logo-align-right')
+  else classes.push('logo-align-center')
+
+  // menu_pos: 1=Top (sticky), 2=Middle (sticky), 3=Bottom (relative)
+  const menuPos = Number(settings.value?.menu_pos) || 1
+  if (menuPos === 3) classes.push('menu-pos-bottom')
+
+  // screen_mode: 1=full screen, 2=boxed
+  const screenMode = Number(settings.value?.screen_mode) || 1
+  if (screenMode === 2) classes.push('screen-boxed')
+
+  return classes.join(' ')
+})
+
+// logo_pos: 1=Top (above nav), 2=Middle (inside nav), 3=Bottom (below nav)
+const logoPos = computed(() => Number(settings.value?.logo_pos) || 1)
+
+// menu_align: 1=Left, 2=Center, 3=Right
+const navListClass = computed(() => {
+  const classes: string[] = []
+  if (mobileMenuOpen.value) classes.push('mobile-open')
+
+  const menuAlign = Number(settings.value?.menu_align) || 2
+  if (menuAlign === 1) classes.push('menu-align-left')
+  else if (menuAlign === 3) classes.push('menu-align-right')
+  else classes.push('menu-align-center')
+
+  return classes.join(' ')
 })
 
 const mobileMenuOpen = ref(false)
@@ -160,6 +223,28 @@ const isChildActive = (childId: number) => {
   position: relative;
 }
 
+/* Logo alignment */
+.logo-align-left .top-bar-inner {
+  justify-content: flex-start;
+}
+
+.logo-align-center .top-bar-inner {
+  justify-content: center;
+}
+
+.logo-align-right .top-bar-inner {
+  justify-content: flex-end;
+}
+
+.logo-align-right .top-actions {
+  position: static;
+  margin-right: auto;
+}
+
+.logo-align-left .top-actions {
+  margin-left: auto;
+}
+
 .brand {
   display: flex;
   align-items: center;
@@ -176,6 +261,31 @@ const isChildActive = (childId: number) => {
   max-height: 64px;
   width: auto;
   object-fit: contain;
+}
+
+/* Mobile logo: hidden on desktop, shown on mobile */
+.mobile-logo {
+  display: none;
+}
+
+.desktop-logo {
+  display: inline-block;
+}
+
+.brand-logo-small {
+  max-height: 36px;
+}
+
+.brand-inline {
+  cursor: pointer;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+/* Bottom bar (logo_position=3) */
+.bottom-bar {
+  border-bottom: none;
+  border-top: 3px solid var(--top-bar-border, var(--primary-color));
 }
 
 .brand-title h1 {
@@ -217,6 +327,31 @@ const isChildActive = (childId: number) => {
   padding: 0;
   height: 100%;
   gap: 0;
+}
+
+/* Menu alignment */
+.menu-align-left {
+  justify-content: flex-start;
+}
+
+.menu-align-center {
+  justify-content: center;
+  flex: 1;
+}
+
+.menu-align-right {
+  justify-content: flex-end;
+  flex: 1;
+}
+
+/* Screen mode: boxed */
+.screen-boxed .container {
+  max-width: 960px;
+}
+
+/* Menu position bottom: nav not sticky */
+.menu-pos-bottom .nav-bar {
+  position: relative;
 }
 
 .nav-item {
@@ -333,6 +468,14 @@ const isChildActive = (childId: number) => {
 
   .brand-logo {
     max-height: 48px;
+  }
+
+  .mobile-logo {
+    display: inline-block;
+  }
+
+  .desktop-logo {
+    display: none;
   }
 
   .nav-inner {

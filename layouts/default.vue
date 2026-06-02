@@ -5,6 +5,8 @@
       <slot />
     </main>
     <PublicFooter />
+    <!-- Custom chat/script injection (chat_script + plugin_mode) -->
+    <div v-if="showPlugin && settings?.chat_script" v-html="settings.chat_script"></div>
   </div>
 </template>
 
@@ -13,12 +15,17 @@
 const domainStore = useDomainStore()
 const { getThemeClass } = useTheme()
 
+const settings = computed(() => domainStore.settings)
+
 const themeClass = computed(() => {
   if (domainStore.settings) {
     return getThemeClass(domainStore.settings.theme)
   }
   return 'theme-default'
 })
+
+// plugin_mode: 0=off, 1=on
+const showPlugin = computed(() => Number(settings.value?.plugin_mode) === 1)
 
 onMounted(async () => {
   if (!domainStore.domain) {
