@@ -1,1 +1,0 @@
-import{al as t,h as e,H as a}from"./9_RTSr5a.js";const s=t(o=>{if(e().isAuthenticated)return a("/admin")});export{s as default};

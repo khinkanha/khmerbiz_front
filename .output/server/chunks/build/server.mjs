@@ -1378,7 +1378,7 @@ const _routes = [
     name: "admin",
     path: "/admin",
     meta: __nuxt_page_meta$q || {},
-    component: () => import('./index-BAV7UQq1.mjs')
+    component: () => import('./index-BG2GWV7C.mjs')
   },
   {
     name: "admin-login",
@@ -1518,7 +1518,7 @@ const _routes = [
     name: "index",
     path: "/",
     meta: __nuxt_page_meta$3 || {},
-    component: () => import('./index-BSIlqbfy.mjs')
+    component: () => import('./index-xIMtD52V.mjs')
   },
   {
     name: "news-newsId",
