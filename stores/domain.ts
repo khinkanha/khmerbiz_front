@@ -52,7 +52,16 @@ export const useDomainStore = defineStore('domain', () => {
     }
 
     try {
-      let endpoint = domainId ? `/site/config?domain_id=${domainId}` : '/site/config'
+      let endpoint: string
+      if (domainId) {
+        endpoint = `/site/config?domain_id=${domainId}`
+      } else if (import.meta.client && typeof window !== 'undefined') {
+        // Pass hostname so API can resolve the correct domain
+        endpoint = `/site/config?domain_name=${encodeURIComponent(window.location.hostname)}`
+      } else {
+        endpoint = '/site/config'
+      }
+
       let response = await api.get<{
         domain: Domain
         settings: Setting
