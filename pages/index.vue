@@ -38,9 +38,10 @@ const domainStore = useDomainStore()
 const api = useApi()
 
 const isLoading = ref(true)
+const hasNoContent = ref(false)
 const showUnderConstruction = computed(() => {
   if (isLoading.value) return false
-  return domainStore.menuTree.length === 0 || contentSections.value.length === 0
+  return hasNoContent.value
 })
 
 const themeMap: Record<string, any> = {
@@ -159,6 +160,9 @@ onMounted(async () => {
     await domainStore.resolveDomain()
   }
   await loadContent()
+
+  // Only show under construction if domain exists but has NO menus at all
+  hasNoContent.value = domainStore.menuTree.length === 0
   isLoading.value = false
 })
 
