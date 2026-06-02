@@ -13,6 +13,19 @@
       </div>
     </div>
 
+    <!-- Logo Missing Banner -->
+    <div v-else-if="needsLogo" class="setup-banner logo-banner">
+      <div class="setup-banner-content">
+        <div class="setup-banner-text">
+          <i class="pi pi-image"></i>
+          <span>Your website doesn't have a logo yet. Upload one to make your site look professional.</span>
+        </div>
+        <NuxtLink to="/admin/settings/logo" class="setup-banner-btn">
+          Upload Logo <i class="pi pi-arrow-right"></i>
+        </NuxtLink>
+      </div>
+    </div>
+
     <div class="panel">
       <div class="panel-header">{{ $t('dashboard.quickActions') }}</div>
       <div class="panel-body">
@@ -92,6 +105,11 @@ const needsSetup = computed(() =>
   (!setupStatus.value.hasLanguage || !setupStatus.value.hasMenus || !setupStatus.value.hasContent)
 )
 
+const needsLogo = computed(() => {
+  if (authStore.isSuperAdmin || authStore.isNormalUser) return false
+  return !domainStore.settings?.logo
+})
+
 onMounted(async () => {
   await domainStore.resolveDomain(authStore.user?.domain_id)
   if (authStore.isWebAdmin) await fetchStatus()
@@ -104,6 +122,10 @@ onMounted(async () => {
   border-radius: 8px;
   margin-bottom: 1.5rem;
   padding: 1rem 1.5rem;
+}
+
+.setup-banner.logo-banner {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
 }
 
 .setup-banner-content {

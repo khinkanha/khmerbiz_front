@@ -1,5 +1,19 @@
 <template>
-  <component v-if="themeComponent" :is="themeComponent"
+  <!-- Under Construction: domain has no menus/content -->
+  <div v-if="showUnderConstruction" class="under-construction">
+    <div class="uc-content">
+      <div class="uc-icon">
+        <i class="pi pi-building"></i>
+      </div>
+      <h1 class="uc-title">{{ domainStore.settings?.title || domainStore.domain?.domain_name || 'Our Website' }}</h1>
+      <div class="uc-divider"></div>
+      <p class="uc-text">Our website is currently under construction.</p>
+      <p class="uc-subtext">We're working hard to bring you an amazing experience. Please check back soon!</p>
+    </div>
+  </div>
+
+  <!-- Normal theme rendering -->
+  <component v-else-if="themeComponent" :is="themeComponent"
     :menu-tree="homeMenuTree.length ? homeMenuTree : domainStore.menuTree" :content-sections="contentSections"
     :banners="domainStore.banners" :settings="domainStore.settings" :domain="domainStore.domain"
     :social-media="domainStore.socialMedia" :language="domainStore.currentLanguage" />
@@ -22,6 +36,12 @@ definePageMeta({
 
 const domainStore = useDomainStore()
 const api = useApi()
+
+const isLoading = ref(true)
+const showUnderConstruction = computed(() => {
+  if (isLoading.value) return false
+  return domainStore.menuTree.length === 0 || contentSections.value.length === 0
+})
 
 const themeMap: Record<string, any> = {
   ClassicMultiPage,
@@ -139,6 +159,7 @@ onMounted(async () => {
     await domainStore.resolveDomain()
   }
   await loadContent()
+  isLoading.value = false
 })
 
 watch(() => domainStore.currentLanguage, async (newLang, oldLang) => {
@@ -158,5 +179,58 @@ useHead({
   align-items: center;
   justify-content: center;
   min-height: 50vh;
+}
+
+.under-construction {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  padding: 2rem;
+}
+
+.uc-content {
+  text-align: center;
+  max-width: 500px;
+}
+
+.uc-icon {
+  font-size: 4rem;
+  color: #94a3b8;
+  margin-bottom: 1.5rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+.uc-title {
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-weight: 800;
+  color: #1a202c;
+  margin: 0 0 1rem;
+  font-family: var(--font-battambang);
+}
+
+.uc-divider {
+  width: 60px;
+  height: 4px;
+  background: var(--primary-color, #3b82f6);
+  border-radius: 2px;
+  margin: 0 auto 1.5rem;
+}
+
+.uc-text {
+  font-size: 1.15rem;
+  color: #4a5568;
+  margin: 0 0 0.5rem;
+}
+
+.uc-subtext {
+  font-size: 0.95rem;
+  color: #94a3b8;
+  margin: 0;
 }
 </style>
