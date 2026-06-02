@@ -1518,7 +1518,7 @@ const _routes = [
     name: "index",
     path: "/",
     meta: __nuxt_page_meta$3 || {},
-    component: () => import('./index-BwuatuWd.mjs')
+    component: () => import('./index-CGcWKTH5.mjs')
   },
   {
     name: "news-newsId",
@@ -36312,7 +36312,7 @@ const plugins = [
 const layouts = {
   admin: defineAsyncComponent(() => import('./admin-flGYrCU-.mjs')),
   blank: defineAsyncComponent(() => import('./blank-CPiFi3ag.mjs')),
-  default: defineAsyncComponent(() => import('./default-ByiOb5Zu.mjs'))
+  default: defineAsyncComponent(() => import('./default-SFJ1aehg.mjs'))
 };
 const LayoutLoader = defineComponent({
   name: "LayoutLoader",
