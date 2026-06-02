@@ -1366,7 +1366,7 @@ const _routes = [
     name: "admin-content-id",
     path: "/admin/content/:id()",
     meta: __nuxt_page_meta$s || {},
-    component: () => import('./_id_-Cx5KgZuJ.mjs')
+    component: () => import('./_id_-DsHdYu4k.mjs')
   },
   {
     name: "admin-content",
@@ -1378,7 +1378,7 @@ const _routes = [
     name: "admin",
     path: "/admin",
     meta: __nuxt_page_meta$q || {},
-    component: () => import('./index-BG2GWV7C.mjs')
+    component: () => import('./index-DzeekKx_.mjs')
   },
   {
     name: "admin-login",
@@ -1396,19 +1396,19 @@ const _routes = [
     name: "admin-menu-id",
     path: "/admin/menu/:id()",
     meta: __nuxt_page_meta$n || {},
-    component: () => import('./_id_-CNpo9FyP.mjs')
+    component: () => import('./_id_-BUl17xeD.mjs')
   },
   {
     name: "admin-menu-add",
     path: "/admin/menu/add",
     meta: __nuxt_page_meta$m || {},
-    component: () => import('./add-Bi0MIHmP.mjs')
+    component: () => import('./add-DYD4gb-1.mjs')
   },
   {
     name: "admin-menu",
     path: "/admin/menu",
     meta: __nuxt_page_meta$l || {},
-    component: () => import('./index-Bm15kJbA.mjs')
+    component: () => import('./index-B_Nz-f-i.mjs')
   },
   {
     name: "admin-password",
@@ -1470,7 +1470,7 @@ const _routes = [
     name: "admin-setup",
     path: "/admin/setup",
     meta: __nuxt_page_meta$b || {},
-    component: () => import('./setup-BVPzCzCB.mjs')
+    component: () => import('./setup-Oq02Fe0L.mjs')
   },
   {
     name: "admin-signup",
@@ -1518,7 +1518,7 @@ const _routes = [
     name: "index",
     path: "/",
     meta: __nuxt_page_meta$3 || {},
-    component: () => import('./index-xIMtD52V.mjs')
+    component: () => import('./index-CWepkOpv.mjs')
   },
   {
     name: "news-newsId",
@@ -1530,7 +1530,7 @@ const _routes = [
     name: "pages-domainId-menuId",
     path: "/pages/:domainId()/:menuId()",
     meta: __nuxt_page_meta$1 || {},
-    component: () => import('./_menuId_-VDoAR6US.mjs')
+    component: () => import('./_menuId_-BCqskgcC.mjs')
   },
   {
     name: "test",
@@ -2035,7 +2035,7 @@ const globalMiddleware = [
 ];
 const namedMiddleware = {
   auth: () => import('./auth-DUV2_0-n.mjs'),
-  "domain-resolver-server": () => import('./domain-resolver.server-CHShnYX3.mjs'),
+  "domain-resolver-server": () => import('./domain-resolver.server-BwqGKgoU.mjs'),
   guest: () => import('./guest-CH_PLUZc.mjs')
 };
 const plugin$1 = /* @__PURE__ */ defineNuxtPlugin({
@@ -36310,9 +36310,9 @@ const plugins = [
   primevue_7rYYRZQLyx
 ];
 const layouts = {
-  admin: defineAsyncComponent(() => import('./admin-EOS8NQfJ.mjs')),
+  admin: defineAsyncComponent(() => import('./admin-BVGoSuwu.mjs')),
   blank: defineAsyncComponent(() => import('./blank-CPiFi3ag.mjs')),
-  default: defineAsyncComponent(() => import('./default-bAC8gwkV.mjs'))
+  default: defineAsyncComponent(() => import('./default-DpvK9CPz.mjs'))
 };
 const LayoutLoader = defineComponent({
   name: "LayoutLoader",
