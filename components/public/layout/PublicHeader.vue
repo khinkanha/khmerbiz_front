@@ -155,8 +155,8 @@ const headerClass = computed(() => {
   return classes.join(' ')
 })
 
-// logo_pos: 1=Top (above nav), 2=Middle (inside nav), 3=Bottom (below nav)
-const logoPos = computed(() => Number(settings.value?.logo_pos) || 1)
+// logo_position: 1=Top (above nav), 2=Middle (inside nav), 3=Bottom (below nav)
+const logoPos = computed(() => Number(settings.value?.logo_position) || 1)
 
 // menu_align: 1=Left, 2=Center, 3=Right
 const navListClass = computed(() => {

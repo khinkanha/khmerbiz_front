@@ -1432,37 +1432,37 @@ const _routes = [
         name: "admin-settings-banner",
         path: "banner",
         meta: __nuxt_page_meta$i || {},
-        component: () => import('./banner-i6C6ZZ1P.mjs')
+        component: () => import('./banner-Je_NqWGm.mjs')
       },
       {
         name: "admin-settings",
         path: "",
         meta: __nuxt_page_meta$h || {},
-        component: () => import('./index-DNg7DKwQ.mjs')
+        component: () => import('./index-DuUelax8.mjs')
       },
       {
         name: "admin-settings-language",
         path: "language",
         meta: __nuxt_page_meta$g || {},
-        component: () => import('./language-C5XUjPLy.mjs')
+        component: () => import('./language-DvC6ey78.mjs')
       },
       {
         name: "admin-settings-logo",
         path: "logo",
         meta: __nuxt_page_meta$f || {},
-        component: () => import('./logo-B4cqP4yt.mjs')
+        component: () => import('./logo-Ccv82Hle.mjs')
       },
       {
         name: "admin-settings-menu",
         path: "menu",
         meta: __nuxt_page_meta$e || {},
-        component: () => import('./menu-Cqyto9Ex.mjs')
+        component: () => import('./menu-SpPHlE4G.mjs')
       },
       {
         name: "admin-settings-social",
         path: "social",
         meta: __nuxt_page_meta$d || {},
-        component: () => import('./social-Dt7m_E54.mjs')
+        component: () => import('./social-7Q-dsire.mjs')
       }
     ]
   },
@@ -36312,7 +36312,7 @@ const plugins = [
 const layouts = {
   admin: defineAsyncComponent(() => import('./admin-flGYrCU-.mjs')),
   blank: defineAsyncComponent(() => import('./blank-CPiFi3ag.mjs')),
-  default: defineAsyncComponent(() => import('./default-SFJ1aehg.mjs'))
+  default: defineAsyncComponent(() => import('./default-BWl9byju.mjs'))
 };
 const LayoutLoader = defineComponent({
   name: "LayoutLoader",

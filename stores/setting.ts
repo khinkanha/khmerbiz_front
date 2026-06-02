@@ -157,10 +157,7 @@ export const useSettingStore = defineStore('setting', () => {
     }
   }
 
-  const updateLogoSettings = async (data: {
-    logo?: File | string
-    mobileLogo?: File | string
-  }): Promise<boolean> => {
+  const updateLogoSettings = async (data: any): Promise<boolean> => {
     try {
       const formData = new FormData()
 
@@ -175,6 +172,10 @@ export const useSettingStore = defineStore('setting', () => {
       } else if (data.mobileLogo) {
         formData.append('mobile_logo', data.mobileLogo)
       }
+
+      // Send logo position and alignment settings (map to DB column names)
+      if (data.logo_pos !== undefined) formData.append('logo_position', data.logo_pos)
+      if (data.logo_align !== undefined) formData.append('logo_align', data.logo_align)
 
       const response = await api.put('/settings/logo', formData)
 
