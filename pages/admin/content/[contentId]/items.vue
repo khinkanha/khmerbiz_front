@@ -51,6 +51,9 @@
                     toolbar: 'undo redo | bold italic underline | forecolor backcolor | fontselect | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | fullscreen',
                     branding: false,
                     promotion: false,
+                    relative_urls: false,
+                    remove_script_host: false,
+                    document_base_url: photoUrl,
                   }"
                 />
               </ClientOnly>
