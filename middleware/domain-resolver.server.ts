@@ -13,20 +13,23 @@ export default defineEventHandler(async (event) => {
   const apiBaseUrl = useRuntimeConfig().public.apiBaseUrl || 'http://localhost:8000/api/v1'
 
   try {
-    const response = await $fetch<SiteConfig>(`${apiBaseUrl}/site/config`, {
+    const response = await $fetch<{ status: boolean; data: SiteConfig }>(`${apiBaseUrl}/site/config`, {
       headers: {
         'X-Forwarded-Host': host || '',
       },
     })
 
-    event.context.domain = response.domain
-    event.context.settings = response.settings
-    event.context.languages = response.languages
-    event.context.banners = response.banners
-    event.context.socialMedia = response.socialMedia
+    if (response.status && response.data) {
+      const data = response.data
+      event.context.domain = data.domain
+      event.context.settings = data.settings
+      event.context.languages = data.languages
+      event.context.banners = data.banners
+      event.context.socialMedia = data.socialMedia
 
-    // Pass server-fetched config to the client via Nuxt payload so it doesn't re-fetch
-    event.context.configPayload = response
+      // Pass server-fetched config to the client via Nuxt payload so it doesn't re-fetch
+      event.context.configPayload = data
+    }
   } catch (error) {
     console.error('Failed to resolve domain:', error)
   }

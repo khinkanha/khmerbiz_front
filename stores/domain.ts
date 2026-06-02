@@ -61,13 +61,6 @@ export const useDomainStore = defineStore('domain', () => {
         socialMedia: SocialMedia[]
       }>(endpoint)
 
-      // Fallback to /site/default when domain not found
-      if (!response.success && !domainId) {
-        const host = import.meta.client ? window.location.hostname : ''
-        const fallbackEndpoint = host ? `/site/default?domain_name=${host}` : '/site/default'
-        response = await api.get<typeof response.data>(fallbackEndpoint)
-      }
-
       if (response.success && response.data) {
         domain.value = response.data.domain
         settings.value = response.data.settings
