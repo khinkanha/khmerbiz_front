@@ -1348,7 +1348,7 @@ const _routes = [
     name: "admin-content-contentId-items",
     path: "/admin/content/:contentId()/items",
     meta: __nuxt_page_meta$v || {},
-    component: () => import('./items-DtxhUGFa.mjs')
+    component: () => import('./items-rpnfseU8.mjs')
   },
   {
     name: "admin-content-contentId-map",
@@ -1432,37 +1432,37 @@ const _routes = [
         name: "admin-settings-banner",
         path: "banner",
         meta: __nuxt_page_meta$i || {},
-        component: () => import('./banner-Je_NqWGm.mjs')
+        component: () => import('./banner-DLrc-hmS.mjs')
       },
       {
         name: "admin-settings",
         path: "",
         meta: __nuxt_page_meta$h || {},
-        component: () => import('./index-DuUelax8.mjs')
+        component: () => import('./index-lP6orOEb.mjs')
       },
       {
         name: "admin-settings-language",
         path: "language",
         meta: __nuxt_page_meta$g || {},
-        component: () => import('./language-DvC6ey78.mjs')
+        component: () => import('./language-DGmp77cm.mjs')
       },
       {
         name: "admin-settings-logo",
         path: "logo",
         meta: __nuxt_page_meta$f || {},
-        component: () => import('./logo-Ccv82Hle.mjs')
+        component: () => import('./logo-Dd_7cd8p.mjs')
       },
       {
         name: "admin-settings-menu",
         path: "menu",
         meta: __nuxt_page_meta$e || {},
-        component: () => import('./menu-SpPHlE4G.mjs')
+        component: () => import('./menu-BYrMDyJX.mjs')
       },
       {
         name: "admin-settings-social",
         path: "social",
         meta: __nuxt_page_meta$d || {},
-        component: () => import('./social-7Q-dsire.mjs')
+        component: () => import('./social-BiXomItT.mjs')
       }
     ]
   },
@@ -1518,7 +1518,7 @@ const _routes = [
     name: "index",
     path: "/",
     meta: __nuxt_page_meta$3 || {},
-    component: () => import('./index-CGcWKTH5.mjs')
+    component: () => import('./index-CCZNQo6i.mjs')
   },
   {
     name: "news-newsId",
@@ -36310,9 +36310,9 @@ const plugins = [
   primevue_7rYYRZQLyx
 ];
 const layouts = {
-  admin: defineAsyncComponent(() => import('./admin-flGYrCU-.mjs')),
+  admin: defineAsyncComponent(() => import('./admin-DZbBMlFA.mjs')),
   blank: defineAsyncComponent(() => import('./blank-CPiFi3ag.mjs')),
-  default: defineAsyncComponent(() => import('./default-BWl9byju.mjs'))
+  default: defineAsyncComponent(() => import('./default-CBWBAdW7.mjs'))
 };
 const LayoutLoader = defineComponent({
   name: "LayoutLoader",

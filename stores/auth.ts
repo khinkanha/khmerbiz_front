@@ -53,6 +53,7 @@ export const useAuthStore = defineStore('auth', () => {
       if (response.success && response.data) {
         const { user: userData, accessToken: access, refreshToken: refresh } = response.data
         setTokens(access, refresh)
+        //console.log(access)
         setUser(userData)
         return true
       }

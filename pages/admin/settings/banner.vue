@@ -50,10 +50,6 @@
                 <input type="text" v-model="bannerForm.description" class="form-control" />
               </div>
               <div class="form-group">
-                <label>{{ $t('settings.imageLink') }}</label>
-                <input type="text" v-model="bannerForm.link" class="form-control" placeholder="https://..." />
-              </div>
-              <div class="form-group">
                 <label>Language</label>
                 <select v-model="bannerForm.lang_id" class="form-control">
                   <option v-for="lang in domainStore.languages" :key="lang.lang_id" :value="lang.lang_id">
@@ -62,7 +58,11 @@
                 </select>
               </div>
               <div class="form-group">
-                <label>Image</label>
+                <label>Image URL</label>
+                <input type="text" v-model="bannerForm.imageUrl" class="form-control" placeholder="banner/1s1.jpg" />
+              </div>
+              <div class="form-group">
+                <label>Or Upload Image</label>
                 <input type="file" accept="image/*" @change="handleImageSelect" class="form-control" />
                 <div v-if="bannerForm.photoPreview" style="margin-top:5px">
                   <img :src="bannerForm.photoPreview" style="max-height:100px" />
@@ -83,19 +83,19 @@
                 <th>Image</th>
                 <th>{{ $t('settings.imageTitle') }}</th>
                 <th>{{ $t('settings.imageLink') }}</th>
-                <th></th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(banner, i) in settingStore.banners" :key="banner.banner_id">
                 <td>{{ i + 1 }}</td>
-                <td><img v-if="banner.photo" :src="`${photoUrl}${banner.photo}`" style="height:50px;border-radius:4px" /></td>
+                <td><img v-if="banner.image" :src="`${photoUrl}${banner.image}`" style="height:50px;border-radius:4px" /></td>
                 <td>{{ banner.title }}</td>
                 <td>{{ banner.link }}</td>
                 <td>
-                  <a href="#" @click.prevent="confirmDelete(banner)" class="text-danger">
-                    <i class="fa fa-trash-o fa-lg"></i>
-                  </a>
+                  <button class="btn btn-sm btn-danger" @click="confirmDelete(banner)">
+                    <i class="pi pi-trash"></i> Delete
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -111,9 +111,12 @@ definePageMeta({ layout: 'admin', middleware: 'auth' })
 
 import { useSettingStore } from '~/stores/setting'
 import { useDomainStore } from '~/stores/domain'
+import type { BannerForm } from '~/types'
+import { useToast } from 'primevue/usetoast'
 
 const settingStore = useSettingStore()
 const domainStore = useDomainStore()
+const toast = useToast()
 const { t } = useI18n()
 const config = useRuntimeConfig()
 const photoUrl = config.public.photoUrl || 'https://khmer.biz'
@@ -135,6 +138,7 @@ const bannerForm = ref({
   link: '',
   photo: null as File | null,
   photoPreview: '',
+  imageUrl: '',
   lang_id: defaultLangId.value,
 })
 
@@ -142,13 +146,12 @@ const handleImageSelect = (e: Event) => {
   const file = (e.target as HTMLInputElement).files?.[0]
   if (file) {
     bannerForm.value.photo = file
+    bannerForm.value.imageUrl = ''
     bannerForm.value.photoPreview = URL.createObjectURL(file)
   }
 }
 
 import { useToast } from 'primevue/usetoast'
-
-const toast = useToast()
 
 const handleSaveSettings = async () => {
   savingSettings.value = true
@@ -167,24 +170,37 @@ const handleSaveSettings = async () => {
 }
 
 const handleSaveBanner = async () => {
-  const data: any = {
+  // Use imageUrl string if provided, otherwise use file upload
+  const photo = bannerForm.value.photo || (bannerForm.value.imageUrl || null)
+  const data: BannerForm = {
     title: bannerForm.value.title,
     description: bannerForm.value.description,
     link: bannerForm.value.link,
-    photo: bannerForm.value.photo,
+    photo,
+    banner_order: 0,
     status: 1,
+    image: null,
     lang_id: bannerForm.value.lang_id,
   }
-  console.log('Saving banner with data:', data)
-  await settingStore.addBanner(data)
+  const result = await settingStore.addBanner(data)
+  if (result.success) {
+    toast.add({ severity: 'success', summary: 'Success', detail: 'Banner added', life: 3000 })
+  } else {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to add banner', life: 3000 })
+  }
   await settingStore.fetchBanners()
   showAdd.value = false
-  bannerForm.value = { title: '', description: '', link: '', photo: null, photoPreview: '', lang_id: defaultLangId.value }
+  bannerForm.value = { title: '', description: '', link: '', photo: null, photoPreview: '', imageUrl: '', lang_id: defaultLangId.value }
 }
 
 const confirmDelete = async (banner: any) => {
-  if (confirm('Are you sure?')) {
-    await settingStore.deleteBanner(banner.banner_id)
+  if (confirm('Are you sure you want to delete this banner?')) {
+    const success = await settingStore.deleteBanner(banner.banner_id)
+    if (success) {
+      toast.add({ severity: 'success', summary: 'Deleted', detail: 'Banner deleted', life: 3000 })
+    } else {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete banner', life: 3000 })
+    }
   }
 }
 

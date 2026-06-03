@@ -114,9 +114,8 @@ const bannerMode = computed(() => Number(props.settings?.banner_mode) !== 0)
 const bannerDisplayAll = computed(() => Number(props.settings?.banner_display) === 1)
 
 const showBanners = computed(() => {
-  if (!bannerMode.value) return false
-  if (props.banners.length === 0) return false
-  return bannerDisplayAll.value || isHomePage.value
+  // Banner only supported in ClassicMultiPage style
+  return false
 })
 
 // banner_position: 1=Top, 2=Middle, 3=Bottom

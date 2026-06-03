@@ -1,6 +1,5 @@
 <template>
   <div class="banner-slideshow">
-
     <Carousel :value="banners" :numVisible="1" :numScroll="1" :circular="true" :autoplayInterval="5000"
       class="banner-carousel">
       <template #item="{ data }">
@@ -24,7 +23,7 @@
 import type { Banner } from '~/types'
 
 interface Props {
-  banners: Banner[]
+  banners: readonly Banner[]
 }
 
 defineProps<Props>()

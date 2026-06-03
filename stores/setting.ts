@@ -67,9 +67,9 @@ export const useSettingStore = defineStore('setting', () => {
       formData.append('lang_id', String(data.lang_id))
 
       if (typeof data.photo === 'string') {
-        formData.append('existing_photo', data.photo)
+        formData.append('image', data.photo)
       } else if (data.photo) {
-        formData.append('photo', data.photo)
+        formData.append('image', data.photo)
       }
 
       const response = await api.post<{ banner_id: number }>('/banners', formData)
