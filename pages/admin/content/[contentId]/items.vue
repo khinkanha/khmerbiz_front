@@ -173,6 +173,7 @@
             <Button :label="$t('contentManager.addNew')" icon="pi pi-plus" size="small" @click="addNewItem" />
           </div>
         </template>
+        
         <template #content>
           <DataTable
             :value="displayItems"
@@ -186,7 +187,7 @@
             <Column :header="$t('contentManager.primaryImage')" :style="{ width: '100px' }">
               <template #body="{ data }">
                 <img
-                  v-if="data.photo || data.url"
+                  v-if="data.photo || data.url && contentType !== ContentType.VIDEO"
                   :src="`${photoUrl}${data.photo || data.url}`"
                   :alt="data.title"
                   class="item-thumb"

@@ -9,7 +9,7 @@
         <a href="https://t.me/cambodiawebhosting" target="_blank">
           <i class="fa-brands fa-telegram fa-lg"></i> cambodiawebhosting
         </a> |
-        <a href="https://www.youtube.com/watch?v=01OhUFUhQM8&list=PLFNGjBqsHQG0odXrXZeBUEaqJghiocvyX&index=6"
+        <a href="https://www.youtube.com/@cambodiawebhosting"
           target="_blank">
           <i class="fa-brands fa-youtube text-danger fa-lg"></i> Cambodia Web Hosting
         </a>

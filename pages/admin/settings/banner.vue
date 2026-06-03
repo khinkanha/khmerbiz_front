@@ -6,23 +6,23 @@
           <div class="form-group">
             <label>{{ $t('settings.slidePosition') }}</label>
             <select v-model="settingsForm.banner_pos" class="form-control">
-              <option value="1">Top</option>
-              <option value="2">Middle</option>
-              <option value="3">Bottom</option>
+              <option :value="1">Top</option>
+              <option :value="2">Middle</option>
+              <option :value="3">Bottom</option>
             </select>
           </div>
           <div class="form-group">
             <label>{{ $t('settings.slideMode') }}</label>
             <select v-model="settingsForm.banner_mode" class="form-control">
-              <option value="1">On</option>
-              <option value="0">Off</option>
+              <option :value="1">On</option>
+              <option :value="0">Off</option>
             </select>
           </div>
           <div class="form-group">
             <label>{{ $t('settings.slideDisplay') }}</label>
             <div>
-              <label style="font-weight:normal"><input type="radio" v-model="settingsForm.banner_display" value="0" /> Default Page</label>
-              <label style="font-weight:normal;margin-left:15px"><input type="radio" v-model="settingsForm.banner_display" value="1" /> All Pages</label>
+              <label style="font-weight:normal"><input type="radio" v-model="settingsForm.banner_display" :value="0" /> Default Page</label>
+              <label style="font-weight:normal;margin-left:15px"><input type="radio" v-model="settingsForm.banner_display" :value="1" /> All Pages</label>
             </div>
           </div>
           <button type="submit" class="btn btn-danger" :disabled="savingSettings">
@@ -46,11 +46,23 @@
                 <input type="text" v-model="bannerForm.title" class="form-control" />
               </div>
               <div class="form-group">
+                <label>Description</label>
+                <input type="text" v-model="bannerForm.description" class="form-control" />
+              </div>
+              <div class="form-group">
                 <label>{{ $t('settings.imageLink') }}</label>
                 <input type="text" v-model="bannerForm.link" class="form-control" placeholder="https://..." />
               </div>
               <div class="form-group">
-                <label>{{ $t('settings.imageSize') }}</label>
+                <label>Language</label>
+                <select v-model="bannerForm.lang_id" class="form-control">
+                  <option v-for="lang in domainStore.languages" :key="lang.lang_id" :value="lang.lang_id">
+                    {{ lang.lang_name }}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Image</label>
                 <input type="file" accept="image/*" @change="handleImageSelect" class="form-control" />
                 <div v-if="bannerForm.photoPreview" style="margin-top:5px">
                   <img :src="bannerForm.photoPreview" style="max-height:100px" />
@@ -98,8 +110,10 @@
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
 import { useSettingStore } from '~/stores/setting'
+import { useDomainStore } from '~/stores/domain'
 
 const settingStore = useSettingStore()
+const domainStore = useDomainStore()
 const { t } = useI18n()
 const config = useRuntimeConfig()
 const photoUrl = config.public.photoUrl || 'https://khmer.biz'
@@ -107,13 +121,21 @@ const photoUrl = config.public.photoUrl || 'https://khmer.biz'
 const showAdd = ref(false)
 const savingSettings = ref(false)
 
-const settingsForm = ref({ banner_pos: 1, banner_mode: '1', banner_display: 0 })
+const settingsForm = ref({ banner_pos: 1, banner_mode: 1, banner_display: 0 })
+
+const defaultLangId = computed(() => {
+  const langs = domainStore.languages
+  const defaultLang = langs.find((l: any) => l.is_default === 1)
+  return defaultLang?.lang_id ?? langs[0]?.lang_id ?? 1
+})
 
 const bannerForm = ref({
   title: '',
+  description: '',
   link: '',
   photo: null as File | null,
   photoPreview: '',
+  lang_id: defaultLangId.value,
 })
 
 const handleImageSelect = (e: Event) => {
@@ -124,10 +146,21 @@ const handleImageSelect = (e: Event) => {
   }
 }
 
+import { useToast } from 'primevue/usetoast'
+
+const toast = useToast()
+
 const handleSaveSettings = async () => {
   savingSettings.value = true
   try {
-    await settingStore.updateSettings(settingsForm.value)
+    const success = await settingStore.updateBanner(settingsForm.value)
+    if (success) {
+      toast.add({ severity: 'success', summary: 'Success', detail: 'Banner settings updated', life: 3000 })
+    } else {
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update banner settings', life: 3000 })
+    }
+  } catch {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update banner settings', life: 3000 })
   } finally {
     savingSettings.value = false
   }
@@ -136,14 +169,17 @@ const handleSaveSettings = async () => {
 const handleSaveBanner = async () => {
   const data: any = {
     title: bannerForm.value.title,
+    description: bannerForm.value.description,
     link: bannerForm.value.link,
     photo: bannerForm.value.photo,
     status: 1,
+    lang_id: bannerForm.value.lang_id,
   }
+  console.log('Saving banner with data:', data)
   await settingStore.addBanner(data)
   await settingStore.fetchBanners()
   showAdd.value = false
-  bannerForm.value = { title: '', link: '', photo: null, photoPreview: '' }
+  bannerForm.value = { title: '', description: '', link: '', photo: null, photoPreview: '', lang_id: defaultLangId.value }
 }
 
 const confirmDelete = async (banner: any) => {
@@ -158,7 +194,7 @@ onMounted(async () => {
   if (settingStore.settings) {
     settingsForm.value = {
       banner_pos: settingStore.settings.banner_pos || 1,
-      banner_mode: String(settingStore.settings.banner_mode ?? '1'),
+      banner_mode: settingStore.settings.banner_mode ?? 1,
       banner_display: settingStore.settings.banner_display ?? 0,
     }
   }

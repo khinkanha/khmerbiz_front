@@ -6,18 +6,18 @@ export interface Setting {
   mobile_logo: string
   footer: string | null
   title: string | null
-  menu_position: string | null
-  banner_position: string | null
+  menu_position: number | null
+  banner_position: number | null
   banner_display: number
-  logo_position: string | null
-  logo_align: string | null
-  menu_align: string | null
+  logo_position: number | null
+  logo_align: number | null
+  menu_align: number | null
   menu_pos: number | null
-  screen_mode: string | null
+  screen_mode: number | null
   s_mode: number | null
-  banner_mode: string | null
+  banner_mode: number | null
   banner_pos: number | null
-  plugin_mode: string | null
+  plugin_mode: number | null
   background: string | null
   footer_align: number
   theme: number
@@ -47,20 +47,24 @@ export interface Banner {
   banner_id: number
   domain_id: number
   title: string | null
+  description: string | null
   photo: string
   link: string | null
   banner_order: number
   status: number
   image: string | null
+  lang_id: number
 }
 
 export interface BannerForm {
   title: string
+  description: string
   photo: File | string | null
   link: string
   banner_order: number
   status: number
   image: string | null
+  lang_id: number
 }
 
 export interface SocialMedia {

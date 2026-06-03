@@ -7,7 +7,7 @@ import type {
   Language,
 } from '~/types'
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { useApi} from '~/composables/useApi'
+import { useApi } from '~/composables/useApi'
 export const useSettingStore = defineStore('setting', () => {
   const api = useApi()
 
@@ -30,7 +30,6 @@ export const useSettingStore = defineStore('setting', () => {
   const updateSettings = async (data: Partial<Setting>): Promise<boolean> => {
     try {
       const response = await api.put('/settings/general', data)
-
       if (response.success) {
         if (settings.value) {
           settings.value = { ...settings.value, ...data }
@@ -61,9 +60,11 @@ export const useSettingStore = defineStore('setting', () => {
     try {
       const formData = new FormData()
       formData.append('title', data.title)
+      formData.append('description', data.description || '')
       formData.append('link', data.link)
       formData.append('banner_order', String(data.banner_order))
       formData.append('status', String(data.status))
+      formData.append('lang_id', String(data.lang_id))
 
       if (typeof data.photo === 'string') {
         formData.append('existing_photo', data.photo)
@@ -85,9 +86,15 @@ export const useSettingStore = defineStore('setting', () => {
     }
   }
 
-  const updateBanner = async (id: number, data: Partial<BannerForm>): Promise<boolean> => {
-    // TODO: Backend has no PUT /banners/:id endpoint — needs to be added
-    console.warn('updateBanner: no backend endpoint for banner update')
+  const updateBanner = async (data: Partial<Setting>): Promise<boolean> => {
+    const response = await api.put('/settings/banner', data)
+    console.log('Update settings response:', response)
+    if (response.success) {
+      if (settings.value) {
+        settings.value = { ...settings.value, ...data }
+      }
+      return true
+    }
     return false
   }
 
