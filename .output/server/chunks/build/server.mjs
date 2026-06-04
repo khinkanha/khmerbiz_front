@@ -1444,7 +1444,7 @@ const _routes = [
         name: "admin-settings-language",
         path: "language",
         meta: __nuxt_page_meta$g || {},
-        component: () => import('./language-DGmp77cm.mjs')
+        component: () => import('./language-Ws9uUibJ.mjs')
       },
       {
         name: "admin-settings-logo",

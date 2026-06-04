@@ -11,7 +11,7 @@
         <div class="col-md-6">
           <div class="form-group">
             <label>{{ $t('settings.flagType') }}</label>
-            <select v-model="langForm.flag_icon" class="form-control">
+            <select v-model="langForm.flag" class="form-control">
               <option value="">-- Select --</option>
               <option v-for="f in flagOptions" :key="f.value" :value="f.value">{{ f.label }}</option>
             </select>
@@ -32,7 +32,7 @@
           <tr v-for="(lang, i) in settingStore.languages" :key="lang.lang_id">
             <td>{{ i + 1 }}</td>
             <td>{{ lang.lang_name }}</td>
-            <td><img :src="`/flag/${lang.flag_icon}`" style="width:20px;height:14px;border-radius:2px" /></td>
+            <td><img :src="`/flag/${flagOptions.find(f => f.value === lang.flag)?.icon || 'kh.svg'}`" style="width:20px;height:14px;border-radius:2px" /></td>
             <td>
               <i v-if="lang.is_default" class="fa fa-star" style="color:#f0ad4e"></i>
               <a v-else href="#" @click.prevent="handleSetDefault(lang.lang_id)"><i class="fa fa-star" style="color:#ccc"></i></a>
@@ -53,27 +53,25 @@ import { useSettingStore } from '~/stores/setting'
 const settingStore = useSettingStore()
 const adding = ref(false)
 
-const langForm = ref({ lang_name: '', flag_icon: '' })
+const langForm = ref({ lang_name: '', flag: '' })
 
 const flagOptions = [
-  { label: 'ខ្មែរ (KH)', value: 'kh.svg' },
-  { label: 'English (EN)', value: 'en.svg' },
-  { label: '中文 (CH)', value: 'ch.svg' },
-  { label: 'ไทย (TH)', value: 'th.svg' },
-  { label: 'Tiếng Việt (VN)', value: 'vn.svg' },
+  { label: 'ខ្មែរ (KH)', value: 0, icon: 'kh.svg' },
+  { label: 'English (EN)', value: 1, icon: 'en.svg' },
+  { label: '中文 (CH)', value: 2, icon: 'ch.svg' },
+  { label: 'ไทย (TH)', value: 3, icon: 'th.svg' },
+  { label: 'Tiếng Việt (VN)', value: 4, icon: 'vn.svg' },
 ]
 
 const handleAddLanguage = async () => {
-  if (!langForm.value.lang_name || !langForm.value.flag_icon) return
+  if (!langForm.value.lang_name || langForm.value.flag === '') return
   adding.value = true
   try {
-    const selectedFlag = flagOptions.find(f => f.value === langForm.value.flag_icon)
     await settingStore.addLanguage({
       lang_name: langForm.value.lang_name,
-      lang_code: selectedFlag?.value?.replace('.svg', '') || 'kh',
-      flag_icon: langForm.value.flag_icon,
+      flag: Number(langForm.value.flag),
     })
-    langForm.value = { lang_name: '', flag_icon: '' }
+    langForm.value = { lang_name: '', flag: '' }
   } finally {
     adding.value = false
   }

@@ -211,7 +211,7 @@ export const useSettingStore = defineStore('setting', () => {
     }
   }
 
-  const addLanguage = async (data: { lang_name: string; lang_code: string; flag_icon: string }): Promise<{ success: boolean; id?: number }> => {
+  const addLanguage = async (data: { lang_name: string; flag: number }): Promise<{ success: boolean; id?: number }> => {
     try {
       const response = await api.post<{ lang_id: number }>('/settings/languages', data)
       if (response.success && response.data) {
