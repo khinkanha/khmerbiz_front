@@ -25,6 +25,7 @@ const themeClass = computed(() => {
   }
   return 'theme-default'
 })
+const {setFromSetting}=useSeo()
 
 // Banner display logic — only for ClassicMultiPage style (page_style === 0):
 // banner_mode: 0=off, 1=on
@@ -61,6 +62,7 @@ onMounted(async () => {
     domainStore.hydrateFromServer()
     await domainStore.resolveDomain()
   }
+  setFromSetting(domainStore.settings)
 })
 </script>
 
