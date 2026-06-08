@@ -1,8 +1,9 @@
 <template>
-  <div class="flag">
-    <LanguageSelector />
-  </div>
   <header class="public-header" :class="headerClass">
+    <!-- Language flag -->
+    <div class="flag">
+      <LanguageSelector />
+    </div>
     <!-- Top Bar (hidden when logo_position=bottom) -->
     <div v-if="logoPos !== 3" class="top-bar">
       <div class="container top-bar-inner">
@@ -18,22 +19,22 @@
       </div>
     </div>
 
+    <!-- Mobile logo row (hidden on desktop, shown above nav on mobile) -->
+    <div class="mobile-logo-bar">
+      <div class="container mobile-logo-inner">
+        <img v-if="settings?.mobile_logo" :src="config.photoUrl + settings.mobile_logo"
+          :alt="settings?.title || 'Logo'" class="mobile-logo-img" />
+        <div v-else-if="settings?.title" class="mobile-logo-title">
+          <h1>{{ settings.title }}</h1>
+        </div>
+      </div>
+    </div>
+
     <!-- Navigation Bar -->
     <nav class="nav-bar">
       <div class="container nav-inner">
-        <!-- Mobile brand (shown only on mobile, left side of nav) -->
+        <!-- Mobile brand: title only in nav bar -->
         <div class="mobile-brand" @click="goHome">
-          <img v-if="settings?.mobile_logo" :src="config.photoUrl + settings.mobile_logo"
-            :alt="settings?.title || 'Logo'" class="brand-logo brand-logo-small" />
-          <div v-if="settings?.title" class="brand-title">
-            <h1>{{ settings.title }}</h1>
-          </div>
-        </div>
-
-        <!-- Logo inside nav when logo_position=middle (desktop only) -->
-        <div v-if="logoPos === 2" class="brand brand-inline" @click="goHome">
-          <img v-if="settings?.logo" :src="config.photoUrl + settings.logo" :alt="settings?.title || 'Logo'"
-            class="brand-logo brand-logo-small" />
           <div v-if="settings?.title" class="brand-title">
             <h1>{{ settings.title }}</h1>
           </div>
@@ -41,15 +42,32 @@
 
         <ul class="nav-list" :class="navListClass">
           <li v-for="item in filteredMenuTree" :key="item.item_id" class="nav-item"
-            :class="{ 'has-dropdown': item.children && item.children.length > 0 }">
-            <a v-if="isSinglePage" :href="`#section-${item.item_id}`" class="nav-link"
-              :class="{ active: activeMenuId === item.item_id }" @click.prevent="scrollToSection(item.item_id)">
-              {{ item.item_name }}
-            </a>
-            <NuxtLink v-else :to="`/pages/${domain?.domain_id}/${item.item_id}`" class="nav-link"
-              :class="{ active: isMenuActive(item) }">
-              {{ item.item_name }}
-            </NuxtLink>
+            :class="{ 'has-dropdown': item.children && item.children.length > 0, 'accordion-open': expandedMenuId === item.item_id }">
+
+            <!-- Items WITH children: clickable toggle (mobile accordion) / hoverable (desktop) -->
+            <template v-if="item.children && item.children.length > 0">
+              <a v-if="isSinglePage" :href="`#section-${item.item_id}`" class="nav-link"
+                :class="{ active: activeMenuId === item.item_id }" @click.prevent="scrollToSection(item.item_id)">
+                {{ item.item_name }}
+              </a>
+              <div v-else class="nav-link nav-link-parent" :class="{ active: isMenuActive(item) }"
+                @click="toggleAccordion(item.item_id)">
+                <span>{{ item.item_name }}</span>
+                <i class="pi accordion-icon" :class="expandedMenuId === item.item_id ? 'pi-chevron-up' : 'pi-chevron-down'" />
+              </div>
+            </template>
+
+            <!-- Items WITHOUT children: normal links -->
+            <template v-else>
+              <a v-if="isSinglePage" :href="`#section-${item.item_id}`" class="nav-link"
+                :class="{ active: activeMenuId === item.item_id }" @click.prevent="scrollToSection(item.item_id)">
+                {{ item.item_name }}
+              </a>
+              <NuxtLink v-else :to="`/pages/${domain?.domain_id}/${item.item_id}`" class="nav-link"
+                :class="{ active: isMenuActive(item) }">
+                {{ item.item_name }}
+              </NuxtLink>
+            </template>
 
             <div v-if="item.children && item.children.length > 0" class="dropdown-menu">
               <div class="dropdown-inner">
@@ -173,10 +191,17 @@ const navListClass = computed(() => {
 })
 
 const mobileMenuOpen = ref(false)
+const expandedMenuId = ref<number | null>(null)
 
-// Auto-close mobile menu on route change (NuxtLink navigation)
+const toggleAccordion = (itemId: number) => {
+  // Exclusive accordion: only one parent open at a time
+  expandedMenuId.value = expandedMenuId.value === itemId ? null : itemId
+}
+
+// Auto-close mobile menu and accordion on route change
 watch(() => route.path, () => {
   mobileMenuOpen.value = false
+  expandedMenuId.value = null
 })
 
 const toggleMobileMenu = () => {
@@ -209,14 +234,13 @@ const isChildActive = (childId: number) => {
   background: white;
 }
 
-div .flag {
+.flag {
   position: fixed;
   z-index: 1100;
   top: 0;
   right: 0;
   margin-right: 20px;
   margin-top: 5px;
-  margin-bottom: 15px;
 }
 
 .container {
@@ -477,44 +501,88 @@ div .flag {
   font-size: 1.25rem;
 }
 
-/* Mobile Brand (hidden on desktop, shown on mobile) */
+/* Mobile Brand (title only, hidden on desktop) */
 .mobile-brand {
   display: none;
-  align-items: left;
-  gap: 0.75rem;
+  align-items: center;
   cursor: pointer;
-  flex: 1;
-  min-width: 0;
+}
+
+/* Mobile logo bar (hidden on desktop) */
+.mobile-logo-bar {
+  display: none;
+  background-color: white;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.mobile-logo-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+}
+
+.mobile-logo-img {
+  max-height: 48px;
+  width: auto;
+  object-fit: contain;
+}
+
+.mobile-logo-title h1 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary-color, #1a202c);
+  margin: 0;
+  font-family: var(--font-battambang);
 }
 
 /* ---- Responsive ---- */
 @media (max-width: 768px) {
-  .brand-title h1 {
-    font-size: 1.1rem;
+  /* Flag: static above nav on mobile instead of fixed overlay */
+  .flag {
+    position: relative;
+    z-index: 100;
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.4rem 1rem 0;
+    background-color: white;
   }
 
-  .brand-logo {
-    max-height: 48px;
+  /* Hide desktop top bar on mobile */
+  .top-bar {
+    display: none !important;
   }
 
-  .mobile-logo {
-    display: inline-block;
-  }
-
-  .desktop-logo {
-    display: none;
+  /* Show mobile logo bar */
+  .mobile-logo-bar {
+    display: block;
   }
 
   .nav-inner {
-    flex-wrap: wrap;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     height: auto;
     min-height: 46px;
-    padding: 0.75rem 1rem;
-    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    gap: 0.5rem;
   }
 
   .mobile-brand {
     display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .mobile-brand .brand-title h1 {
+    font-size: 0.95rem;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .brand-inline {
@@ -526,17 +594,38 @@ div .flag {
     flex-direction: column;
     width: 100%;
     background-color: var(--nav-bg, #1e3a5f);
+    order: 3;
   }
 
   .nav-list.mobile-open {
     display: flex;
   }
 
-  .nav-link {
-    padding: 0.85rem 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  .nav-item {
+    flex-direction: column;
+    align-items: stretch;
   }
 
+  .nav-link {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* Parent link with accordion toggle */
+  .nav-link-parent {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+  }
+
+  .accordion-icon {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    transition: transform 0.2s;
+  }
+
+  /* Accordion dropdown: hidden by default, shown when parent is open */
   .dropdown-menu {
     position: static;
     opacity: 1;
@@ -544,17 +633,32 @@ div .flag {
     transform: none;
     box-shadow: none;
     border-radius: 0;
-    background-color: rgba(0, 0, 0, 0.08);
+    background-color: rgba(0, 0, 0, 0.1);
+    display: none;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .accordion-open .dropdown-menu {
+    display: block;
+    max-height: 500px;
+  }
+
+  /* Disable hover-based dropdown on mobile */
+  .has-dropdown:hover .dropdown-menu {
     display: none;
   }
 
-  .has-dropdown:hover .dropdown-menu {
+  .accordion-open.has-dropdown:hover .dropdown-menu {
     display: block;
   }
 
   .dropdown-link {
     color: rgba(255, 255, 255, 0.8);
-    padding-left: 2rem;
+    padding: 0.7rem 1rem 0.7rem 2rem;
+    font-size: 0.825rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   }
 
   .dropdown-link:hover {
@@ -570,10 +674,7 @@ div .flag {
     display: flex;
     align-items: center;
     justify-content: center;
-    position: absolute;
-    right: 1rem;
-    top: 0.75rem;
-    z-index: 300;
+    flex-shrink: 0;
   }
 
   .nav-bar {
