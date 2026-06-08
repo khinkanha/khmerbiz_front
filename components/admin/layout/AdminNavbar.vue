@@ -66,7 +66,7 @@
         <!-- Right nav -->
         <ul class="nav navbar-nav navbar-right">
           <li v-if="!authStore.isAuthenticated">
-            <NuxtLink to="/admin/login">{{ $t('sidebar.login') }}</NuxtLink>
+            <NuxtLink to="/member/login">{{ $t('sidebar.login') }}</NuxtLink>
           </li>
           <li v-else class="dropdown user-dropdown">
             <a class="dropdown-toggle" @click.prevent="userDrop = !userDrop">
@@ -148,7 +148,7 @@ const closeMenus = () => {
 const handleLogout = async () => {
   closeMenus()
   await authStore.logout()
-  router.push('/admin/login')
+  router.push('/member/login')
 }
 
 router.afterEach(() => closeMenus())

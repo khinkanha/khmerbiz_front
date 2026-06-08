@@ -23,7 +23,7 @@ export default defineEventHandler((event) => {
   const url = event.path.split('?')[0]
 
   // 1. Always allow valid page routes (no file extension, or known routes)
-  //    /, /admin/login, /pages/1/2, /news/5, /article/xxx, /legal, etc.
+  //    /, /member/login, /pages/1/2, /news/5, /article/xxx, /legal, etc.
   //    These have no dots in the last path segment
   const lastSegment = url.split('/').pop() || ''
   const hasExtension = lastSegment.includes('.')

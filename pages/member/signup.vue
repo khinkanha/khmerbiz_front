@@ -56,7 +56,7 @@
         <i class="fa fa-floppy-o"></i> {{ $t('auth.signup') }}
       </button>
       &nbsp;
-      <NuxtLink to="/admin/login" class="btn btn-info">{{ $t('auth.login') }}</NuxtLink>
+      <NuxtLink to="/member/login" class="btn btn-info">{{ $t('auth.login') }}</NuxtLink>
     </form>
   </div>
 </template>
@@ -119,7 +119,7 @@ const handleSignup = async () => {
         setTimeout(() => navigateTo('/admin/setup'), 1000)
       } else {
         successMessage.value = t('auth.signupSuccess')
-        setTimeout(() => navigateTo('/admin/login'), 1500)
+        setTimeout(() => navigateTo('/member/login'), 1500)
       }
     } else {
       errorMessage.value = t('auth.signupError')

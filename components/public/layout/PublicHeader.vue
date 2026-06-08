@@ -1,24 +1,19 @@
 <template>
+  <div class="flag">
+    <LanguageSelector />
+  </div>
   <header class="public-header" :class="headerClass">
     <!-- Top Bar (hidden when logo_position=bottom) -->
     <div v-if="logoPos !== 3" class="top-bar">
       <div class="container top-bar-inner">
         <div class="brand" @click="goHome">
           <!-- Desktop logo -->
-          <img v-if="settings?.logo && !settings?.mobile_logo" :src="config.photoUrl + settings.logo"
-            :alt="settings?.title || 'Logo'" class="brand-logo" />
-          <template v-else-if="settings?.logo">
-            <img :src="config.photoUrl + settings.logo" :alt="settings?.title || 'Logo'" class="brand-logo desktop-logo" />
+          <template v-if="settings?.logo">
+            <img :src="config.photoUrl + settings.logo" :alt="settings?.title || 'Logo'"
+              class="brand-logo desktop-logo" />
             <img v-if="settings?.mobile_logo" :src="config.photoUrl + settings.mobile_logo"
               :alt="settings?.title || 'Logo'" class="brand-logo mobile-logo" />
           </template>
-          <div v-if="settings?.title" class="brand-title">
-            <h1>{{ settings.title }}</h1>
-          </div>
-        </div>
-
-        <div class="top-actions">
-          <LanguageSelector />
         </div>
       </div>
     </div>
@@ -26,18 +21,29 @@
     <!-- Navigation Bar -->
     <nav class="nav-bar">
       <div class="container nav-inner">
-        <!-- Logo inside nav when logo_position=middle -->
-        <div v-if="logoPos === 2" class="brand brand-inline" @click="goHome">
-          <img v-if="settings?.logo" :src="config.photoUrl + settings.logo"
+        <!-- Mobile brand (shown only on mobile, left side of nav) -->
+        <div class="mobile-brand" @click="goHome">
+          <img v-if="settings?.mobile_logo" :src="config.photoUrl + settings.mobile_logo"
             :alt="settings?.title || 'Logo'" class="brand-logo brand-logo-small" />
+          <div v-if="settings?.title" class="brand-title">
+            <h1>{{ settings.title }}</h1>
+          </div>
+        </div>
+
+        <!-- Logo inside nav when logo_position=middle (desktop only) -->
+        <div v-if="logoPos === 2" class="brand brand-inline" @click="goHome">
+          <img v-if="settings?.logo" :src="config.photoUrl + settings.logo" :alt="settings?.title || 'Logo'"
+            class="brand-logo brand-logo-small" />
+          <div v-if="settings?.title" class="brand-title">
+            <h1>{{ settings.title }}</h1>
+          </div>
         </div>
 
         <ul class="nav-list" :class="navListClass">
           <li v-for="item in filteredMenuTree" :key="item.item_id" class="nav-item"
             :class="{ 'has-dropdown': item.children && item.children.length > 0 }">
             <a v-if="isSinglePage" :href="`#section-${item.item_id}`" class="nav-link"
-              :class="{ active: activeMenuId === item.item_id }"
-              @click.prevent="scrollToSection(item.item_id)">
+              :class="{ active: activeMenuId === item.item_id }" @click.prevent="scrollToSection(item.item_id)">
               {{ item.item_name }}
             </a>
             <NuxtLink v-else :to="`/pages/${domain?.domain_id}/${item.item_id}`" class="nav-link"
@@ -48,16 +54,14 @@
             <div v-if="item.children && item.children.length > 0" class="dropdown-menu">
               <div class="dropdown-inner">
                 <template v-if="isSinglePage">
-                  <a v-for="child in item.children" :key="child.item_id"
-                    :href="`#section-${child.item_id}`" class="dropdown-link"
-                    @click.prevent="scrollToSection(child.item_id)">
+                  <a v-for="child in item.children" :key="child.item_id" :href="`#section-${child.item_id}`"
+                    class="dropdown-link" @click.prevent="scrollToSection(child.item_id)">
                     {{ child.item_name }}
                   </a>
                 </template>
                 <template v-else>
                   <NuxtLink v-for="child in item.children" :key="child.item_id"
-                    :to="`/pages/${domain?.domain_id}/${child.item_id}`"
-                    class="dropdown-link"
+                    :to="`/pages/${domain?.domain_id}/${child.item_id}`" class="dropdown-link"
                     :class="{ active: isChildActive(child.item_id) }">
                     {{ child.item_name }}
                   </NuxtLink>
@@ -67,29 +71,26 @@
           </li>
         </ul>
 
-        <NuxtLink v-if="!isAuthenticated" to="/admin/login" class="login-btn">
+        <NuxtLink v-if="!isAuthenticated" to="/member/login" class="login-btn">
           {{ $t('auth.login') }}
         </NuxtLink>
-
         <button class="mobile-toggle" @click="toggleMobileMenu">
           <i :class="mobileMenuOpen ? 'pi pi-times' : 'pi pi-bars'"></i>
         </button>
+        
+
       </div>
+
     </nav>
 
     <!-- Bottom bar for logo_position=bottom -->
     <div v-if="logoPos === 3" class="top-bar bottom-bar">
       <div class="container top-bar-inner">
         <div class="brand" @click="goHome">
-          <img v-if="settings?.logo" :src="config.photoUrl + settings.logo"
-            :alt="settings?.title || 'Logo'" class="brand-logo" />
-          <div v-if="settings?.title" class="brand-title">
-            <h1>{{ settings.title }}</h1>
-          </div>
+          <img v-if="settings?.logo" :src="config.photoUrl + settings.logo" :alt="settings?.title || 'Logo'"
+            class="brand-logo" />
         </div>
-        <div class="top-actions">
-          <LanguageSelector />
-        </div>
+
       </div>
     </div>
   </header>
@@ -203,6 +204,16 @@ const isChildActive = (childId: number) => {
   background: white;
 }
 
+div .flag {
+  position: fixed;
+  z-index: 1100;
+  top: 0;
+  right: 0;
+  margin-right: 20px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -258,8 +269,7 @@ const isChildActive = (childId: number) => {
 }
 
 .brand-logo {
-  max-height: 64px;
-  width: auto;
+  width: 95%;
   object-fit: contain;
 }
 
@@ -460,6 +470,16 @@ const isChildActive = (childId: number) => {
   font-size: 1.25rem;
 }
 
+/* Mobile Brand (hidden on desktop, shown on mobile) */
+.mobile-brand {
+  display: none;
+  align-items: left;
+  gap: 0.75rem;
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 768px) {
   .brand-title h1 {
@@ -481,7 +501,17 @@ const isChildActive = (childId: number) => {
   .nav-inner {
     flex-wrap: wrap;
     height: auto;
-    padding: 0;
+    min-height: 46px;
+    padding: 0.75rem 1rem;
+    justify-content: space-between;
+  }
+
+  .mobile-brand {
+    display: flex;
+  }
+
+  .brand-inline {
+    display: none;
   }
 
   .nav-list {
@@ -529,14 +559,14 @@ const isChildActive = (childId: number) => {
     display: none;
   }
 
-  .mobile-toggle {
+  button.mobile-toggle {
     display: flex;
     align-items: center;
     justify-content: center;
     position: absolute;
     right: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
+    top: 0.75rem;
+    z-index: 300;
   }
 
   .nav-bar {

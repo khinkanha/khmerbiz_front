@@ -20,8 +20,28 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
+import { useDomainStore } from '~/stores/domain'
+import { useSeo } from '~/composables/useSeo'
 
 const authStore = useAuthStore()
+const domainStore = useDomainStore()
+const { setFromSetting } = useSeo()
+
+const settings = computed(() => domainStore.settings)
+
+// Set admin page title and favicon
+useHead({
+  title: 'Cambodia Web Hosting',
+  link: [
+    { rel: 'icon', type: 'image/gif', href: '/assets/images/logo/2logo.gif' },
+  ],
+})
+
+watch(settings, (val) => {
+  if (val) {
+    setFromSetting(val)
+  }
+}, { immediate: true })
 
 if (import.meta.client) {
   authStore.initialize()

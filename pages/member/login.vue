@@ -20,7 +20,7 @@
             <i class="fa fa-sign-in-alt"></i> {{ $t('auth.login') }}
           </button>
           &nbsp;
-          <NuxtLink to="/admin/signup" class="btn btn-info">{{ $t('auth.signup') }}</NuxtLink>
+          <NuxtLink to="/member/signup" class="btn btn-info">{{ $t('auth.signup') }}</NuxtLink>
         </form>
       </div>
     </div>

@@ -5,7 +5,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (import.meta.server) return
 
   const authStore = useAuthStore()
-  const publicRoutes = ['/admin/login', '/admin/signup']
+  const publicRoutes = ['/member/login', '/member/signup']
   const isAdminRoute = to.path.startsWith('/admin')
   const isSuperAdminRoute = to.path.startsWith('/admin/super')
 
@@ -19,7 +19,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   if (isAdminRoute && !publicRoutes.includes(to.path)) {
     if (!authStore.isAuthenticated) {
-      return navigateTo('/admin/login')
+      return navigateTo('/member/login')
     }
 
     // Super admin routes require super admin role

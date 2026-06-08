@@ -8,6 +8,7 @@ export const useSeo = () => {
     title?: string
     description?: string
     image?: string
+    icon?: string
     siteName?: string
     url?: string
     type?: string
@@ -16,6 +17,7 @@ export const useSeo = () => {
       title = '',
       description = '',
       image,
+      icon,
       siteName,
       url,
       type = 'website',
@@ -23,6 +25,13 @@ export const useSeo = () => {
 
     useHead({
       title,
+      link: [
+    {
+      rel: 'icon',
+      type: 'image/png', // Change to 'image/x-icon' if your file ends with .ico
+      href: icon   // Pass your dynamic or static icon URL variable here
+    }
+  ].filter(l => l.href !== undefined),
       meta: [
         { name: 'description', content: description },
         { property: 'og:title', content: title },
@@ -43,6 +52,7 @@ export const useSeo = () => {
     setMeta({
       title: setting.title || setting.domain_name || '',
       siteName: setting.domain_name || '',
+      icon: photoUrl + setting.mobile_logo || photoUrl + setting.logo || '',
     })
 
     if (setting.tracking_id) {
@@ -91,6 +101,7 @@ export const useSeo = () => {
       title: content.title,
       description: content.description || undefined,
       image: imageUrl,
+      icon: photoUrl+ setting.mobile_logo || photoUrl+setting.logo || '',
       siteName: setting.domain_name || '',
       type: 'article',
     })
