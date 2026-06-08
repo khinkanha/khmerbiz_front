@@ -36306,7 +36306,7 @@ const plugins = [
 const layouts = {
   admin: defineAsyncComponent(() => import('./admin-DNPquJSj.mjs')),
   blank: defineAsyncComponent(() => import('./blank-CPiFi3ag.mjs')),
-  default: defineAsyncComponent(() => import('./default-Cr_bk5Qw.mjs'))
+  default: defineAsyncComponent(() => import('./default-hbAIXfw5.mjs'))
 };
 const LayoutLoader = defineComponent({
   name: "LayoutLoader",

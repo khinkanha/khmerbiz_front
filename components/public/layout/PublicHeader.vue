@@ -77,7 +77,7 @@
         <button class="mobile-toggle" @click="toggleMobileMenu">
           <i :class="mobileMenuOpen ? 'pi pi-times' : 'pi pi-bars'"></i>
         </button>
-        
+
 
       </div>
 
@@ -269,7 +269,9 @@ div .flag {
 }
 
 .brand-logo {
-  width: 95%;
+  max-height: 97px;
+  width: auto;
+  max-width: 95%;
   object-fit: contain;
 }
 
