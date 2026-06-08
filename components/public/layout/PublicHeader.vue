@@ -174,6 +174,11 @@ const navListClass = computed(() => {
 
 const mobileMenuOpen = ref(false)
 
+// Auto-close mobile menu on route change (NuxtLink navigation)
+watch(() => route.path, () => {
+  mobileMenuOpen.value = false
+})
+
 const toggleMobileMenu = () => {
   mobileMenuOpen.value = !mobileMenuOpen.value
 }
