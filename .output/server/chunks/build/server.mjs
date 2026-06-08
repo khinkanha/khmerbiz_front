@@ -1270,11 +1270,7 @@ const wrapInKeepAlive = (props, children) => {
 function toArray(value3) {
   return Array.isArray(value3) ? value3 : [value3];
 }
-const __nuxt_page_meta$w = { layout: "admin" };
-const __nuxt_page_meta$v = {
-  layout: "admin",
-  middleware: "auth"
-};
+const __nuxt_page_meta$v = { layout: "admin" };
 const __nuxt_page_meta$u = {
   layout: "admin",
   middleware: "auth"
@@ -1291,11 +1287,11 @@ const __nuxt_page_meta$r = {
   layout: "admin",
   middleware: "auth"
 };
-const __nuxt_page_meta$q = { layout: "admin" };
-const __nuxt_page_meta$p = {
+const __nuxt_page_meta$q = {
   layout: "admin",
-  middleware: "guest"
+  middleware: "auth"
 };
+const __nuxt_page_meta$p = { layout: "admin" };
 const __nuxt_page_meta$o = { layout: "admin", middleware: "auth" };
 const __nuxt_page_meta$n = {
   layout: "admin",
@@ -1313,78 +1309,71 @@ const __nuxt_page_meta$e = { layout: "admin", middleware: "auth" };
 const __nuxt_page_meta$d = { layout: "admin", middleware: "auth" };
 const __nuxt_page_meta$c = { layout: "admin", middleware: "auth" };
 const __nuxt_page_meta$b = { layout: "admin" };
-const __nuxt_page_meta$a = {
-  layout: "admin",
-  middleware: "guest"
-};
+const __nuxt_page_meta$a = { layout: "admin", middleware: "auth" };
 const __nuxt_page_meta$9 = { layout: "admin", middleware: "auth" };
 const __nuxt_page_meta$8 = { layout: "admin", middleware: "auth" };
 const __nuxt_page_meta$7 = { layout: "admin", middleware: "auth" };
 const __nuxt_page_meta$6 = { layout: "admin", middleware: "auth" };
 const __nuxt_page_meta$5 = { layout: "admin", middleware: "auth" };
-const __nuxt_page_meta$4 = { layout: "admin", middleware: "auth" };
-const __nuxt_page_meta$3 = {
+const __nuxt_page_meta$4 = {
   layout: "default"
 };
+const __nuxt_page_meta$3 = {
+  layout: "admin",
+  middleware: "guest"
+};
 const __nuxt_page_meta$2 = {
-  layout: "default"
+  layout: "admin",
+  middleware: "guest"
 };
 const __nuxt_page_meta$1 = {
   layout: "default"
 };
 const __nuxt_page_meta = {
-  layout: "admin",
-  middleware: "auth",
-  title: "Test Page"
+  layout: "default"
 };
 const _routes = [
   {
     name: "admin-ai-chat",
     path: "/admin/ai-chat",
-    meta: __nuxt_page_meta$w || {},
+    meta: __nuxt_page_meta$v || {},
     component: () => import('./ai-chat-B_Ucz_BH.mjs')
   },
   {
     name: "admin-content-contentId-items",
     path: "/admin/content/:contentId()/items",
-    meta: __nuxt_page_meta$v || {},
+    meta: __nuxt_page_meta$u || {},
     component: () => import('./items-rpnfseU8.mjs')
   },
   {
     name: "admin-content-contentId-map",
     path: "/admin/content/:contentId()/map",
-    meta: __nuxt_page_meta$u || {},
+    meta: __nuxt_page_meta$t || {},
     component: () => import('./map-ClGV4nNW.mjs')
   },
   {
     name: "admin-content-contentId-news",
     path: "/admin/content/:contentId()/news",
-    meta: __nuxt_page_meta$t || {},
+    meta: __nuxt_page_meta$s || {},
     component: () => import('./news-CJCGxj5U.mjs')
   },
   {
     name: "admin-content-id",
     path: "/admin/content/:id()",
-    meta: __nuxt_page_meta$s || {},
+    meta: __nuxt_page_meta$r || {},
     component: () => import('./_id_-COLF2teW.mjs')
   },
   {
     name: "admin-content",
     path: "/admin/content",
-    meta: __nuxt_page_meta$r || {},
+    meta: __nuxt_page_meta$q || {},
     component: () => import('./index-4quIB__Z.mjs')
   },
   {
     name: "admin",
     path: "/admin",
-    meta: __nuxt_page_meta$q || {},
-    component: () => import('./index-Dqc8I6qH.mjs')
-  },
-  {
-    name: "admin-login",
-    path: "/admin/login",
     meta: __nuxt_page_meta$p || {},
-    component: () => import('./login-DtCEyd1U.mjs')
+    component: () => import('./index-Dqc8I6qH.mjs')
   },
   {
     name: "admin-media",
@@ -1473,70 +1462,75 @@ const _routes = [
     component: () => import('./setup-Dg4xWvMj.mjs')
   },
   {
-    name: "admin-signup",
-    path: "/admin/signup",
-    meta: __nuxt_page_meta$a || {},
-    component: () => import('./signup-Br3mc9Wm.mjs')
-  },
-  {
     name: "admin-super-announcing",
     path: "/admin/super/announcing",
-    meta: __nuxt_page_meta$9 || {},
+    meta: __nuxt_page_meta$a || {},
     component: () => import('./index-BWNQ7qpH.mjs')
   },
   {
     name: "admin-super-domains-id",
     path: "/admin/super/domains/:id()",
-    meta: __nuxt_page_meta$8 || {},
+    meta: __nuxt_page_meta$9 || {},
     component: () => import('./_id_-CNOo34Lm.mjs')
   },
   {
     name: "admin-super-domains-add",
     path: "/admin/super/domains/add",
-    meta: __nuxt_page_meta$7 || {},
+    meta: __nuxt_page_meta$8 || {},
     component: () => import('./add-D3tSfvkq.mjs')
   },
   {
     name: "admin-super-domains",
     path: "/admin/super/domains",
-    meta: __nuxt_page_meta$6 || {},
+    meta: __nuxt_page_meta$7 || {},
     component: () => import('./index-Cnh1WVAq.mjs')
   },
   {
     name: "admin-super-users",
     path: "/admin/super/users",
-    meta: __nuxt_page_meta$5 || {},
+    meta: __nuxt_page_meta$6 || {},
     component: () => import('./index-DTIwSJVR.mjs')
   },
   {
     name: "admin-users",
     path: "/admin/users",
-    meta: __nuxt_page_meta$4 || {},
+    meta: __nuxt_page_meta$5 || {},
     component: () => import('./index-D7NpioNS.mjs')
   },
   {
     name: "index",
     path: "/",
-    meta: __nuxt_page_meta$3 || {},
+    meta: __nuxt_page_meta$4 || {},
     component: () => import('./index-CCZNQo6i.mjs')
+  },
+  {
+    name: "member-login",
+    path: "/member/login",
+    meta: __nuxt_page_meta$3 || {},
+    component: () => import('./login-DHgMDK9n.mjs')
+  },
+  {
+    name: "member-signup",
+    path: "/member/signup",
+    meta: __nuxt_page_meta$2 || {},
+    component: () => import('./signup-BU9FEUmx.mjs')
   },
   {
     name: "news-newsId",
     path: "/news/:newsId()",
-    meta: __nuxt_page_meta$2 || {},
+    meta: __nuxt_page_meta$1 || {},
     component: () => import('./_newsId_-BD_KNZn_.mjs')
   },
   {
     name: "pages-domainId-menuId",
     path: "/pages/:domainId()/:menuId()",
-    meta: __nuxt_page_meta$1 || {},
+    meta: __nuxt_page_meta || {},
     component: () => import('./_menuId_-BgRUMGmT.mjs')
   },
   {
     name: "test",
     path: "/test",
-    meta: __nuxt_page_meta || {},
-    component: () => import('./index-B9OlwUSm.mjs')
+    component: () => import('./index-Dtj1xOer.mjs')
   }
 ];
 const _wrapIf = (component, props, slots) => {
@@ -2034,7 +2028,7 @@ const globalMiddleware = [
   auth_45global
 ];
 const namedMiddleware = {
-  auth: () => import('./auth-DUV2_0-n.mjs'),
+  auth: () => import('./auth-DgQynvfw.mjs'),
   "domain-resolver-server": () => import('./domain-resolver.server-BFDku0mc.mjs'),
   guest: () => import('./guest-CH_PLUZc.mjs')
 };
@@ -36310,9 +36304,9 @@ const plugins = [
   primevue_7rYYRZQLyx
 ];
 const layouts = {
-  admin: defineAsyncComponent(() => import('./admin-DZbBMlFA.mjs')),
+  admin: defineAsyncComponent(() => import('./admin-DNPquJSj.mjs')),
   blank: defineAsyncComponent(() => import('./blank-CPiFi3ag.mjs')),
-  default: defineAsyncComponent(() => import('./default-CBWBAdW7.mjs'))
+  default: defineAsyncComponent(() => import('./default-Cr_bk5Qw.mjs'))
 };
 const LayoutLoader = defineComponent({
   name: "LayoutLoader",
