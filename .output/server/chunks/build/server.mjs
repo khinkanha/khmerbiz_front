@@ -36304,9 +36304,9 @@ const plugins = [
   primevue_7rYYRZQLyx
 ];
 const layouts = {
-  admin: defineAsyncComponent(() => import('./admin-DNPquJSj.mjs')),
+  admin: defineAsyncComponent(() => import('./admin-HTQCa61k.mjs')),
   blank: defineAsyncComponent(() => import('./blank-CPiFi3ag.mjs')),
-  default: defineAsyncComponent(() => import('./default-C-15OMrA.mjs'))
+  default: defineAsyncComponent(() => import('./default-CPBQC6Ri.mjs'))
 };
 const LayoutLoader = defineComponent({
   name: "LayoutLoader",

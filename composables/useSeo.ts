@@ -98,7 +98,7 @@ export const useSeo = () => {
       : undefined
 
     setMeta({
-      title: content.title,
+      title: content.title || '',
       description: content.description || undefined,
       image: imageUrl,
       icon: photoUrl+ setting.mobile_logo || photoUrl+setting.logo || '',
