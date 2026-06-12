@@ -1337,7 +1337,7 @@ const _routes = [
     name: "admin-ai-chat",
     path: "/admin/ai-chat",
     meta: __nuxt_page_meta$v || {},
-    component: () => import('./ai-chat-B_Ucz_BH.mjs')
+    component: () => import('./ai-chat-pMCTCUPK.mjs')
   },
   {
     name: "admin-content-contentId-items",
