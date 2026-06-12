@@ -1,10 +1,11 @@
 import { storeToRefs } from 'pinia';
 import { useApi } from './useApi';
 import { useAIChatStore } from '~/stores/aiChat';
-import type { ToolCallResult, UsageInfo } from '~/types/ai';
+import type { ToolCallResult, UsageInfo, AIOperation, ContentVersion } from '~/types/ai';
 
 export interface SendMessageRequest {
   message: string;
+  conversationId?: number;
   context?: {
     langId?: number;
   };
@@ -13,6 +14,7 @@ export interface SendMessageRequest {
 export interface SendMessageResponse {
   response: string;
   toolCalls?: ToolCallResult[];
+  conversationId?: number;
   usage?: {
     promptTokens: number;
     completionTokens: number;
@@ -37,9 +39,9 @@ export interface JobStatusResponse {
 export const useAIChat = () => {
   const api = useApi();
   const chatStore = useAIChatStore();
-  const { messages, hasMessages, loading, error, usageInfo, remainingQuestions, canSendMessage, isLimitReached } = storeToRefs(chatStore);
+  const { messages, hasMessages, loading, error, usageInfo, remainingQuestions, canSendMessage, isLimitReached, conversationId } = storeToRefs(chatStore);
 
-  const pollJob = async (jobId: string, loadingMessageId: string): Promise<void> => {
+  const pollJob = async (jobId: string, loadingMessageId: string): Promise<SendMessageResponse | null> => {
     const maxPolls = 120; // ~2 minutes at 1s interval
     let pollCount = 0;
 
@@ -64,12 +66,17 @@ export const useAIChat = () => {
       }
 
       if (jobStatus === 'completed' && result) {
+        // Save conversationId from result for subsequent messages
+        if (result.conversationId && !conversationId.value) {
+          chatStore.setConversationId(result.conversationId);
+        }
+
         chatStore.updateMessage(loadingMessageId, {
           content: result.response,
           toolCalls: result.toolCalls,
           loading: false,
         });
-        return;
+        return result;
       }
 
       if (jobStatus === 'failed') {
@@ -79,7 +86,7 @@ export const useAIChat = () => {
           error: jobError || 'AI processing failed',
         });
         chatStore.setError(jobError || 'AI processing failed');
-        return;
+        return null;
       }
 
       // Wait 1s before next poll
@@ -93,6 +100,7 @@ export const useAIChat = () => {
       error: 'Request timed out. Please try again.',
     });
     chatStore.setError('Request timed out');
+    return null;
   };
 
   const sendMessage = async (message: string, context?: { langId?: number }) => {
@@ -113,7 +121,11 @@ export const useAIChat = () => {
         loading: true,
       });
 
-      const request: SendMessageRequest = { message, context };
+      const request: SendMessageRequest = {
+        message,
+        context,
+        ...(conversationId.value ? { conversationId: conversationId.value } : {}),
+      };
 
       // Send message — get jobId back immediately
       const response = await api.post<AsyncJobResponse>('/ai-chat/message', request);
@@ -152,9 +164,9 @@ export const useAIChat = () => {
     return null;
   };
 
-  const getOperationHistory = async (limit: number = 50) => {
+  const getOperationHistory = async (limit: number = 50): Promise<AIOperation[] | null> => {
     try {
-      const response = await api.get(`/ai-chat/history?limit=${limit}`);
+      const response = await api.get<AIOperation[]>(`/ai-chat/history?limit=${limit}`);
       return response.success ? response.data : null;
     } catch (error: any) {
       console.error('Error fetching operation history:', error);
@@ -164,10 +176,89 @@ export const useAIChat = () => {
 
   const checkHealth = async () => {
     try {
-      const response = await api.get('/ai-chat/health');
+      const response = await api.get<{ aiEnabled: boolean; timestamp: string }>('/ai-chat/health');
       return response.success ? response.data : null;
     } catch (error: any) {
       console.error('Error checking AI health:', error);
+      return null;
+    }
+  };
+
+  const confirmAction = async (confirmationId: string, messageId: string) => {
+    try {
+      const response = await api.post<{ toolName: string; success: boolean; result?: any; error?: string }>(
+        `/ai-chat/confirm/${confirmationId}`, {}
+      );
+
+      // Update the message's toolCalls to reflect the confirmed result
+      const msg = chatStore.messages.find(m => m.id === messageId);
+      if (msg && msg.toolCalls) {
+        msg.toolCalls = msg.toolCalls.map(tc =>
+          tc.confirmationId === confirmationId
+            ? { ...tc, needsConfirmation: false, success: response.data?.success ?? response.success, result: response.data?.result, error: response.data?.error }
+            : tc
+        );
+        chatStore.updateMessage(messageId, { toolCalls: msg.toolCalls });
+      }
+
+      return { success: response.data?.success ?? response.success, result: response.data };
+    } catch (error: any) {
+      return { success: false, error: error.message || 'Failed to confirm action' };
+    }
+  };
+
+  const rejectAction = async (confirmationId: string, messageId: string) => {
+    try {
+      await api.post(`/ai-chat/reject/${confirmationId}`, {});
+
+      // Update the message's toolCalls to reflect the rejected result
+      const msg = chatStore.messages.find(m => m.id === messageId);
+      if (msg && msg.toolCalls) {
+        msg.toolCalls = msg.toolCalls.map(tc =>
+          tc.confirmationId === confirmationId
+            ? { ...tc, needsConfirmation: false, success: false, error: 'Action cancelled' }
+            : tc
+        );
+        chatStore.updateMessage(messageId, { toolCalls: msg.toolCalls });
+      }
+
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message || 'Failed to reject action' };
+    }
+  };
+
+  const rollbackOperation = async (operationId: number, messageId?: string) => {
+    try {
+      const response = await api.post<{ toolName: string; success: boolean; result?: any; error?: string }>(
+        `/ai-chat/rollback/${operationId}`, {}
+      );
+
+      // If messageId provided, update the tool call to show rolled back status
+      if (messageId) {
+        const msg = chatStore.messages.find(m => m.id === messageId);
+        if (msg && msg.toolCalls) {
+          msg.toolCalls = msg.toolCalls.map(tc =>
+            tc.operationId === operationId
+              ? { ...tc, success: false, error: 'Undone' }
+              : tc
+          );
+          chatStore.updateMessage(messageId, { toolCalls: msg.toolCalls });
+        }
+      }
+
+      return { success: response.data?.success ?? response.success, result: response.data };
+    } catch (error: any) {
+      return { success: false, error: error.message || 'Failed to rollback operation' };
+    }
+  };
+
+  const getContentVersions = async (contentId: number): Promise<ContentVersion[] | null> => {
+    try {
+      const response = await api.get<ContentVersion[]>(`/ai-chat/content/${contentId}/versions`);
+      return response.success ? response.data : null;
+    } catch (error: any) {
+      console.error('Error fetching content versions:', error);
       return null;
     }
   };
@@ -186,9 +277,14 @@ export const useAIChat = () => {
     remainingQuestions,
     canSendMessage,
     isLimitReached,
+    conversationId,
 
     // Actions
     sendMessage,
+    confirmAction,
+    rejectAction,
+    rollbackOperation,
+    getContentVersions,
     getUsage,
     getOperationHistory,
     checkHealth,

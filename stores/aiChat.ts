@@ -10,6 +10,7 @@ export interface ChatMessage {
   toolCalls?: ToolCallResult[];
   loading?: boolean;
   error?: string;
+  operationIds?: number[];
 }
 
 export const useAIChatStore = defineStore('aiChat', () => {
@@ -18,7 +19,7 @@ export const useAIChatStore = defineStore('aiChat', () => {
   const loading = ref(false);
   const error = ref<string | null>(null);
   const usageInfo = ref<UsageInfo | null>(null);
-  const conversationId = ref<string | null>(null);
+  const conversationId = ref<number | null>(null);
 
   // Computed
   const hasMessages = computed(() => messages.value.length > 0);
@@ -67,7 +68,7 @@ export const useAIChatStore = defineStore('aiChat', () => {
     usageInfo.value = val;
   }
 
-  function setConversationId(val: string) {
+  function setConversationId(val: number | null) {
     conversationId.value = val;
   }
 

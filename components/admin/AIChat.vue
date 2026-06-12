@@ -3,6 +3,7 @@
     <!-- Chat Header -->
     <div class="chat-header">
       <div class="header-left">
+        <span :class="['health-dot', aiHealthy === true ? 'healthy' : aiHealthy === false ? 'unhealthy' : 'unknown']" v-tooltip="aiHealthy ? 'AI service online' : 'AI service unavailable'"></span>
         <h3>AI Assistant</h3>
         <Tag
           v-if="usageInfo"
@@ -12,6 +13,14 @@
       </div>
       <div class="header-right">
         <Button
+          icon="pi pi-history"
+          class="p-button-text"
+          v-tooltip="'Operation history'"
+          @click="toggleHistory"
+          :badge="historyItems.length > 0 ? String(historyItems.length) : undefined"
+          badgeSeverity="info"
+        />
+        <Button
           icon="pi pi-refresh"
           class="p-button-text"
           v-tooltip="'Reset conversation'"
@@ -20,6 +29,57 @@
         />
       </div>
     </div>
+
+    <!-- Operation History Panel -->
+    <div v-if="showHistory" class="history-panel">
+      <div class="history-header">
+        <span class="history-title"><i class="pi pi-history"></i> Recent Operations</span>
+        <Button icon="pi pi-times" class="p-button-text p-button-sm" @click="showHistory = false" />
+      </div>
+      <div class="history-list">
+        <div v-if="historyLoading" class="history-empty">
+          <ProgressSpinner style="width: 20px; height: 20px" strokeWidth="4" />
+          <span>Loading...</span>
+        </div>
+        <div v-else-if="historyItems.length === 0" class="history-empty">
+          No operations yet
+        </div>
+        <div
+          v-for="op in historyItems"
+          :key="op.id"
+          class="history-item"
+        >
+          <div class="history-item-left">
+            <i :class="['pi', getOperationIcon(op.operation_type)]" :style="{ color: getOperationColor(op.operation_type) }"></i>
+            <div class="history-item-info">
+              <span class="history-item-desc">{{ formatOperationDescription(op) }}</span>
+              <span class="history-item-time">{{ formatOperationTime(op.created_at) }}</span>
+            </div>
+          </div>
+          <div class="history-item-right">
+            <Tag
+              :value="op.status"
+              :severity="getStatusSeverity(op.status)"
+              style="font-size: 0.7rem"
+            />
+            <Button
+              v-if="isRollbackable(op)"
+              icon="pi pi-undo"
+              class="p-button-text p-button-sm"
+              v-tooltip="'Undo this operation'"
+              :loading="rollingBack[op.id]"
+              @click="handleRollback(op.id)"
+              severity="warning"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Unavailable Warning -->
+    <Message v-if="aiHealthy === false" severity="error" :closable="false">
+      <strong>AI service is currently unavailable.</strong> Please try again later.
+    </Message>
 
     <!-- Messages Container -->
     <div class="messages-container" ref="messagesContainer">
@@ -102,14 +162,61 @@
           <div
             v-for="(tool, index) in message.toolCalls"
             :key="index"
-            :class="['tool-call', tool.success ? 'success' : 'error']"
+            :class="['tool-call', tool.needsConfirmation ? 'pending' : (tool.success ? 'success' : 'error')]"
           >
-            <div class="tool-name">{{ formatToolName(tool.toolName) }}</div>
-            <div v-if="tool.success" class="tool-result">
+            <div class="tool-call-top">
+              <div class="tool-name">
+                <i :class="['pi', getToolIcon(tool.toolName)]"></i>
+                {{ formatToolName(tool.toolName) }}
+              </div>
+              <!-- Undo button for successful create/update operations -->
+              <Button
+                v-if="tool.success && canRollbackTool(tool.toolName)"
+                icon="pi pi-undo"
+                label="Undo"
+                class="p-button-text p-button-sm"
+                severity="warning"
+                size="small"
+                v-tooltip="'Undo this action'"
+                @click="handleToolRollback(tool, message.id)"
+              />
+            </div>
+
+            <!-- Confirmation UI -->
+            <div v-if="tool.needsConfirmation" class="tool-confirmation">
+              <div class="confirmation-preview">
+                <i class="pi pi-exclamation-triangle"></i>
+                {{ tool.confirmationPreview }}
+              </div>
+              <div class="confirmation-actions">
+                <Button
+                  label="Confirm"
+                  icon="pi pi-check"
+                  severity="danger"
+                  size="small"
+                  :loading="confirming[tool.confirmationId!]"
+                  @click="handleConfirm(tool.confirmationId!, message.id)"
+                />
+                <Button
+                  label="Cancel"
+                  icon="pi pi-times"
+                  severity="secondary"
+                  size="small"
+                  outlined
+                  @click="handleReject(tool.confirmationId!, message.id)"
+                />
+              </div>
+            </div>
+
+            <!-- Success result -->
+            <div v-else-if="tool.success" class="tool-result">
               {{ formatToolResult(tool) }}
             </div>
-            <div v-else class="tool-error">
-              {{ tool.error }}
+
+            <!-- Categorized error display -->
+            <div v-else-if="tool.error" :class="['tool-error', getErrorCategory(tool.error)]">
+              <i :class="['pi', getErrorIcon(tool.error)]"></i>
+              <span>{{ tool.error }}</span>
             </div>
           </div>
         </div>
@@ -138,7 +245,7 @@
         <Textarea
           v-model="userInput"
           placeholder="Ask AI to modify your website..."
-          :disabled="loading || isLimitReached"
+          :disabled="loading || isLimitReached || aiHealthy === false"
           :autoResize="true"
           rows="3"
           @keydown.ctrl.enter="handleSendMessage"
@@ -148,7 +255,7 @@
           <Button
             icon="pi pi-send"
             @click="handleSendMessage"
-            :disabled="!canSendMessage || !userInput.trim()"
+            :disabled="!canSendMessage || !userInput.trim() || aiHealthy === false"
             :loading="loading"
             severity="primary"
           >
@@ -161,22 +268,41 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick, watch } from 'vue';
+import { ref, onMounted, nextTick, watch } from 'vue';
 import { useAIChat } from '~/composables/useAIChat';
-import { useAuthStore } from '~/stores/auth';
+import type { AIOperation } from '~/types/ai';
 
-const { sendMessage, loading, error, messages, hasMessages, usageInfo, canSendMessage, isLimitReached, remainingQuestions, getUsage, resetChat } = useAIChat();
-const authStore = useAuthStore();
+const {
+  sendMessage, confirmAction, rejectAction, rollbackOperation,
+  getOperationHistory, checkHealth, getUsage, resetChat,
+  loading, error, messages, hasMessages, usageInfo,
+  canSendMessage, isLimitReached,
+} = useAIChat();
 
 const userInput = ref('');
 const messagesContainer = ref<HTMLElement | null>(null);
+const confirming = ref<Record<string, boolean>>({});
+const rollingBack = ref<Record<number, boolean>>({});
+
+// Health status: true = online, false = offline, null = unknown
+const aiHealthy = ref<boolean | null>(null);
+
+// Operation history
+const showHistory = ref(false);
+const historyItems = ref<AIOperation[]>([]);
+const historyLoading = ref(false);
 
 const useSuggestion = (text: string) => {
   userInput.value = text;
 };
 
 onMounted(async () => {
-  await getUsage();
+  // Check AI health and usage in parallel
+  const [healthResult] = await Promise.all([
+    checkHealth(),
+    getUsage(),
+  ]);
+  aiHealthy.value = healthResult?.aiEnabled ?? false;
 });
 
 // Auto-scroll to bottom when messages change
@@ -193,11 +319,7 @@ const handleSendMessage = async () => {
   const message = userInput.value.trim();
   userInput.value = '';
 
-  
-  const result = await sendMessage(message, {
-    langId: authStore.user?.lang_id,
-  });
-  
+  await sendMessage(message);
 };
 
 const handleReset = () => {
@@ -206,11 +328,70 @@ const handleReset = () => {
   }
 };
 
+const handleConfirm = async (confirmationId: string, messageId: string) => {
+  confirming.value[confirmationId] = true;
+  await confirmAction(confirmationId, messageId);
+  confirming.value[confirmationId] = false;
+};
+
+const handleReject = async (confirmationId: string, messageId: string) => {
+  await rejectAction(confirmationId, messageId);
+};
+
+const handleRollback = async (operationId: number) => {
+  rollingBack.value[operationId] = true;
+  const result = await rollbackOperation(operationId);
+  rollingBack.value[operationId] = false;
+  if (result.success) {
+    // Refresh history
+    await loadHistory();
+  }
+};
+
+const handleToolRollback = async (tool: any, messageId: string) => {
+  // For tool calls without a known operationId, we'll find it from history
+  // The backend logs operations, so we can look up the most recent matching operation
+  const history = await getOperationHistory(20);
+  if (!history) return;
+
+  // Find the most recent completed operation matching this tool
+  const match = history.find(op =>
+    op.status === 'completed' &&
+    op.operation_data?.toolName === tool.toolName &&
+    !['rolled_back'].includes(op.status)
+  );
+
+  if (match) {
+    rollingBack.value[match.id] = true;
+    const result = await rollbackOperation(match.id, messageId);
+    rollingBack.value[match.id] = false;
+    if (result.success) {
+      await loadHistory();
+    }
+  }
+};
+
+const toggleHistory = async () => {
+  showHistory.value = !showHistory.value;
+  if (showHistory.value) {
+    await loadHistory();
+  }
+};
+
+const loadHistory = async () => {
+  historyLoading.value = true;
+  const data = await getOperationHistory(30);
+  historyItems.value = data || [];
+  historyLoading.value = false;
+};
+
 const scrollToBottom = () => {
   if (messagesContainer.value) {
     messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
   }
 };
+
+// ── Formatting helpers ──
 
 const formatTime = (timestamp: string) => {
   const date = new Date(timestamp);
@@ -233,6 +414,128 @@ const formatToolResult = (tool: any) => {
     return 'Completed';
   }
   return 'Completed';
+};
+
+const getToolIcon = (toolName: string): string => {
+  if (toolName.includes('theme')) return 'pi-palette';
+  if (toolName.includes('layout')) return 'pi-th-large';
+  if (toolName.includes('logo')) return 'pi-image';
+  if (toolName.includes('menu')) return 'pi-bars';
+  if (toolName.includes('article') || toolName.includes('content')) return 'pi-file';
+  if (toolName.includes('news')) return 'pi pi-newspaper';
+  if (toolName.includes('banner')) return 'pi pi-image';
+  if (toolName.includes('seo')) return 'pi pi-search';
+  if (toolName.includes('setup') || toolName.includes('template')) return 'pi pi-bolt';
+  if (toolName.includes('delete')) return 'pi pi-trash';
+  if (toolName.includes('rollback')) return 'pi pi-undo';
+  return 'pi pi-cog';
+};
+
+const canRollbackTool = (toolName: string): boolean => {
+  return ['create_article', 'create_menu_with_content', 'create_menu_item',
+          'create_news', 'create_banner', 'update_article', 'update_menu_item',
+          'update_theme', 'update_layout', 'update_logo_position', 'update_menu_position'].includes(toolName);
+};
+
+// ── Error categorization ──
+
+type ErrorCategory = 'permission' | 'notfound' | 'sizelimit' | 'ratelimit' | 'quality' | 'generic';
+
+const getErrorCategory = (errorMsg: string): ErrorCategory => {
+  if (!errorMsg) return 'generic';
+  const lower = errorMsg.toLowerCase();
+  if (lower.includes('admin') || lower.includes('privilege') || lower.includes('permission') || lower.includes('access denied')) return 'permission';
+  if (lower.includes('not found') || lower.includes('not exist')) return 'notfound';
+  if (lower.includes('too large') || lower.includes('maximum allowed') || lower.includes('exceeds max')) return 'sizelimit';
+  if (lower.includes('limit') || lower.includes('daily') || lower.includes('too many')) return 'ratelimit';
+  if (lower.includes('too short') || lower.includes('no visible text') || lower.includes('empty')) return 'quality';
+  return 'generic';
+};
+
+const getErrorIcon = (errorMsg: string): string => {
+  const cat = getErrorCategory(errorMsg);
+  switch (cat) {
+    case 'permission': return 'pi pi-lock';
+    case 'notfound': return 'pi pi-eye-slash';
+    case 'sizelimit': return 'pi pi-file';
+    case 'ratelimit': return 'pi pi-clock';
+    case 'quality': return 'pi pi-exclamation-circle';
+    default: return 'pi pi-times-circle';
+  }
+};
+
+// ── Operation history helpers ──
+
+const getOperationIcon = (type: string): string => {
+  switch (type) {
+    case 'create': return 'pi pi-plus-circle';
+    case 'update': return 'pi pi-pencil';
+    case 'delete': return 'pi pi-trash';
+    case 'ui_change': return 'pi pi-palette';
+    case 'conversation': return 'pi pi-comment';
+    default: return 'pi pi-cog';
+  }
+};
+
+const getOperationColor = (type: string): string => {
+  switch (type) {
+    case 'create': return '#059669';
+    case 'update': return '#2563eb';
+    case 'delete': return '#dc2626';
+    case 'ui_change': return '#7c3aed';
+    case 'conversation': return '#6b7280';
+    default: return '#6b7280';
+  }
+};
+
+const getStatusSeverity = (status: string): 'success' | 'warning' | 'danger' | 'info' => {
+  switch (status) {
+    case 'completed': return 'success';
+    case 'pending': return 'info';
+    case 'failed': return 'danger';
+    case 'rolled_back': return 'warning';
+    default: return 'info';
+  }
+};
+
+const isRollbackable = (op: AIOperation): boolean => {
+  return op.status === 'completed' && ['create', 'update'].includes(op.operation_type);
+};
+
+const formatOperationDescription = (op: AIOperation): string => {
+  const toolName = op.operation_data?.toolName;
+  const args = op.operation_data?.args;
+
+  if (toolName) {
+    const name = formatToolName(toolName);
+    // Add target detail
+    if (args?.title) return `${name}: ${args.title}`;
+    if (args?.itemName || args?.menuName) return `${name}: ${args.itemName || args.menuName}`;
+    if (args?.itemId) return `${name} #${args.itemId}`;
+    if (args?.contentId) return `${name} #${args.contentId}`;
+    if (args?.bannerId) return `${name} #${args.bannerId}`;
+    return name;
+  }
+
+  // Fallback for conversation logs or generic entries
+  const typeLabel = op.operation_type.charAt(0).toUpperCase() + op.operation_type.slice(1);
+  const targetLabel = op.target_type ? ` ${op.target_type}` : '';
+  return `${typeLabel}${targetLabel}`;
+};
+
+const formatOperationTime = (dateStr: string): string => {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffHr = Math.floor(diffMs / 3600000);
+  const diffDay = Math.floor(diffMs / 86400000);
+
+  if (diffMin < 1) return 'Just now';
+  if (diffMin < 60) return `${diffMin}m ago`;
+  if (diffHr < 24) return `${diffHr}h ago`;
+  if (diffDay < 7) return `${diffDay}d ago`;
+  return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
 };
 </script>
 
@@ -266,6 +569,124 @@ const formatToolResult = (tool: any) => {
   margin: 0;
   font-size: 1.125rem;
   color: #1f2937;
+}
+
+.header-right {
+  display: flex;
+  gap: 0.25rem;
+}
+
+/* Health indicator dot */
+.health-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.health-dot.healthy {
+  background: #22c55e;
+  box-shadow: 0 0 4px #22c55e80;
+}
+.health-dot.unhealthy {
+  background: #ef4444;
+  box-shadow: 0 0 4px #ef444480;
+}
+.health-dot.unknown {
+  background: #9ca3af;
+}
+
+/* Operation History Panel */
+.history-panel {
+  flex-shrink: 0;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+  max-height: 300px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.history-title {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.history-list {
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+.history-empty {
+  text-align: center;
+  padding: 1rem;
+  color: #9ca3af;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+.history-item:hover {
+  background: #e5e7eb;
+}
+
+.history-item-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.history-item-left > i {
+  flex-shrink: 0;
+  font-size: 0.85rem;
+}
+
+.history-item-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.history-item-desc {
+  color: #1f2937;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-item-time {
+  color: #9ca3af;
+  font-size: 0.7rem;
+}
+
+.history-item-right {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
 }
 
 .messages-container {
@@ -403,6 +824,12 @@ const formatToolResult = (tool: any) => {
   font-size: 0.875rem;
 }
 
+.tool-call-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .tool-call.success {
   background: #d1fae5;
   color: #065f46;
@@ -413,9 +840,73 @@ const formatToolResult = (tool: any) => {
   color: #991b1b;
 }
 
+.tool-call.pending {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #f59e0b;
+}
+
+.tool-confirmation {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.confirmation-preview {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.confirmation-preview i {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.confirmation-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .tool-name {
   font-weight: 500;
   margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.tool-name i {
+  font-size: 0.8rem;
+}
+
+/* Categorized error styles */
+.tool-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+}
+.tool-error i {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.tool-error.permission {
+  color: #991b1b;
+}
+.tool-error.notfound {
+  color: #9a3412;
+}
+.tool-error.sizelimit,
+.tool-error.ratelimit,
+.tool-error.quality {
+  color: #92400e;
+}
+.tool-error.generic {
+  color: #991b1b;
 }
 
 .message-loading {
