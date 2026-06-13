@@ -8,6 +8,7 @@ export interface User {
   email: string
   sitebuilder: number
   user_level: UserLevel
+  is_verified?: boolean
 
 
 }

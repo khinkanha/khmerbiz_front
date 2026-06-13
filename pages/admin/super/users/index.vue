@@ -1,9 +1,14 @@
 <template>
   <div>
-    <div id="btnnew">
-      <a href="#" class="btn btn-info pull-right" @click.prevent="showAddForm = true"><i class="fa fa-plus"></i> Add User</a>
-      <br/><br/>
+    <div id="btnnew" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+      <div class="input-group" style="flex:1 1 300px;max-width:500px">
+        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+        <input type="text" v-model="search" class="form-control" placeholder="Search username, name, email..." />
+        <span v-if="search" class="input-group-addon" style="cursor:pointer" @click="clearSearch"><i class="fa fa-times"></i></span>
+      </div>
+      <a href="#" class="btn btn-info" @click.prevent="showAddForm = true"><i class="fa fa-plus"></i> Add User</a>
     </div>
+    <br/>
 
     <!-- Add User Form -->
     <div v-if="showAddForm" class="panel panel-warning">
@@ -139,40 +144,34 @@
             <th>Phone</th>
             <th>Email</th>
             <th>Domain</th>
+            <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(user, i) in users" :key="user.userid">
-            <td>{{ (page - 1) * 10 + i + 1 }}</td>
+          <tr v-for="(user, i) in filteredUsers" :key="user.userid">
+            <td>{{ i + 1 }}</td>
             <td>{{ user.username }}</td>
             <td>{{ user.full_name }}</td>
             <td>{{ user.phone }}</td>
             <td>{{ user.email }}</td>
             <td>{{ user.domain_id }}</td>
             <td>
-              <a href="#" @click.prevent="openEdit(user)" title="Edit"><i class="fa fa-pencil"></i></a>&nbsp;
-              <a href="#" @click.prevent="openSetPassword(user)" title="Set Password"><i class="fa fa-key"></i></a>
+              <span v-if="user.is_verified" class="label label-success">Verified</span>
+              <span v-else class="label label-warning">Pending</span>
             </td>
+            <td>
+              <a href="#" @click.prevent="openEdit(user)" title="Edit"><i class="fa fa-pencil"></i></a>&nbsp;
+              <a href="#" @click.prevent="openSetPassword(user)" title="Set Password"><i class="fa fa-key"></i></a>&nbsp;
+              <a v-if="!user.is_verified" href="#" @click.prevent="verifyUser(user)" title="Verify User"><i class="fa fa-check-circle"></i></a>
+            </td>
+          </tr>
+          <tr v-if="filteredUsers.length === 0">
+            <td colspan="8" class="text-center text-muted">No users match your search.</td>
           </tr>
         </tbody>
       </table>
     </div>
-
-    <!-- Pagination -->
-    <nav v-if="pagination.totalPages > 1" class="text-center">
-      <ul class="pagination">
-        <li :class="{ disabled: page <= 1 }">
-          <a href="#" @click.prevent="goPage(page - 1)">&laquo;</a>
-        </li>
-        <li v-for="p in pagination.totalPages" :key="p" :class="{ active: p === page }">
-          <a href="#" @click.prevent="goPage(p)">{{ p }}</a>
-        </li>
-        <li :class="{ disabled: page >= pagination.totalPages }">
-          <a href="#" @click.prevent="goPage(page + 1)">&raquo;</a>
-        </li>
-      </ul>
-    </nav>
   </div>
 </template>
 
@@ -182,9 +181,19 @@ definePageMeta({ layout: 'admin', middleware: 'auth' })
 import { useApi } from '~/composables/useApi'
 
 const api = useApi()
-const users = ref<any[]>([])
-const page = ref(1)
-const pagination = ref({ page: 1, limit: 10, total: 0, totalPages: 1 })
+const allUsers = ref<any[]>([])
+const search = ref('')
+
+// Client-side filter over the loaded users (username / full_name / email)
+const filteredUsers = computed(() => {
+  const term = search.value.trim().toLowerCase()
+  if (!term) return allUsers.value
+  return allUsers.value.filter(u =>
+    String(u.username || '').toLowerCase().includes(term) ||
+    String(u.full_name || '').toLowerCase().includes(term) ||
+    String(u.email || '').toLowerCase().includes(term)
+  )
+})
 
 // Add user
 const showAddForm = ref(false)
@@ -204,20 +213,18 @@ const passwordForm = ref({ new_password: '' })
 
 const loadUsers = async () => {
   try {
-    const res = await api.get(`/users?page=${page.value}&limit=10`)
+    // Load the full user collection once; filtering happens client-side
+    const res = await api.get('/users?page=1&limit=1000')
     if (res.success) {
-      users.value = res.data?.items || []
-      pagination.value = res.data?.pagination || { page: 1, limit: 10, total: 0, totalPages: 1 }
+      allUsers.value = res.data?.items || []
     }
   } catch (e) {
     console.error(e)
   }
 }
 
-const goPage = (p: number) => {
-  if (p < 1 || p > pagination.value.totalPages) return
-  page.value = p
-  loadUsers()
+const clearSearch = () => {
+  search.value = ''
 }
 
 const handleAdd = async () => {
@@ -286,6 +293,18 @@ const handleSetPassword = async () => {
     const res = await api.put(`/users/${passwordUser.value.userid}/password`, { password: passwordForm.value.new_password })
     if (res.success) {
       showPasswordDialog.value = false
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+const verifyUser = async (user: any) => {
+  if (!confirm(`Verify user "${user.username}"? This will allow them to login.`)) return
+  try {
+    const res = await api.put(`/users/${user.userid}/verify`, {})
+    if (res.success) {
+      await loadUsers()
     }
   } catch (e) {
     console.error(e)

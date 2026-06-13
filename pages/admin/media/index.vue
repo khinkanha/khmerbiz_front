@@ -1,7 +1,11 @@
 <template>
   <div>
-    <form @submit.prevent="handleSearch" style="margin-bottom:10px">
-      <input type="text" v-model="searchQuery" class="form-control" :placeholder="$t('contentManager.search')" />
+    <form @submit.prevent="handleSearch" style="margin-bottom:10px;max-width:500px">
+      <div class="input-group">
+        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+        <input type="text" v-model="mediaStore.search" class="form-control" :placeholder="$t('contentManager.search')" />
+        <span v-if="mediaStore.search" class="input-group-addon" style="cursor:pointer" @click="clearSearch"><i class="fa fa-times"></i></span>
+      </div>
     </form>
 
     <div class="text-right" style="margin-bottom:10px">
@@ -64,7 +68,6 @@ const mediaStore = useMediaStore()
 const config = useRuntimeConfig()
 const photoUrl = config.public.photoUrl || 'https://khmer.biz'
 
-const searchQuery = ref('')
 const showUpload = ref(false)
 const showPreview = ref(false)
 const previewUrl = ref('')
@@ -78,6 +81,26 @@ const onPageChange = (event: any) => {
   mediaStore.fetchMedia(event.page + 1).finally(() => { loading.value = false })
 }
 
+// Debounced live search: reset to page 1 and refetch 400ms after typing stops
+let searchTimer: any = null
+watch(() => mediaStore.search, () => {
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => {
+    loading.value = true
+    mediaStore.fetchMedia(1).finally(() => { loading.value = false })
+  }, 400)
+})
+
+const handleSearch = () => {
+  clearTimeout(searchTimer)
+  loading.value = true
+  mediaStore.fetchMedia(1).finally(() => { loading.value = false })
+}
+
+const clearSearch = () => {
+  mediaStore.search = ''
+}
+
 const handleFileSelect = (e: Event) => {
   uploadForm.value.file = (e.target as HTMLInputElement).files?.[0] || null
 }
@@ -88,8 +111,6 @@ const handleUpload = async () => {
   showUpload.value = false
   uploadForm.value = { title: '', file: null }
 }
-
-const handleSearch = () => { }
 
 onMounted(async () => {
   loading.value = true

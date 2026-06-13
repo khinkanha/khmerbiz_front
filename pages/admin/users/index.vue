@@ -1,9 +1,14 @@
 <template>
   <div>
-    <div id="btnnew">
-      <a href="#" class="btn btn-info pull-right" @click.prevent="showForm = !showForm"><i class="fa fa-plus"></i></a>
-      <br/><br/>
+    <div id="btnnew" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+      <div class="input-group" style="flex:1 1 300px;max-width:500px">
+        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+        <input type="text" v-model="search" class="form-control" placeholder="Search username, name, email..." />
+        <span v-if="search" class="input-group-addon" style="cursor:pointer" @click="clearSearch"><i class="fa fa-times"></i></span>
+      </div>
+      <a href="#" class="btn btn-info" @click.prevent="showForm = !showForm"><i class="fa fa-plus"></i> {{ $t('userManager.addUser') }}</a>
     </div>
+    <br/>
 
     <div v-if="showForm" class="panel panel-warning">
       <div class="panel-heading">{{ $t('userManager.addUser') }}</div>
@@ -50,9 +55,8 @@
       </div>
     </div>
 
-    <DataTable :value="userStore.users" :loading="loading" :paginator="true" :rows="pagination.limit"
-      :totalRecords="pagination.total" :lazy="true" @page="onPageChange" :rowsPerPageOptions="[10, 20, 50]"
-      stripedRows>
+    <DataTable :value="filteredUsers" :loading="loading" :paginator="true" :rows="10"
+      :rowsPerPageOptions="[10, 20, 50]" stripedRows>
       <Column field="userid" header="#" :style="{ width: '80px' }" />
       <Column field="username" :header="$t('userManager.username')">
         <template #body="{ data }">
@@ -62,6 +66,19 @@
       <Column field="full_name" :header="$t('userManager.fullName')" />
       <Column field="phone" :header="$t('userManager.phone')" />
       <Column field="email" :header="$t('userManager.email')" />
+      <Column header="Status" :style="{ width: '100px' }">
+        <template #body="{ data }">
+          <span v-if="data.is_verified" class="label label-success">Verified</span>
+          <span v-else class="label label-warning">Pending</span>
+        </template>
+      </Column>
+      <Column header="Actions" :style="{ width: '120px' }">
+        <template #body="{ data }">
+          <button v-if="isSuperAdmin && !data.is_verified" class="btn btn-success btn-xs" @click="verifyUser(data)">
+            <i class="fa fa-check"></i> Verify
+          </button>
+        </template>
+      </Column>
     </DataTable>
 
     <div v-if="showPasswordDialog" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center">
@@ -86,10 +103,13 @@
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
 import { useUserStore } from '~/stores/user'
+import { useAuthStore } from '~/stores/auth'
 import { useToast } from 'primevue/usetoast'
 
 const userStore = useUserStore()
+const authStore = useAuthStore()
 const toast = useToast()
+const isSuperAdmin = computed(() => authStore.isSuperAdmin)
 
 const showForm = ref(false)
 const showPasswordDialog = ref(false)
@@ -97,12 +117,31 @@ const selectedUser = ref<any>(null)
 const addForm = ref({ username: '', full_name: '', phone: '', email: '', password: '' })
 const passwordForm = ref({ new_password: '' })
 const loading = ref(false)
+const search = ref('')
 
-const pagination = computed(() => userStore.pagination)
+// Client-side filter over the loaded users (username / full_name / email)
+const filteredUsers = computed(() => {
+  const term = search.value.trim().toLowerCase()
+  if (!term) return userStore.users
+  return userStore.users.filter(u =>
+    String(u.username || '').toLowerCase().includes(term) ||
+    String(u.full_name || '').toLowerCase().includes(term) ||
+    String(u.email || '').toLowerCase().includes(term)
+  )
+})
 
-const onPageChange = (event: any) => {
-  loading.value = true
-  userStore.fetchUsers(event.page + 1).finally(() => { loading.value = false })
+const clearSearch = () => {
+  search.value = ''
+}
+
+const verifyUser = async (user: any) => {
+  if (!confirm(`Verify user "${user.username}"? This will allow them to login.`)) return
+  const result = await userStore.verifyUser(user.userid)
+  if (result.success) {
+    toast.add({ severity: 'success', summary: 'Verified', detail: `${user.username} can now login`, life: 3000 })
+  } else {
+    toast.add({ severity: 'error', summary: 'Error', detail: result.message || 'Failed to verify user', life: 5000 })
+  }
 }
 
 const handleAdd = async () => {

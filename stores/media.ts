@@ -8,6 +8,7 @@ export const useMediaStore = defineStore('media', () => {
   const { uploadFile, uploads, isUploading } = useUpload()
 
   const mediaList = ref<Media[]>([])
+  const search = ref('')
   const pagination = ref({
     page: 1,
     limit: 20,
@@ -21,6 +22,8 @@ export const useMediaStore = defineStore('media', () => {
         page: String(page),
         limit: String(pagination.value.limit),
       })
+      const term = search.value.trim()
+      if (term) params.set('search', term)
 
       const response = await api.get<PaginatedResponse<Media>>(`/media?${params}`)
 
@@ -68,19 +71,13 @@ export const useMediaStore = defineStore('media', () => {
   }
 
   const searchMedia = async (query: string) => {
-    try {
-      const response = await api.get<Media[]>(`/media/search?q=${encodeURIComponent(query)}`)
-
-      if (response.success && response.data) {
-        mediaList.value = response.data
-      }
-    } catch (error) {
-      console.error('Failed to search media:', error)
-    }
+    search.value = query
+    await fetchMedia(1)
   }
 
   return {
     mediaList: readonly(mediaList),
+    search,
     pagination: readonly(pagination),
     uploads,
     isUploading,

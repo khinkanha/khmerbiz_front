@@ -69,16 +69,16 @@ const handleLogin = async () => {
   loading.value = true
 
   try {
-    const success = await authStore.login({
+    const result = await authStore.login({
       username: form.value.username,
       password: form.value.password,
       recaptchaToken,
     } as any)
 
-    if (success) {
+    if (result.success) {
       navigateTo('/admin')
     } else {
-      errorMessage.value = t('auth.invalidCredentials')
+      errorMessage.value = result.message || t('auth.invalidCredentials')
       resetRecaptcha()
     }
   } catch (error: any) {

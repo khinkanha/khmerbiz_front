@@ -43,7 +43,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const login = async (credentials: LoginForm): Promise<boolean> => {
+  const login = async (credentials: LoginForm): Promise<{ success: boolean; message?: string }> => {
     try {
       const response = await api.post<{
         user: User
@@ -55,13 +55,13 @@ export const useAuthStore = defineStore('auth', () => {
         setTokens(access, refresh)
         //console.log(access)
         setUser(userData)
-        return true
+        return { success: true }
       }
 
-      return false
+      return { success: false, message: response.message }
     } catch (error) {
       console.error('Login failed:', error)
-      return false
+      return { success: false }
     }
   }
 

@@ -6,6 +6,7 @@ export const useUserStore = defineStore('user', () => {
   const api = useApi()
 
   const users = ref<User[]>([])
+  const search = ref('')
   const pagination = ref({
     page: 1,
     limit: 10,
@@ -15,7 +16,11 @@ export const useUserStore = defineStore('user', () => {
 
   const fetchUsers = async (page: number = 1) => {
     try {
-      const response = await api.get<PaginatedResponse<User>>(`/users?page=${page}&limit=${pagination.value.limit}`)
+      // Load the full user collection once; filtering/pagination happen client-side
+      const params = new URLSearchParams()
+      params.set('page', String(page))
+      params.set('limit', '1000')
+      const response = await api.get<PaginatedResponse<User>>(`/users?${params.toString()}`)
       if (response.success && response.data) {
         users.value = response.data.items || []
         const pag = response.data.pagination
@@ -75,14 +80,30 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  const verifyUser = async (id: number): Promise<{ success: boolean; message?: string }> => {
+    try {
+      const response = await api.put(`/users/${id}/verify`, {})
+      if (response.success) {
+        await fetchUsers()
+        return { success: true }
+      }
+      return { success: false, message: response.message }
+    } catch (error) {
+      console.error('Failed to verify user:', error)
+      return { success: false, message: 'Network error' }
+    }
+  }
+
   return {
     users: readonly(users),
+    search,
     pagination: readonly(pagination),
     fetchUsers,
     addUser,
     updateUser,
     deleteUser,
     setUserPassword,
+    verifyUser,
   }
 })
 

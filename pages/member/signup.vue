@@ -114,13 +114,9 @@ const handleSignup = async () => {
     } as any)
 
     if (result) {
-      if (form.value.domain_name) {
-        successMessage.value = 'Account created! Redirecting to setup...'
-        setTimeout(() => navigateTo('/admin/setup'), 1000)
-      } else {
-        successMessage.value = t('auth.signupSuccess')
-        setTimeout(() => navigateTo('/member/login'), 1500)
-      }
+      // All new accounts require Super Admin approval before login
+      successMessage.value = 'Account created. Pending admin approval. You will be able to login once an admin verifies your account.'
+      setTimeout(() => navigateTo('/member/login'), 3000)
     } else {
       errorMessage.value = t('auth.signupError')
     }
