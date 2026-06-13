@@ -43,6 +43,22 @@
           </template>
         </Column>
         <Column field="item_order" :header="$t('menuManager.menuOrder')" :style="{ width: '100px' }" />
+        <Column :header="$t('menuManager.reorder')" :style="{ width: '90px' }">
+          <template #body="{ data }">
+            <div class="reorder-btns">
+              <a href="#" @click.prevent="handleReorder(data, 'up')"
+                :class="['btn btn-xs btn-default', { disabled: loading }]"
+                v-tooltip.top="$t('menuManager.moveUp')">
+                <i class="fa fa-arrow-up"></i>
+              </a>
+              <a href="#" @click.prevent="handleReorder(data, 'down')"
+                :class="['btn btn-xs btn-default', { disabled: loading }]"
+                v-tooltip.top="$t('menuManager.moveDown')">
+                <i class="fa fa-arrow-down"></i>
+              </a>
+            </div>
+          </template>
+        </Column>
         <Column :header="$t('menuManager.language')" :style="{ width: '80px' }">
           <template #body="{ data }">
             <img v-if="getLanguageByLangId(data.lang_id)"
@@ -133,9 +149,40 @@ const confirmDelete = async (item: any) => {
   }
 }
 
+const handleReorder = async (item: any, direction: 'up' | 'down') => {
+  if (loading.value) return
+  loading.value = true
+  const ok = await menuStore.reorderMenu(item.item_id, direction)
+  if (ok) {
+    // Ordering changed — invalidate cached menu trees so the public site reflects it
+    menuStore.clearCache()
+    domainStore.clearCache()
+  }
+  await menuStore.fetchMenuItems(pagination.value.page)
+  loading.value = false
+}
+
 onMounted(async () => {
   loading.value = true
   await menuStore.fetchMenuItems()
   loading.value = false
 })
 </script>
+
+<style scoped>
+.reorder-btns {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.reorder-btns .btn-xs {
+  padding: 2px 6px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.reorder-btns .disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+</style>

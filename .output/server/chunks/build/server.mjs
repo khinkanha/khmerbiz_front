@@ -1343,31 +1343,31 @@ const _routes = [
     name: "admin-content-contentId-items",
     path: "/admin/content/:contentId()/items",
     meta: __nuxt_page_meta$u || {},
-    component: () => import('./items-rpnfseU8.mjs')
+    component: () => import('./items-BUlDilcm.mjs')
   },
   {
     name: "admin-content-contentId-map",
     path: "/admin/content/:contentId()/map",
     meta: __nuxt_page_meta$t || {},
-    component: () => import('./map-ClGV4nNW.mjs')
+    component: () => import('./map-WNDJ4mpo.mjs')
   },
   {
     name: "admin-content-contentId-news",
     path: "/admin/content/:contentId()/news",
     meta: __nuxt_page_meta$s || {},
-    component: () => import('./news-CJCGxj5U.mjs')
+    component: () => import('./news-CC-NuOxD.mjs')
   },
   {
     name: "admin-content-id",
     path: "/admin/content/:id()",
     meta: __nuxt_page_meta$r || {},
-    component: () => import('./_id_-l0dEwjoQ.mjs')
+    component: () => import('./_id_-DiWOeEem.mjs')
   },
   {
     name: "admin-content",
     path: "/admin/content",
     meta: __nuxt_page_meta$q || {},
-    component: () => import('./index-4quIB__Z.mjs')
+    component: () => import('./index-CJhBHRNS.mjs')
   },
   {
     name: "admin",
@@ -1397,7 +1397,7 @@ const _routes = [
     name: "admin-menu",
     path: "/admin/menu",
     meta: __nuxt_page_meta$l || {},
-    component: () => import('./index-DiRHTTRO.mjs')
+    component: () => import('./index-BhsVPFws.mjs')
   },
   {
     name: "admin-password",
@@ -2477,15 +2477,15 @@ const localeCodes = [
 ];
 const localeLoaders = {
   "en": [{ key: "../i18n/locales/en.json", load: () => import(
-    './en-Bcv3lvAg.mjs'
+    './en-BnG4whqd.mjs'
     /* webpackChunkName: "locale__Users_khinkanha_websites_4khweb_khmerbiz_front_i18n_locales_en_json" */
   ), cache: true }],
   "kh": [{ key: "../i18n/locales/kh.json", load: () => import(
-    './kh-R7H3bMhN.mjs'
+    './kh-B6tsON5y.mjs'
     /* webpackChunkName: "locale__Users_khinkanha_websites_4khweb_khmerbiz_front_i18n_locales_kh_json" */
   ), cache: true }],
   "ch": [{ key: "../i18n/locales/ch.json", load: () => import(
-    './ch-C8Wo4D5U.mjs'
+    './ch-CLcvjiTS.mjs'
     /* webpackChunkName: "locale__Users_khinkanha_websites_4khweb_khmerbiz_front_i18n_locales_ch_json" */
   ), cache: true }]
 };

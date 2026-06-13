@@ -97,6 +97,7 @@
     "delete": "删除",
     "moveUp": "上移",
     "moveDown": "下移",
+    "reorder": "排序",
     "selectMenu": "Select Menu"
   },
   "settings": {

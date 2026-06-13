@@ -20,8 +20,8 @@
           <InputText v-model="searchQuery" :placeholder="$t('contentManager.search')" class="search-input" />
           <Dropdown v-model="contentTypeFilter" :options="contentTypeOptions" optionLabel="label" optionValue="value"
             :placeholder="$t('contentManager.contentType')" class="filter-dropdown" showClear />
-          <Dropdown v-model="statusFilter" :options="statusOptions" optionLabel="label" optionValue="value"
-            :placeholder="$t('contentManager.status')" class="filter-dropdown" showClear />
+          <!--<Dropdown v-model="statusFilter" :options="statusOptions" optionLabel="label" optionValue="value"
+            :placeholder="$t('contentManager.status')" class="filter-dropdown" showClear />-->
           <Button :label="$t('contentManager.btnsearch')" icon="pi pi-search" @click="handleSearch" />
         </div>
       </template>
@@ -39,12 +39,12 @@
               <Tag :value="getContentTypeLabel(data.content_type)" />
             </template>
           </Column>
-          <Column field="status" :header="$t('contentManager.status')" :style="{ width: '120px' }">
+          <!--<Column field="status" :header="$t('contentManager.status')" :style="{ width: '120px' }">
             <template #body="{ data }">
               <Tag :value="data.status === 1 ? $t('contentManager.published') : $t('contentManager.draft')"
                 :severity="data.status === 1 ? 'success' : 'warning'" />
             </template>
-          </Column>
+          </Column>-->
           <Column :header="$t('contentManager.actions')" :style="{ width: '200px' }">
             <template #body="{ data }">
               <div class="action-buttons">
@@ -106,11 +106,11 @@ const getContentTypeLabel = (type: ContentType): string => {
 }
 
 const onPageChange = (event: any) => {
-  contentStore.fetchContents(event.page + 1, searchQuery.value)
+  contentStore.fetchContents(event.page + 1, searchQuery.value, contentTypeFilter.value)
 }
 
 const handleSearch = () => {
-  contentStore.fetchContents(1, searchQuery.value)
+  contentStore.fetchContents(1, searchQuery.value, contentTypeFilter.value)
 }
 
 const confirmDelete = (content: any) => {

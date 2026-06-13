@@ -25,7 +25,7 @@ export const useContentStore = defineStore('content', () => {
     totalPages: 0,
   })
 
-  const fetchContents = async (page: number = 1, search?: string) => {
+  const fetchContents = async (page: number = 1, search?: string, contentType?: number | null) => {
     try {
       const params = new URLSearchParams({
         page: String(page),
@@ -34,6 +34,10 @@ export const useContentStore = defineStore('content', () => {
 
       if (search) {
         params.append('search', search)
+      }
+
+      if (contentType !== undefined && contentType !== null) {
+        params.append('content_type', String(contentType))
       }
 
       const response = await api.get<PaginatedResponse<any>>(`/content?${params}`)

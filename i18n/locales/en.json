@@ -97,6 +97,7 @@
     "delete": "Delete",
     "moveUp": "Move Up",
     "moveDown": "Move Down",
+    "reorder": "Reorder",
     "selectMenu": "Select Menu"
   },
   "settings": {
@@ -163,7 +164,7 @@
     "logout": "Logout"
   },
   "userManager": {
-    "title": "User Management",
+    "title": "Manage User",
     "subtitle": "Manage user accounts and permissions",
     "addUser": "Add User",
     "search": "Search users...",
