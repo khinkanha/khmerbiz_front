@@ -47,13 +47,11 @@
           <template #body="{ data }">
             <div class="reorder-btns">
               <a href="#" @click.prevent="handleReorder(data, 'up')"
-                :class="['btn btn-xs btn-default', { disabled: loading }]"
-                v-tooltip.top="$t('menuManager.moveUp')">
+                :class="['btn btn-xs btn-default', { disabled: loading }]" v-tooltip.top="$t('menuManager.moveUp')">
                 <i class="fa fa-arrow-up"></i>
               </a>
               <a href="#" @click.prevent="handleReorder(data, 'down')"
-                :class="['btn btn-xs btn-default', { disabled: loading }]"
-                v-tooltip.top="$t('menuManager.moveDown')">
+                :class="['btn btn-xs btn-default', { disabled: loading }]" v-tooltip.top="$t('menuManager.moveDown')">
                 <i class="fa fa-arrow-down"></i>
               </a>
             </div>
@@ -134,7 +132,9 @@ const handleLanguageChange = async () => {
   }
 }
 
-const handleClearCache = () => {
+const handleClearCache = async () => {
+  const api = useApi();
+  await api.post(`/menus/clear-cache`, { "domainId": domainStore.domain.domain_id });
   menuStore.clearCache()
   domainStore.clearCache()
   clearMsg.value = true

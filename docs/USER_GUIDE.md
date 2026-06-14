@@ -18,7 +18,7 @@
 
 ### Logging In
 
-1. Go to your admin URL: `http://yourdomain.com/admin/login`
+1. Go to your admin URL: `https://khmer.biz/member/login`
 2. Enter your **username** and **password**
 3. Click **Login**
 

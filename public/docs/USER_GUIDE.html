@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KhmerBiz CMS — User Guide</title>
-  <style>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KhmerBiz CMS — User Guide</title>
+    <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Battambang','Noto Sans Khmer',sans-serif;line-height:1.7;color:#1a202c;background:#f7fafc;padding:2rem 1rem}
     .container{max-width:900px;margin:0 auto;background:#fff;padding:2rem 3rem;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
@@ -37,23 +37,24 @@
     .guide-footer{text-align:center;color:#718096;font-size:.85rem}
     @media(max-width:768px){.container{padding:1rem 1.25rem}body{padding:.5rem}}
   </style>
-</head>
-<body>
-<div class="container">
+  </head>
+  <body>
+    <div class="container">
 
-  <div class="lang-switch">
-    <button class="lang-btn active" onclick="setLang('en')">EN</button>
-    <button class="lang-btn" onclick="setLang('kh')">ខ្មែរ</button>
-  </div>
+      <div class="lang-switch">
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('kh')">ខ្មែរ</button>
+      </div>
 
-  <div id="guide-content"></div>
+      <div id="guide-content"></div>
 
-  <hr class="guide-hr">
-  <p class="guide-footer"><em data-i18n="footer">KhmerBiz CMS User Guide — Last updated: May 2026</em></p>
+      <hr class="guide-hr">
+      <p class="guide-footer"><em data-i18n="footer">KhmerBiz CMS User Guide —
+          Last updated: May 2026</em></p>
 
-</div>
+    </div>
 
-<script>
+    <script>
 const translations = {
   en: {
     footer: "KhmerBiz CMS User Guide — Last updated: May 2026",
@@ -78,7 +79,7 @@ const translations = {
 <h2 id="getting-started">1. Getting Started</h2>
 <h3>Logging In</h3>
 <ol>
-  <li>Go to your admin URL: <code>http://yourdomain.com/admin/login</code></li>
+  <li>Go to your admin URL: <code>https://khmer.biz/admin/login</code></li>
   <li>Enter your <strong>username</strong> and <strong>password</strong></li>
   <li>Click <strong>Login</strong></li>
 </ol>
@@ -702,5 +703,5 @@ if (savedLang !== 'en') setLang(savedLang);
 else document.getElementById('guide-content').innerHTML = translations.en.content;
 </script>
 
-</body>
+  </body>
 </html>

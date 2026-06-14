@@ -1397,7 +1397,7 @@ const _routes = [
     name: "admin-menu",
     path: "/admin/menu",
     meta: __nuxt_page_meta$l || {},
-    component: () => import('./index-BhsVPFws.mjs')
+    component: () => import('./index-DZJykEwO.mjs')
   },
   {
     name: "admin-password",
