@@ -58,6 +58,7 @@ const bannerPosClass = computed(() => {
 const showPlugin = computed(() => Number(settings.value?.plugin_mode) === 1)
 
 onMounted(async () => {
+  
   if (!domainStore.domain) {
     domainStore.hydrateFromServer()
     await domainStore.resolveDomain()

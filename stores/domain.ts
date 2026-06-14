@@ -56,8 +56,11 @@ export const useDomainStore = defineStore('domain', () => {
       if (domainId) {
         endpoint = `/site/config?domain_id=${domainId}`
       } else if (import.meta.client && typeof window !== 'undefined') {
-        // Pass hostname so API can resolve the correct domain
-        endpoint = `/site/config?domain_name=${encodeURIComponent(window.location.hostname)}`
+        // Pass hostname so API can resolve the correct domain.
+        // Strip a leading "www." so it matches the bare domain in the database
+        // (the server middleware already does this for the SSR path).
+        const hostname = window.location.hostname.toLowerCase().replace(/^www\./, '')
+        endpoint = `/site/config?domain_name=${encodeURIComponent(hostname)}`
       } else {
         endpoint = '/site/config'
       }

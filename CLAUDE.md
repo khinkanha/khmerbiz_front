@@ -94,9 +94,11 @@ The app splits into a **public site** (SSR) and an **admin panel** (client-side 
 
 ### Domain Resolution Flow
 
-1. **Server middleware** (`middleware/domain-resolver.server.ts`): reads `Host` header, calls `GET /site/config` with `X-Forwarded-Host`, stores config in `event.context`
-2. **Nitro plugin** (`server/plugins/domain-hydration.ts`): serializes config into `<script>window.__NUXT_SITE_CONFIG__</script>` in the HTML head
-3. **Domain store** (`stores/domain.ts`): on client mount, `hydrateFromServer()` reads `__NUXT_SITE_CONFIG__` to avoid re-fetching; falls back to API call if not present
+1. **Nitro server middleware** (`server/middleware/domain-resolver.ts`): runs on every request, reads the `Host` header, **normalizes it** (lowercase, take first value if comma-separated by a proxy, strip a leading `www.` and the port), calls `GET /site/config` with `X-Forwarded-Host`, and stores the result in `event.context` + `event.context.configPayload`. A sibling middleware `server/middleware/block-scanners.ts` 404s obvious bot/probe paths (anything with a file extension that isn't a known asset, e.g. `.php`, `.env`) before they reach Vue Router.
+2. **Nitro plugin** (`server/plugins/domain-hydration.ts`): on `render:html`, serializes `event.context.configPayload` into `<script>window.__NUXT_SITE_CONFIG__</script>` in the HTML head.
+3. **Domain store** (`stores/domain.ts`): on client mount, `hydrateFromServer()` reads `__NUXT_SITE_CONFIG__` and skips re-fetching; if absent it falls back to a client-side `GET /site/config?domain_name=` call (which also strips a leading `www.` from `window.location.hostname`).
+
+> **Sharp edge — `middleware/` and `server/middleware/` are different systems.** `middleware/` holds *Nuxt route middleware*: export `defineNuxtRouteMiddleware`, they run during Vue navigation, and only run globally when named `*.global.ts`. `server/middleware/` holds *Nitro server middleware*: export `defineEventHandler`, auto-registered by directory, run on **every HTTP request** in filename order before routes/SSR. A `defineEventHandler` file placed in `middleware/` is silently dead code — this was the root cause of the `www.` resolution bug (the resolver sat in the wrong directory and never executed). When adding server-side request handling, put it in `server/middleware/`.
 
 ### Template & Theme System
 
