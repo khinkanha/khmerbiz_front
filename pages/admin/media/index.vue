@@ -3,8 +3,10 @@
     <form @submit.prevent="handleSearch" style="margin-bottom:10px;max-width:500px">
       <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-search"></i></span>
-        <input type="text" v-model="mediaStore.search" class="form-control" :placeholder="$t('contentManager.search')" />
-        <span v-if="mediaStore.search" class="input-group-addon" style="cursor:pointer" @click="clearSearch"><i class="fa fa-times"></i></span>
+        <input type="text" v-model="mediaStore.search" class="form-control"
+          :placeholder="$t('contentManager.search')" />
+        <span v-if="mediaStore.search" class="input-group-addon" style="cursor:pointer" @click="clearSearch"><i
+            class="fa fa-times"></i></span>
       </div>
     </form>
 
@@ -25,14 +27,13 @@
             <input type="file" @change="handleFileSelect" class="form-control" required />
           </div>
           <button type="submit" class="btn btn-danger"><i class="fa fa-floppy-o"></i> {{ $t('contentManager.save')
-            }}</button>
+          }}</button>
         </form>
       </div>
     </div>
 
     <DataTable :value="mediaStore.mediaList" :loading="loading" :paginator="true" :rows="pagination.limit"
-      :totalRecords="pagination.total" :lazy="true" @page="onPageChange" :rowsPerPageOptions="[10, 20, 50]"
-      stripedRows>
+      :totalRecords="pagination.total" :lazy="true" @page="onPageChange" :rowsPerPageOptions="[10, 20, 50]" stripedRows>
       <Column field="photo_id" header="#" :style="{ width: '80px' }" />
       <Column header="" :style="{ width: '60px' }">
         <template #body="{ data }">
@@ -62,6 +63,8 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
+import { Title } from '#build/components'
+import { tileLayer } from 'leaflet'
 import { useMediaStore } from '~/stores/media'
 
 const mediaStore = useMediaStore()
@@ -107,7 +110,7 @@ const handleFileSelect = (e: Event) => {
 
 const handleUpload = async () => {
   if (!uploadForm.value.file) return
-  await mediaStore.uploadMedia(uploadForm.value.file)
+  await mediaStore.uploadMedia(uploadForm.value.title, uploadForm.value.file)
   showUpload.value = false
   uploadForm.value = { title: '', file: null }
 }

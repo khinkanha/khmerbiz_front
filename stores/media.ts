@@ -43,11 +43,12 @@ export const useMediaStore = defineStore('media', () => {
   }
 
   const uploadMedia = async (
+    title:string,
     file: File,
     folder: string = 'uploads',
     onProgress?: (progress: number) => void
   ): Promise<number | null> => {
-    const mediaId = await uploadFile(file, folder, onProgress)
+    const mediaId = await uploadFile(title,file, folder, onProgress)
     if (mediaId) {
       await fetchMedia()
     }

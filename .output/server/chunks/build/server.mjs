@@ -1379,7 +1379,7 @@ const _routes = [
     name: "admin-media",
     path: "/admin/media",
     meta: __nuxt_page_meta$o || {},
-    component: () => import('./index-ByLKnQcS.mjs')
+    component: () => import('./index-J3vpyKHd.mjs')
   },
   {
     name: "admin-menu-id",
@@ -2478,15 +2478,15 @@ const localeCodes = [
 const localeLoaders = {
   "en": [{ key: "../i18n/locales/en.json", load: () => import(
     './en-BnG4whqd.mjs'
-    /* webpackChunkName: "locale__Users_khinkanha_websites_4khweb_khmerbiz_front_i18n_locales_en_json" */
+    /* webpackChunkName: "locale__Users_admin_dev_website_khmerbiz_khmerbiz_front_i18n_locales_en_json" */
   ), cache: true }],
   "kh": [{ key: "../i18n/locales/kh.json", load: () => import(
     './kh-B6tsON5y.mjs'
-    /* webpackChunkName: "locale__Users_khinkanha_websites_4khweb_khmerbiz_front_i18n_locales_kh_json" */
+    /* webpackChunkName: "locale__Users_admin_dev_website_khmerbiz_khmerbiz_front_i18n_locales_kh_json" */
   ), cache: true }],
   "ch": [{ key: "../i18n/locales/ch.json", load: () => import(
     './ch-CLcvjiTS.mjs'
-    /* webpackChunkName: "locale__Users_khinkanha_websites_4khweb_khmerbiz_front_i18n_locales_ch_json" */
+    /* webpackChunkName: "locale__Users_admin_dev_website_khmerbiz_khmerbiz_front_i18n_locales_ch_json" */
   ), cache: true }]
 };
 const vueI18nConfigs = [];
@@ -2496,7 +2496,7 @@ const normalizedLocales = [
     "name": "English",
     "files": [
       {
-        "path": "/Users/khinkanha/websites/4khweb/khmerbiz_front/i18n/locales/en.json"
+        "path": "/Users/admin/dev/website/khmerbiz/khmerbiz_front/i18n/locales/en.json"
       }
     ]
   },
@@ -2505,7 +2505,7 @@ const normalizedLocales = [
     "name": "ខ្មែរ",
     "files": [
       {
-        "path": "/Users/khinkanha/websites/4khweb/khmerbiz_front/i18n/locales/kh.json"
+        "path": "/Users/admin/dev/website/khmerbiz/khmerbiz_front/i18n/locales/kh.json"
       }
     ]
   },
@@ -2514,7 +2514,7 @@ const normalizedLocales = [
     "name": "中文",
     "files": [
       {
-        "path": "/Users/khinkanha/websites/4khweb/khmerbiz_front/i18n/locales/ch.json"
+        "path": "/Users/admin/dev/website/khmerbiz/khmerbiz_front/i18n/locales/ch.json"
       }
     ]
   }

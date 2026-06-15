@@ -19,6 +19,7 @@ export interface UploadConfirmRequest {
 }
 
 export interface MediaUpload {
+  title?: string
   file: File
   progress: number
   status: 'pending' | 'uploading' | 'success' | 'error'

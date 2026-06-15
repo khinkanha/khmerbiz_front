@@ -7,11 +7,13 @@ export const useUpload = () => {
   const isUploading = ref(false)
 
   const uploadFile = async (
+    title: string,
     file: File,
     folder: string = 'uploads',
     onProgress?: (progress: number) => void
   ): Promise<number | null> => {
     const upload: MediaUpload = {
+      title,
       file,
       progress: 0,
       status: 'pending',
@@ -25,7 +27,7 @@ export const useUpload = () => {
 
       const formData = new FormData()
       formData.append('file', file)
-      formData.append('title', file.name)
+      formData.append('title', title)
 
       const response = await api.post<{ photo_id: number; file_name: string }>('/media/upload', formData)
 
