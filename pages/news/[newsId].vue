@@ -73,16 +73,38 @@ definePageMeta({
 })
 
 import { parseNewsItem } from '~/composables/useNewsParser'
+import { useSeo } from '~/composables/useSeo'
+import { useDomainStore } from '~/stores/domain'
 
 const route = useRoute()
-const api = useApi()
 const config = useRuntimeConfig()
+const { public: { apiBaseUrl } } = config
 const photoUrl = config.public.photoUrl || 'https://khmer.biz'
+const domainStore = useDomainStore()
+const { setForNews } = useSeo()
 
 const newsId = route.params.newsId as string
 
-const loading = ref(true)
-const news = ref<any>(null)
+// SSR-aware fetch; honors the in-app router-state shortcut on client navigation.
+const { data: news, pending: loading } = await useAsyncData(`news-${newsId}`, async () => {
+  if (import.meta.client) {
+    const state = (history.state || {}) as { news?: any }
+    if (state.news) return parseNewsItem(state.news)
+  }
+  try {
+    const res = await $fetch<any>(`${apiBaseUrl}/site/news/${newsId}`)
+    if (res?.status !== false && res?.data) return parseNewsItem(res.data)
+  } catch (e) {
+    console.error('Failed to fetch news:', e)
+  }
+  return null
+})
+
+// Apply SEO reactively (fires during SSR once data resolves, and on client)
+watchEffect(() => {
+  if (news.value) setForNews(domainStore.settings, news.value)
+})
+
 const relatedNews = ref<any[]>([])
 
 const goToNews = (item: any) => {
@@ -91,41 +113,20 @@ const goToNews = (item: any) => {
   })
 }
 
+// Related news (sidebar) — client-only, not SEO-critical
 onMounted(async () => {
-  // Try to get news from router state first (no API call)
-  const state = history.state as { news?: any }
-  if (state.news) {
-    news.value = state.news
-    loading.value = false
-  } else {
-    // Fallback: fetch from API if opened directly via URL
-    try {
-      const response = await api.get<any>(`/site/news/${newsId}`)
-      if (response.success && response.data) {
-        news.value = parseNewsItem(response.data)
-      }
-    } catch (e) {
-      console.error('Failed to fetch news:', e)
-    } finally {
-      loading.value = false
+  if (!news.value?.content_id) return
+  try {
+    const res = await $fetch<any>(`${apiBaseUrl}/site/list-news/${news.value.content_id}?page=1`)
+    if (res?.status !== false && res?.data) {
+      const items = res.data.items || res.data
+      relatedNews.value = (Array.isArray(items) ? items : [])
+        .map(parseNewsItem)
+        .filter((n: any) => String(n.news_id || n.id) !== String(newsId))
+        .slice(0, 10)
     }
-  }
-
-  // Fetch related news via /site/list-news/:contentId
-  if (news.value?.content_id) {
-    try {
-      const response = await api.get<any>(`/site/list-news/${news.value.content_id}?page=1`)
-      if (response.success && response.data) {
-        const data = response.data
-        const items = data.items || data
-        relatedNews.value = (Array.isArray(items) ? items : [])
-          .map(parseNewsItem)
-          .filter((n: any) => String(n.news_id || n.id) !== String(newsId))
-          .slice(0, 10)
-      }
-    } catch {
-      // Silently fail — sidebar is optional
-    }
+  } catch {
+    // Silently fail — sidebar is optional
   }
 })
 
@@ -138,10 +139,6 @@ const formatDate = (date: string | null) => {
   const year = d.getFullYear()
   return `${day}-${month}-${year}`
 }
-
-useHead({
-  title: news.value?.title || 'News',
-})
 </script>
 
 <style scoped>

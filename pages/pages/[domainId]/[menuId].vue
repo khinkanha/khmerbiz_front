@@ -37,65 +37,45 @@ definePageMeta({
 import type { ContentSection } from '~/types'
 import { ContentType } from '~/types'
 import { useDomainStore } from '~/stores/domain'
+import { useSeo } from '~/composables/useSeo'
 
 const route = useRoute()
-const api = useApi()
+const { public: { apiBaseUrl } } = useRuntimeConfig()
 const domainStore = useDomainStore()
+const { setForContent } = useSeo()
 
 const domainId = route.params.domainId as string
 const menuId = route.params.menuId as string
 
-const loading = ref(true)
-const contentSection = ref<ContentSection | null>(null)
-const menuItemName = ref('')
-
-const findMenuItem = (items: readonly any[]): any => {
-  for (const item of items) {
-    if (String(item.item_id) === menuId) return item
-    if (item.children?.length) {
-      const found = findMenuItem(item.children)
-      if (found) return found
-    }
-  }
-  return null
-}
-
-const loadContent = async () => {
-  loading.value = true
-
-  const menuItem = findMenuItem(domainStore.menuTree)
-  menuItemName.value = menuItem?.item_name || ''
-
-  try {
-    const response = await api.get<any>(`/site/pages/${domainId}/${menuId}`)
-    if (response.success && response.data) {
-      const data = response.data
-      const raw = data.content || data
-      contentSection.value = {
+// SSR-aware fetch; refetch when the site language changes.
+const { data: contentSection, pending: loading } = await useAsyncData(
+  `page-${domainId}-${menuId}`,
+  async () => {
+    try {
+      const res = await $fetch<any>(`${apiBaseUrl}/site/pages/${domainId}/${menuId}`)
+      if (res?.status === false || !res?.data) return null
+      const raw = res.data.content || res.data
+      return {
         content: {
           ...raw,
           items: raw.items || [],
         },
         items: raw.items || [],
-      }
+      } as ContentSection
+    } catch (e) {
+      console.error('Failed to fetch page content:', e)
+      return null
     }
-  } catch (e) {
-    console.error('Failed to fetch page content:', e)
-  } finally {
-    loading.value = false
-  }
-}
+  },
+  { watch: [() => domainStore.currentLanguage] }
+)
 
-onMounted(async () => {
-  if (!domainStore.domain) {
-    await domainStore.resolveDomain()
-  }
-  await loadContent()
-})
-
-watch(() => domainStore.currentLanguage, async (newLang, oldLang) => {
-  if (newLang?.lang_id !== oldLang?.lang_id) {
-    await loadContent()
+// Article-only SEO (no SEO for photo/video/document/map/news-listing — they
+// fall back to the layout's site-wide title).
+watchEffect(() => {
+  const c = contentSection.value?.content
+  if (c && c.content_type === ContentType.ARTICLE) {
+    setForContent(domainStore.settings, c, contentSection.value?.items?.[0] ?? null)
   }
 })
 
@@ -113,10 +93,6 @@ const parseMapData = (content: any): MapData => {
     return {}
   }
 }
-
-useHead({
-  title: menuItemName.value || 'Page',
-})
 </script>
 
 <style scoped>
