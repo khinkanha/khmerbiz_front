@@ -1,5 +1,5 @@
 import { unref, inject, getCurrentInstance, hasInjectionContext, toRef, isRef, defineComponent, ref, watch, h, Suspense, nextTick, Fragment, Transition, toRaw, computed, isReactive, provide, shallowReactive, reactive, effectScope, shallowRef, getCurrentScope, onScopeDispose, toRefs, markRaw, version, defineAsyncComponent, mergeProps, createApp, createVNode, Text, onErrorCaptured, onServerPrefetch, resolveDynamicComponent, readonly, onMounted, withCtx, isReadonly, useSSRContext, isShallow, useId, openBlock, createElementBlock, createElementVNode, renderSlot, createTextVNode, toDisplayString as toDisplayString$1, resolveComponent, resolveDirective, withDirectives, createBlock, createCommentVNode, normalizeClass, Teleport, normalizeStyle, renderList, vShow, withKeys, createSlots, normalizeProps, withModifiers, toHandlers, guardReactiveProps, TransitionGroup } from 'vue';
-import { s as sanitizeStatusCode, h as defu, i as getContext, $ as $fetch, k as createHooks, c as createError$1, l as getRequestHeaders, m as klona, p as parse$1, n as getRequestHeader, o as destr, q as setCookie, r as getCookie, t as deleteCookie } from '../nitro/nitro.mjs';
+import { c as createError$1, s as sanitizeStatusCode, h as defu, i as getContext, $ as $fetch, k as createHooks, l as getRequestHeaders, m as klona, p as parse$1, n as getRequestHeader, o as destr, q as setCookie, r as getCookie, t as deleteCookie } from '../nitro/nitro.mjs';
 import { b as baseURL } from '../routes/renderer.mjs';
 import { getActiveHead, CapoPlugin } from 'unhead';
 import { defineHeadPlugin } from '@unhead/shared';
@@ -488,6 +488,7 @@ const appLayoutTransition = false;
 const appPageTransition = false;
 const appKeepalive = false;
 const nuxtLinkDefaults = { "componentName": "NuxtLink", "prefetch": true, "prefetchOn": { "visibility": true } };
+const asyncDataDefaults = { "value": null, "errorValue": null, "deep": true };
 const appId = "nuxt-app";
 function getNuxtAppCtx(id = appId) {
   return getContext(id, {
@@ -1501,7 +1502,7 @@ const _routes = [
     name: "index",
     path: "/",
     meta: __nuxt_page_meta$4 || {},
-    component: () => import('./index-CCZNQo6i.mjs')
+    component: () => import('./index-l4NWBW_C.mjs')
   },
   {
     name: "member-login",
@@ -1519,13 +1520,13 @@ const _routes = [
     name: "news-newsId",
     path: "/news/:newsId()",
     meta: __nuxt_page_meta$1 || {},
-    component: () => import('./_newsId_-BD_KNZn_.mjs')
+    component: () => import('./_newsId_-DT-HQTVe.mjs')
   },
   {
     name: "pages-domainId-menuId",
     path: "/pages/:domainId()/:menuId()",
     meta: __nuxt_page_meta || {},
-    component: () => import('./_menuId_-BgRUMGmT.mjs')
+    component: () => import('./_menuId_-Dv0-YOIo.mjs')
   },
   {
     name: "test",
@@ -2028,9 +2029,9 @@ const globalMiddleware = [
   auth_45global
 ];
 const namedMiddleware = {
-  auth: () => import('./auth-CAalik_a.mjs'),
+  auth: () => import('./auth-v4QtemHb.mjs'),
   "domain-resolver-server": () => import('./domain-resolver.server-BFDku0mc.mjs'),
-  guest: () => import('./guest-C3kh8oLM.mjs')
+  guest: () => import('./guest-CTCFBuZt.mjs')
 };
 const plugin$1 = /* @__PURE__ */ defineNuxtPlugin({
   name: "nuxt:router",
@@ -2478,15 +2479,15 @@ const localeCodes = [
 const localeLoaders = {
   "en": [{ key: "../i18n/locales/en.json", load: () => import(
     './en-BnG4whqd.mjs'
-    /* webpackChunkName: "locale__Users_admin_dev_website_khmerbiz_khmerbiz_front_i18n_locales_en_json" */
+    /* webpackChunkName: "locale__Users_khinkanha_websites_4khweb_khmerbiz_front_i18n_locales_en_json" */
   ), cache: true }],
   "kh": [{ key: "../i18n/locales/kh.json", load: () => import(
     './kh-B6tsON5y.mjs'
-    /* webpackChunkName: "locale__Users_admin_dev_website_khmerbiz_khmerbiz_front_i18n_locales_kh_json" */
+    /* webpackChunkName: "locale__Users_khinkanha_websites_4khweb_khmerbiz_front_i18n_locales_kh_json" */
   ), cache: true }],
   "ch": [{ key: "../i18n/locales/ch.json", load: () => import(
     './ch-CLcvjiTS.mjs'
-    /* webpackChunkName: "locale__Users_admin_dev_website_khmerbiz_khmerbiz_front_i18n_locales_ch_json" */
+    /* webpackChunkName: "locale__Users_khinkanha_websites_4khweb_khmerbiz_front_i18n_locales_ch_json" */
   ), cache: true }]
 };
 const vueI18nConfigs = [];
@@ -2496,7 +2497,7 @@ const normalizedLocales = [
     "name": "English",
     "files": [
       {
-        "path": "/Users/admin/dev/website/khmerbiz/khmerbiz_front/i18n/locales/en.json"
+        "path": "/Users/khinkanha/websites/4khweb/khmerbiz_front/i18n/locales/en.json"
       }
     ]
   },
@@ -2505,7 +2506,7 @@ const normalizedLocales = [
     "name": "ខ្មែរ",
     "files": [
       {
-        "path": "/Users/admin/dev/website/khmerbiz/khmerbiz_front/i18n/locales/kh.json"
+        "path": "/Users/khinkanha/websites/4khweb/khmerbiz_front/i18n/locales/kh.json"
       }
     ]
   },
@@ -2514,7 +2515,7 @@ const normalizedLocales = [
     "name": "中文",
     "files": [
       {
-        "path": "/Users/admin/dev/website/khmerbiz/khmerbiz_front/i18n/locales/ch.json"
+        "path": "/Users/khinkanha/websites/4khweb/khmerbiz_front/i18n/locales/ch.json"
       }
     ]
   }
@@ -36304,9 +36305,9 @@ const plugins = [
   primevue_7rYYRZQLyx
 ];
 const layouts = {
-  admin: defineAsyncComponent(() => import('./admin-Cl4M-0Ue.mjs')),
+  admin: defineAsyncComponent(() => import('./admin-Mv3n8eGl.mjs')),
   blank: defineAsyncComponent(() => import('./blank-CPiFi3ag.mjs')),
-  default: defineAsyncComponent(() => import('./default-CZ7aATW_.mjs'))
+  default: defineAsyncComponent(() => import('./default-Do7W4a3E.mjs'))
 };
 const LayoutLoader = defineComponent({
   name: "LayoutLoader",
@@ -36682,5 +36683,5 @@ let entry;
 }
 const entry_default = (ssrContext) => entry(ssrContext);
 
-export { _export_sfc as _, useNuxtApp as a, useRuntimeConfig as b, withoutTrailingSlash as c, nuxtLinkDefaults as d, entry_default as default, resolveUnrefHeadInput as e, defineStore as f, useConfirm as g, hasProtocol as h, injectHead as i, joinURL as j, useI18n as k, useRoute as l, useState as m, navigateTo as n, __nuxt_component_1 as o, parseQuery as p, useToast as q, resolveRouteObject as r, storeToRefs as s, defineNuxtRouteMiddleware as t, useRouter as u, withTrailingSlash as w };
+export { _export_sfc as _, useNuxtApp as a, useRuntimeConfig as b, withoutTrailingSlash as c, nuxtLinkDefaults as d, entry_default as default, resolveUnrefHeadInput as e, defineStore as f, useConfirm as g, hasProtocol as h, injectHead as i, joinURL as j, useI18n as k, useRoute as l, useState as m, navigateTo as n, __nuxt_component_1 as o, parseQuery as p, useToast as q, resolveRouteObject as r, storeToRefs as s, asyncDataDefaults as t, useRouter as u, createError as v, withTrailingSlash as w, defineNuxtRouteMiddleware as x };
 //# sourceMappingURL=server.mjs.map
