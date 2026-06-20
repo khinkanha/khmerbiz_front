@@ -9,6 +9,47 @@ export const useAuthStore = defineStore('auth', () => {
   const refreshToken = ref<string | null>(null)
   const isAuthenticated = computed(() => !!user.value && !!accessToken.value)
 
+  // Decode a JWT and report whether its `exp` is already in the past.
+  // Returns false on anything we can't confidently parse (don't log people out
+  // due to malformed tokens).
+  const isTokenExpired = (token: string): boolean => {
+    try {
+      const parts = token.split('.')
+      if (parts.length !== 3) return false
+      const payload = JSON.parse(atob(parts[1]))
+      if (!payload?.exp) return false
+      return payload.exp * 1000 < Date.now()
+    } catch {
+      return false
+    }
+  }
+
+  // Clear all in-memory + persisted auth state WITHOUT redirecting.
+  // Used for proactive expiry detection so public visitors aren't yanked to login.
+  const clearAuth = () => {
+    user.value = null
+    accessToken.value = null
+    refreshToken.value = null
+    if (import.meta.client) {
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('refreshToken')
+      localStorage.removeItem('user')
+    }
+  }
+
+  // Hard session reset: clear state and force a full reload to the login page.
+  // Used when a mid-session API call comes back 401 and the refresh also failed.
+  // Network-free (unlike logout()) so it cannot recurse back into apiFetch.
+  const forceLogout = () => {
+    clearAuth()
+    if (import.meta.client) {
+      const path = window.location.pathname
+      if (path !== '/member/login' && path !== '/member/signup') {
+        window.location.href = '/member/login'
+      }
+    }
+  }
+
   const initialize = () => {
     if (import.meta.client) {
       const storedToken = localStorage.getItem('accessToken')
@@ -23,6 +64,14 @@ export const useAuthStore = defineStore('auth', () => {
         } catch (error) {
           console.error('Failed to parse stored user:', error)
         }
+      }
+
+      // Proactive expiry check: if the access token is already past its exp,
+      // drop the session now so the UI can't render in a logged-in state.
+      // The route middleware handles the redirect for admin routes; public
+      // pages just get their stale token cleaned up.
+      if (accessToken.value && isTokenExpired(accessToken.value)) {
+        clearAuth()
       }
     }
   }
@@ -159,6 +208,8 @@ export const useAuthStore = defineStore('auth', () => {
     checkAuth,
     updateProfile,
     changePassword,
+    clearAuth,
+    forceLogout,
   }
 })
 

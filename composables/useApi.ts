@@ -1,7 +1,9 @@
 import type { ApiResponse } from '~/types/api'
+import { useAuthStore } from '~/stores/auth'
 
 let accessToken: string | null = null
 let refreshToken: string | null = null
+let handlingAuthFailure = false
 
 export const useApi = () => {
   const config = useRuntimeConfig()
@@ -29,6 +31,20 @@ export const useApi = () => {
     if (import.meta.client) {
       localStorage.removeItem('accessToken')
       localStorage.removeItem('refreshToken')
+    }
+  }
+
+  // Session is unrecoverable (refresh failed or no refresh token available).
+  // Clear local state and force a full reload to the login page. Deduped so a
+  // burst of parallel 401s only triggers one redirect.
+  const handleAuthFailure = () => {
+    if (handlingAuthFailure) return
+    handlingAuthFailure = true
+    clearTokens()
+    try {
+      useAuthStore().forceLogout()
+    } catch (error) {
+      console.error('Failed to force logout after auth failure:', error)
     }
   }
 
@@ -83,10 +99,22 @@ export const useApi = () => {
 
       const data = await response.json()
 
-      if (response.status === 401 && refreshToken) {
-        const refreshed = await refreshAccessToken()
-        if (refreshed) {
-          return apiFetch<T>(endpoint, options)
+      if (response.status === 401) {
+        // Never auto-logout on auth endpoints (e.g. wrong-password 401 on login).
+        const isAuthEndpoint = endpoint.startsWith('/auth/')
+        if (!isAuthEndpoint) {
+          if (refreshToken) {
+            const refreshed = await refreshAccessToken()
+            if (refreshed) {
+              return apiFetch<T>(endpoint, options)
+            }
+          }
+          // Refresh failed or no refresh token — the session is dead.
+          handleAuthFailure()
+          return {
+            success: false,
+            message: data.message || 'Session expired. Please log in again.',
+          }
         }
       }
 
