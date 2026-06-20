@@ -1,10 +1,9 @@
 <template>
-  <header class="public-header" :class="headerClass">
+  <header class="public-header stiky-header" :class="headerClass">
     <!-- Language flag -->
     <div class="flag">
       <LanguageSelector />
     </div>
-
     <!-- Top Bar (hidden when logo_position=bottom) -->
     <div v-if="logoPos !== 3" class="top-bar">
       <div class="container top-bar-inner">
@@ -113,6 +112,7 @@
         </div>
       </div>
     </div>
+
   </header>
 </template>
 
@@ -239,13 +239,19 @@ const isChildActive = (childId: number) => {
   background: white;
 }
 
+.stiky-header {
+  position: sticky;
+  top: 0;
+  display: space-between;
+  z-index: 1000;
+}
+
 .flag {
   position: fixed;
-  z-index: 1100;
   top: 0;
   right: 0;
-  margin-right: 20px;
-  margin-top: 5px;
+  z-index: 1100;
+
 }
 
 .container {
@@ -267,7 +273,7 @@ const isChildActive = (childId: number) => {
   align-items: center;
   justify-content: center;
   position: relative;
-  
+
 }
 
 .logo-align-left .top-bar-inner {
@@ -561,11 +567,9 @@ const isChildActive = (childId: number) => {
 /* ---- Responsive (mobile < 769px) ---- */
 @media (max-width: 768px) {
   .flag {
-    position: relative;
-    z-index: 100;
-    display: flex;
-    justify-content: flex-end;
-    padding: 0.4rem 1rem 0;
+    position: fixed;
+    right: 1.5rem;
+    top: 1.5rem;
     background-color: white;
   }
 

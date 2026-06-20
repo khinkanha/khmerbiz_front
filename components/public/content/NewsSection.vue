@@ -19,7 +19,7 @@
             </div>
           </div>
           <div class="feature-card-body">
-            <h3 class="feature-title">{{ news.title }}</h3>
+            <h4 class="feature-title">{{ news.title }}</h4>
             <p v-if="news.short_description" class="feature-excerpt">{{ news.short_description }}</p>
             <div v-if="news.publish_date" class="feature-date">
               <i class="pi pi-calendar"></i>
@@ -40,7 +40,7 @@
             </div>
           </div>
           <div class="news-content">
-            <h3 class="news-title">{{ news.title }}</h3>
+            <h4 class="news-title">{{ news.title }}</h4>
             <p v-if="news.short_description" class="news-excerpt">
               {{ news.short_description }}
             </p>
@@ -283,7 +283,7 @@ watch(() => route.query.page, async (newPage) => {
 }
 
 .feature-excerpt {
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   color: #555;
   margin: 0 0 0.75rem 0;
   line-height: 1.6;
@@ -362,7 +362,7 @@ watch(() => route.query.page, async (newPage) => {
 }
 
 .news-excerpt {
-  font-size: 0.875rem;
+  font-size: 1.1rem;
   color: #718096;
   margin: 0 0 0.75rem 0;
   line-height: 1.5;
