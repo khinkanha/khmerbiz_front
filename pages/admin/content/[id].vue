@@ -55,14 +55,14 @@
                 <small v-if="errors.menu_id" class="p-error">{{ errors.menu_id }}</small>
               </div>
 
-              <!--<div class="form-group">
+              <div class="form-group">
                 <label for="status">{{ $t('contentManager.status') }}</label>
                 <div class="status-toggle">
                   <ToggleSwitch id="status" :modelValue="form.status as any"
                     @update:modelValue="(v: any) => form.status = v" :trueValue="1" :falseValue="0" />
                   <span>{{ form.status ? $t('contentManager.published') : $t('contentManager.draft') }}</span>
                 </div>
-              </div>-->
+              </div>
 
               <Message v-if="errorMessage" severity="error" :closable="false">
                 {{ errorMessage }}
@@ -128,7 +128,7 @@ const form = ref({
   content_type: ContentType.ARTICLE,
   lang_id: null as number | null,
   menu_id: null as number | null,
-  status: 0 as boolean | string | number | undefined,
+  status: 0 as  number,
 })
 
 const errors = ref<Record<string, string>>({})
@@ -197,7 +197,7 @@ const handleSave = async () => {
   }
 
   saving.value = true
-
+console.log('Saving content with form data:', form.value)
   try {
     let result: boolean | { success: boolean; id?: number }
 
@@ -208,6 +208,7 @@ const handleSave = async () => {
         content_type: form.value.content_type,
         lang_id: form.value.lang_id!,
         menu_id: form.value.menu_id!,
+        status: form.value.status?0:1,
       })
     } else {
       result = await contentStore.updateContent(contentId.value!, {
@@ -216,7 +217,7 @@ const handleSave = async () => {
         content_type: form.value.content_type,
         lang_id: form.value.lang_id!,
         menu_id: form.value.menu_id!,
-       // status: form.value.status,
+        status: form.value.status?0:1,
       })
     }
 
@@ -247,7 +248,7 @@ onMounted(async () => {
       content_type: raw.content_type,
       lang_id: raw.lang_id,
       menu_id: raw.menu_id ?? null,
-      status: raw.status,
+      status: raw.status?0:1,
     }
   }
 

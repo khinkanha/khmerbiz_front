@@ -20,8 +20,8 @@
           <InputText v-model="searchQuery" :placeholder="$t('contentManager.search')" class="search-input" />
           <Dropdown v-model="contentTypeFilter" :options="contentTypeOptions" optionLabel="label" optionValue="value"
             :placeholder="$t('contentManager.contentType')" class="filter-dropdown" showClear />
-          <!--<Dropdown v-model="statusFilter" :options="statusOptions" optionLabel="label" optionValue="value"
-            :placeholder="$t('contentManager.status')" class="filter-dropdown" showClear />-->
+          <Dropdown v-model="statusFilter" :options="statusOptions" optionLabel="label" optionValue="value"
+            :placeholder="$t('contentManager.status')" class="filter-dropdown" showClear />
           <Button :label="$t('contentManager.btnsearch')" icon="pi pi-search" @click="handleSearch" />
         </div>
       </template>
@@ -39,18 +39,19 @@
               <Tag :value="getContentTypeLabel(data.content_type)" />
             </template>
           </Column>
-          <!--<Column field="status" :header="$t('contentManager.status')" :style="{ width: '120px' }">
+          <Column field="status" :header="$t('contentManager.status')" :style="{ width: '120px' }">
             <template #body="{ data }">
-              <Tag :value="data.status === 1 ? $t('contentManager.published') : $t('contentManager.draft')"
-                :severity="data.status === 1 ? 'success' : 'warning'" />
+              <Tag :value="data.status === 1 ? $t('contentManager.draft') : $t('contentManager.published')"
+                :severity="data.status === 1 ? 'warning' : 'success'" />
             </template>
-          </Column>-->
+          </Column>
           <Column :header="$t('contentManager.actions')" :style="{ width: '200px' }">
             <template #body="{ data }">
               <div class="action-buttons">
                 <Button icon="pi pi-pencil" rounded text @click="$router.push(`/admin/content/${data.content_id}`)"
                   v-tooltip.top="$t('contentManager.edit')" />
-                <Button v-if="data.content_type !== ContentType.ARTICLE" icon="pi pi-list" rounded text @click="$router.push(`/admin/content/${data.content_id}/items`)"
+                <Button v-if="data.content_type !== ContentType.ARTICLE" icon="pi pi-list" rounded text
+                  @click="$router.push(`/admin/content/${data.content_id}/items`)"
                   v-tooltip.top="$t('contentManager.list')" />
                 <Button icon="pi pi-trash" rounded text severity="danger" @click="confirmDelete(data)"
                   v-tooltip.top="$t('contentManager.delete')" />
@@ -96,8 +97,8 @@ const contentTypeOptions = [
 ]
 
 const statusOptions = [
-  { label: t('contentManager.published'), value: 1 },
-  { label: t('contentManager.draft'), value: 0 },
+  { label: t('contentManager.draft'), value: 1 },
+  { label: t('contentManager.published'), value: 0 },
 ]
 
 const getContentTypeLabel = (type: ContentType): string => {

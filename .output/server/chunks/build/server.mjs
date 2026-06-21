@@ -1344,7 +1344,7 @@ const _routes = [
     name: "admin-content-contentId-items",
     path: "/admin/content/:contentId()/items",
     meta: __nuxt_page_meta$u || {},
-    component: () => import('./items-BFNVjt78.mjs')
+    component: () => import('./items-CZL4jzaD.mjs')
   },
   {
     name: "admin-content-contentId-map",
@@ -1362,13 +1362,13 @@ const _routes = [
     name: "admin-content-id",
     path: "/admin/content/:id()",
     meta: __nuxt_page_meta$r || {},
-    component: () => import('./_id_-yFVAj9nS.mjs')
+    component: () => import('./_id_-DE9II5y7.mjs')
   },
   {
     name: "admin-content",
     path: "/admin/content",
     meta: __nuxt_page_meta$q || {},
-    component: () => import('./index-BZ-wqL_7.mjs')
+    component: () => import('./index-BP6MDAQN.mjs')
   },
   {
     name: "admin",

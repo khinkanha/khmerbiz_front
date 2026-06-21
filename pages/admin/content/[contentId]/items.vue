@@ -140,7 +140,7 @@
               <div class="form-group">
                 <label for="newsStatus">{{ $t('contentManager.status') || 'Status' }}</label>
                 <div class="status-toggle">
-                  <InputSwitch
+                  <ToggleSwitch
                     id="newsStatus"
                     v-model="itemForm.status"
                   />

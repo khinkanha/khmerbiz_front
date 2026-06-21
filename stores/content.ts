@@ -105,6 +105,7 @@ export const useContentStore = defineStore('content', () => {
 
   const saveContent = async (data: ContentForm): Promise<{ success: boolean; id?: number }> => {
     try {
+   
       const response = await api.post<{ content_id: number }>('/content', data)
 
       if (response.success && response.data) {
@@ -123,6 +124,7 @@ export const useContentStore = defineStore('content', () => {
     data: Partial<ContentForm>
   ): Promise<boolean> => {
     try {
+      
       const response = await api.put(`/content/${id}`, data)
       return response.success
     } catch (error) {

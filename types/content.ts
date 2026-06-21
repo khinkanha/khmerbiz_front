@@ -57,7 +57,8 @@ export interface ContentForm {
   description: string
   menu_id: number
   content_type: ContentType
-  lang_id: number
+  lang_id: number,
+  status: number
 }
 
 export interface ItemForm {
