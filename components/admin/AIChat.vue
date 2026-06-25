@@ -149,7 +149,12 @@
           </span>
         </div>
 
-        <div class="message-content">
+        <div
+          v-if="message.role === 'assistant'"
+          class="message-content markdown-body"
+          v-html="renderMarkdown(message.content)"
+        ></div>
+        <div v-else class="message-content">
           {{ message.content }}
         </div>
 
@@ -270,6 +275,7 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick, watch } from 'vue';
 import { useAIChat } from '~/composables/useAIChat';
+import { useMarkdown } from '~/composables/useMarkdown';
 import type { AIOperation } from '~/types/ai';
 
 const {
@@ -278,6 +284,8 @@ const {
   loading, error, messages, hasMessages, usageInfo,
   canSendMessage, isLimitReached,
 } = useAIChat();
+
+const { renderMarkdown } = useMarkdown();
 
 const userInput = ref('');
 const messagesContainer = ref<HTMLElement | null>(null);
@@ -801,6 +809,79 @@ const formatOperationTime = (dateStr: string): string => {
 .message.assistant .message-content {
   background: #f3f4f6;
   color: #1f2937;
+}
+
+/* Markdown rendering for assistant replies (v-html injected, so use :deep) */
+.message.assistant .message-content.markdown-body {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.message.assistant .markdown-body :deep(p) {
+  margin: 0 0 0.5rem;
+}
+
+.message.assistant .markdown-body :deep(p:last-child) {
+  margin-bottom: 0;
+}
+
+.message.assistant .markdown-body :deep(h3) {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0.5rem 0 0.35rem;
+  line-height: 1.3;
+}
+
+.message.assistant .markdown-body :deep(ul),
+.message.assistant .markdown-body :deep(ol) {
+  margin: 0.25rem 0 0.5rem;
+  padding-left: 1.25rem;
+}
+
+.message.assistant .markdown-body :deep(li) {
+  margin: 0.15rem 0;
+}
+
+.message.assistant .markdown-body :deep(strong) {
+  font-weight: 600;
+}
+
+.message.assistant .markdown-body :deep(em) {
+  font-style: italic;
+}
+
+.message.assistant .markdown-body :deep(code) {
+  background: rgba(0, 0, 0, 0.06);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+.message.assistant .markdown-body :deep(pre) {
+  background: rgba(0, 0, 0, 0.06);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 0.25rem 0 0.5rem;
+}
+
+.message.assistant .markdown-body :deep(pre code) {
+  background: none;
+  padding: 0;
+}
+
+.message.assistant .markdown-body :deep(blockquote) {
+  border-left: 3px solid #cbd5e1;
+  margin: 0.25rem 0 0.5rem;
+  padding: 0.1rem 0 0.1rem 0.75rem;
+  color: #4b5563;
+}
+
+.message.assistant .markdown-body :deep(a) {
+  color: #4f46e5;
+  text-decoration: underline;
+  word-break: break-all;
 }
 
 .tool-calls {
