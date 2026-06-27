@@ -1520,7 +1520,7 @@ const _routes = [
     name: "news-newsId",
     path: "/news/:newsId()",
     meta: __nuxt_page_meta$1 || {},
-    component: () => import('./_newsId_-DVtYDX89.mjs')
+    component: () => import('./_newsId_-DHm1BF2p.mjs')
   },
   {
     name: "pages-domainId-menuId",

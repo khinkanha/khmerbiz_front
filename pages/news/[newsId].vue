@@ -26,11 +26,6 @@
           <div v-if="news.photo" class="article-image">
             <img :src="`${photoUrl}${news.photo}`" :alt="news.title" />
           </div>
-
-          <div v-if="news.short_description" class="article-excerpt">
-            {{ news.short_description }}
-          </div>
-
           <div class="article-body" v-html="news.description"></div>
         </article>
 
