@@ -5,7 +5,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (import.meta.server) return
 
   const authStore = useAuthStore()
-  const publicRoutes = ['/member/login', '/member/signup']
+  const publicRoutes = ['/member', '/member/login', '/member/signup']
   const isAdminRoute = to.path.startsWith('/admin')
   const isSuperAdminRoute = to.path.startsWith('/admin/super')
 
@@ -35,5 +35,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   if (publicRoutes.includes(to.path) && authStore.isAuthenticated) {
     return navigateTo('/admin')
+  }
+  if (to.path === '/member' && !authStore.isAuthenticated) {
+    return navigateTo('/member/login')
   }
 })
