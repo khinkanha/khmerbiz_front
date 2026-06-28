@@ -207,6 +207,35 @@ export const useAIChat = () => {
     }
   };
 
+  const respondToInput = async (inputId: string, value: number, messageId: string) => {
+    try {
+      const response = await api.post<{ toolName: string; success: boolean; result?: any; error?: string }>(
+        `/ai-chat/respond/${inputId}`, { value }
+      );
+
+      // Update the message's toolCalls to reflect the submitted selection
+      const msg = chatStore.messages.find(m => m.id === messageId);
+      if (msg && msg.toolCalls) {
+        msg.toolCalls = msg.toolCalls.map(tc =>
+          tc.inputId === inputId
+            ? {
+                ...tc,
+                needsInput: false,
+                success: response.data?.success ?? response.success,
+                result: response.data?.result,
+                error: response.data?.error,
+              }
+            : tc
+        );
+        chatStore.updateMessage(messageId, { toolCalls: msg.toolCalls });
+      }
+
+      return { success: response.data?.success ?? response.success, result: response.data };
+    } catch (error: any) {
+      return { success: false, error: error.message || 'Failed to submit selection' };
+    }
+  };
+
   const rejectAction = async (confirmationId: string, messageId: string) => {
     try {
       await api.post(`/ai-chat/reject/${confirmationId}`, {});
@@ -283,6 +312,7 @@ export const useAIChat = () => {
     sendMessage,
     confirmAction,
     rejectAction,
+    respondToInput,
     rollbackOperation,
     getContentVersions,
     getUsage,

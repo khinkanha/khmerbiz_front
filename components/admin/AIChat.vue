@@ -167,7 +167,7 @@
           <div
             v-for="(tool, index) in message.toolCalls"
             :key="index"
-            :class="['tool-call', tool.needsConfirmation ? 'pending' : (tool.success ? 'success' : 'error')]"
+            :class="['tool-call', (tool.needsConfirmation || tool.needsInput) ? 'pending' : (tool.success ? 'success' : 'error')]"
           >
             <div class="tool-call-top">
               <div class="tool-name">
@@ -209,6 +209,33 @@
                   size="small"
                   outlined
                   @click="handleReject(tool.confirmationId!, message.id)"
+                />
+              </div>
+            </div>
+
+            <!-- Input Request UI (e.g. choose which news section the item belongs to) -->
+            <div v-else-if="tool.needsInput" class="tool-input">
+              <div class="input-prompt">
+                <i class="pi pi-question-circle"></i>
+                {{ tool.inputPrompt || 'Please choose an option to continue' }}
+              </div>
+              <div class="input-actions">
+                <Dropdown
+                  v-model="inputSelections[tool.inputId]"
+                  :options="tool.options"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select a news section…"
+                  class="tool-select"
+                />
+                <Button
+                  label="Submit"
+                  icon="pi pi-check"
+                  severity="primary"
+                  size="small"
+                  :loading="responding[tool.inputId]"
+                  :disabled="inputSelections[tool.inputId] === undefined || inputSelections[tool.inputId] === null"
+                  @click="handleRespond(tool, message.id)"
                 />
               </div>
             </div>
@@ -279,7 +306,7 @@ import { useMarkdown } from '~/composables/useMarkdown';
 import type { AIOperation } from '~/types/ai';
 
 const {
-  sendMessage, confirmAction, rejectAction, rollbackOperation,
+  sendMessage, confirmAction, rejectAction, respondToInput, rollbackOperation,
   getOperationHistory, checkHealth, getUsage, resetChat,
   loading, error, messages, hasMessages, usageInfo,
   canSendMessage, isLimitReached,
@@ -291,6 +318,9 @@ const userInput = ref('');
 const messagesContainer = ref<HTMLElement | null>(null);
 const confirming = ref<Record<string, boolean>>({});
 const rollingBack = ref<Record<number, boolean>>({});
+// Pending AI input requests: selected value + submitting state, keyed by inputId
+const inputSelections = ref<Record<string, number | undefined>>({});
+const responding = ref<Record<string, boolean>>({});
 
 // Health status: true = online, false = offline, null = unknown
 const aiHealthy = ref<boolean | null>(null);
@@ -344,6 +374,16 @@ const handleConfirm = async (confirmationId: string, messageId: string) => {
 
 const handleReject = async (confirmationId: string, messageId: string) => {
   await rejectAction(confirmationId, messageId);
+};
+
+const handleRespond = async (tool: any, messageId: string) => {
+  const inputId = tool.inputId;
+  if (!inputId) return;
+  const value = inputSelections.value[inputId];
+  if (value === undefined || value === null) return;
+  responding.value[inputId] = true;
+  await respondToInput(inputId, value, messageId);
+  responding.value[inputId] = false;
 };
 
 const handleRollback = async (operationId: number) => {
@@ -950,6 +990,37 @@ const formatOperationTime = (dateStr: string): string => {
 .confirmation-actions {
   display: flex;
   gap: 0.5rem;
+}
+
+.tool-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.input-prompt {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.input-prompt i {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.input-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.tool-select {
+  flex: 1;
+  min-width: 0;
 }
 
 .tool-name {

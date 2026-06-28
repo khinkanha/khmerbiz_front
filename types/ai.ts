@@ -7,6 +7,12 @@ export interface ToolCallResult {
   confirmationId?: string;
   confirmationPreview?: string;
   operationId?: number;
+  // AI needs the user to pick a value (e.g. which news section) before proceeding
+  needsInput?: boolean;
+  inputId?: string;
+  inputPrompt?: string;
+  inputType?: 'select';
+  options?: { label: string; value: number }[];
 }
 
 export interface UsageInfo {
