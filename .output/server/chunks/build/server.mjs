@@ -1502,7 +1502,7 @@ const _routes = [
     name: "index",
     path: "/",
     meta: __nuxt_page_meta$4 || {},
-    component: () => import('./index-k4o71cuY.mjs')
+    component: () => import('./index-N14NOtEE.mjs')
   },
   {
     name: "member-login",
@@ -1526,7 +1526,7 @@ const _routes = [
     name: "pages-domainId-menuId",
     path: "/pages/:domainId()/:menuId()",
     meta: __nuxt_page_meta || {},
-    component: () => import('./_menuId_-DzwoauTJ.mjs')
+    component: () => import('./_menuId_-8y4_XVh1.mjs')
   },
   {
     name: "test",

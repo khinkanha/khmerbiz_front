@@ -1,6 +1,7 @@
 <template>
   <section class="video-section">
     <h2 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h2>
+    <div v-if="sectionDescription" class="section-description" v-html="sectionDescription"></div>
 
     <div class="video-grid">
       <div v-for="item in items" :key="item.item_id" class="video-item">
@@ -29,10 +30,12 @@ import type { ContentItem } from '~/types'
 interface Props {
   items: ContentItem[]
   sectionTitle?: string
+  sectionDescription?: string
 }
 
 withDefaults(defineProps<Props>(), {
   sectionTitle: '',
+  sectionDescription: '',
 })
 
 const getEmbedUrl = (url: string): string | null => {

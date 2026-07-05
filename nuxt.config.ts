@@ -55,10 +55,7 @@ export default defineNuxtConfig(<any>{
     '/admin/**': { ssr: false },
     '/': { ssr: true },
     '/pages/**': { ssr: true },
-    '/article/**': { ssr: true },
     '/news/**': { ssr: true },
-    '/legal': { ssr: true },
-    '/test/**': { ssr: true },
     '/member/**': { ssr: false },
   },
 

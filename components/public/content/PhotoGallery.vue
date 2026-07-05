@@ -1,6 +1,7 @@
 <template>
   <section class="photo-gallery-section">
     <h2 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h2>
+    <div v-if="sectionDescription" class="section-description" v-html="sectionDescription"></div>   
     <div class="gallery-grid">
       <div v-for="item in items" :key="item.item_id" class="gallery-item" :class="{ featured: item.is_feature }">
         <img :src="`${photoUrl}${item.url}`" :alt="item.title" @click="openLightbox(item)" />
@@ -31,10 +32,12 @@ import type { ContentItem } from '~/types'
 interface Props {
   items: ContentItem[]
   sectionTitle?: string
+  sectionDescription?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   sectionTitle: '',
+  sectionDescription: '',
 })
 
 const config = useRuntimeConfig()

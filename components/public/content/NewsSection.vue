@@ -1,7 +1,7 @@
 <template>
   <section class="news-section">
     <h2 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h2>
-
+    <div v-if="sectionDescription" class="section-description" v-html="sectionDescription"></div>
     <div v-if="loading" class="loading-state">
       <ProgressSpinner />
     </div>
@@ -91,12 +91,14 @@ interface Props {
   sectionTitle?: string
   showMoreLink?: boolean
   moreLink?: string
+  sectionDescription?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   sectionTitle: '',
   showMoreLink: false,
   moreLink: '',
+  sectionDescription: '',
 })
 
 const config = useRuntimeConfig()

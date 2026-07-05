@@ -1,7 +1,7 @@
 <template>
   <section class="map-section">
     <h2 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h2>
-
+    <div v-if="sectionDescription" class="section-description" v-html="sectionDescription"></div>
     <div class="map-container">
       <LMap
         :zoom="mapData.zoom || 13"
@@ -38,10 +38,12 @@ interface MapData {
 interface Props {
   mapData: MapData
   sectionTitle?: string
+  sectionDescription?: string
 }
 
 withDefaults(defineProps<Props>(), {
   sectionTitle: '',
+  sectionDescription: '',
 })
 </script>
 

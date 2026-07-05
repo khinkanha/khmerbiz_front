@@ -1,6 +1,7 @@
 <template>
   <section class="document-section">
     <h2 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h2>
+    <div v-if="sectionDescription" class="section-description" v-html="sectionDescription"></div>
     <div class="document-list">
       <a v-for="item in items" :key="item.item_id" :href="`${photoUrl}${item.url}`" :download="item.title"
         class="document-item" target="_blank">
@@ -25,10 +26,12 @@ import type { ContentItem } from '~/types'
 interface Props {
   items: ContentItem[]
   sectionTitle?: string
+  sectionDescription?: string
 }
 
 withDefaults(defineProps<Props>(), {
   sectionTitle: '',
+  sectionDescription: ''
 })
 
 const config = useRuntimeConfig()
