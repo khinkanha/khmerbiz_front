@@ -52,7 +52,9 @@
     "settings": "Settings",
     "manageContent": "Manage Content",
     "uploadMedia": "Upload Media",
-    "userManagement": "User Management"
+    "userManagement": "Manage User",
+    "AIAssitant": "AI Assistant"
+    
   },
   "header": {
     "welcome": "Welcome",
@@ -262,5 +264,52 @@
     "invalidCredentials": "Invalid username or password",
     "accountExists": "An account with this email already exists",
     "accountNotFound": "Account not found"
+  },
+  "aiChat": {
+    "page": {
+      "title": "AI Assistant",
+      "subtitle": "Get help with website management, content creation, and more"
+    },
+    "sidebar": {
+      "capabilitiesTitle": "What can AI do?",
+      "tipsTitle": "Tips",
+      "capabilities": {
+        "setup": {
+          "title": "Quick Website Setup",
+          "desc": "Generate a complete website with pages, menus, and content from scratch"
+        },
+        "templates": {
+          "title": "Apply Templates",
+          "desc": "Business, portfolio, blog, or organization templates with matching themes"
+        },
+        "theme": {
+          "title": "Theme & Layout",
+          "desc": "Change colors (6 themes), layouts (classic, single page, magazine, hero), logo & menu positions"
+        },
+        "pages": {
+          "title": "Create & Edit Pages",
+          "desc": "Create articles, update content, delete pages, add new menu sections"
+        },
+        "menu": {
+          "title": "Menu Management",
+          "desc": "Add, rename, reorder, or delete menu items and submenus"
+        },
+        "banners": {
+          "title": "Banners & News",
+          "desc": "Create news articles, manage banners, change display styles"
+        },
+        "seo": {
+          "title": "SEO Optimization",
+          "desc": "Generate keywords, update meta titles & descriptions"
+        }
+      },
+      "tips": {
+        "specific": "Be specific about what you want",
+        "natural": "Use natural language - no technical terms needed",
+        "confirm": "AI will ask before making major changes",
+        "undo": "All changes can be undone",
+        "reset": "Daily limit resets at midnight"
+      }
+    }
   }
 }

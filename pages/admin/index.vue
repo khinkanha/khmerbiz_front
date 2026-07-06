@@ -32,7 +32,7 @@
         <NuxtLink to="/admin/ai-chat" class="qbtn-link">
           <div class="qbtn ai-chat-btn">
             <div class="qbtn-icon">🤖</div>
-            <div class="qbtn-label">AI Assistant</div>
+            <div class="qbtn-label">{{ $t('dashboard.AIAssitant') }}</div>
           </div>
         </NuxtLink>
 

@@ -11,6 +11,8 @@
 7. [AI Chat Assistant](#7-ai-chat-assistant)
 8. [Quick Setup Wizard](#8-quick-setup-wizard)
 9. [Profile & Password](#9-profile--password)
+10. [Roles & Super Admin](#10-roles--super-admin)
+11. [Making Your Site Bilingual](#11-making-your-site-bilingual)
 
 ---
 
@@ -18,9 +20,10 @@
 
 ### Logging In
 
-1. Go to your admin URL: `https://khmer.biz/member/login`
+1. Go to your admin login page: `https://<your-domain>/member/login`
 2. Enter your **username** and **password**
-3. Click **Login**
+3. Complete the **reCAPTCHA** ("I'm not a robot") check
+4. Click **Login**
 
 ### After Login
 
@@ -56,58 +59,98 @@ Content is the pages and sections of your website. Each piece of content is link
 ### Creating Content
 
 1. Go to **Content** in the sidebar
-2. Click **Add New** or **Create New**
+2. Click **Add New**
 3. Fill in the form:
-   - **Title** — The page/section heading
-   - **Content Type** — Select the type (Article, Photo, Video, etc.)
-   - **Menu** — Choose which menu item this content belongs to
-   - **Language** — Select the language for this content
-   - **Description** — Enter your content (rich text editor for articles)
+   - **Title** *(required)* — the page/section heading
+   - **Content Type** *(required)* — Article, Photo, Video, Document, Blog News, or Map
+   - **Description** — rich-text (TinyMCE) editor; mainly used for **Article** content
+   - **Menu** *(required)* — the menu item this content belongs to. **The language is set automatically** from the menu you choose (each menu belongs to one language), so there is no separate language field.
+   - **Status** — toggle **Published** (visible on the public site) or **Draft** (hidden)
 4. Click **Save**
 
-### Editing Content
+> 💡 **Tip:** For Photo, Video, Document, News, and Map types, this form only creates the *section*. You add the actual photos / videos / files / articles in the next step (see below).
 
-1. Go to **Content** and find the item you want to edit
-2. Click the **pencil icon** (✏️) on the right
-3. Update the fields and click **Save**
+### The two-step workflow (Photo / Video / Document / News / Map)
 
-### Deleting Content
+Most content types are built in two steps:
 
-1. Click the **trash icon** (🗑️) on the content item
-2. Confirm the deletion
+1. **Create the content section** (title + type + menu + status) — described above.
+2. **Open the section** and add the individual entries using the buttons on the right of the edit page:
+   - **Photo / Video / Document** → click **Items** to open the items table
+   - **Blog News** → click **Blog News** to open the news manager
+   - **Map** → click **Show Map** to configure the map
+
+### Photo Gallery items
+
+1. Open a **Photo** content section → click **Items**
+2. Click **Add New**
+3. Fill in:
+   - **Title** *(required)* — caption shown under the photo
+   - **Primary Image** — choose **Upload** (pick an image file) or **URL** (paste `https://…/image.jpg`). A preview appears.
+4. Click **Add**. Repeat for each photo.
+5. Use the **pencil** (edit) or **trash** (delete) icons on each row.
+
+> The gallery renders as a grid with a lightbox on the public site.
+
+### Video items
+
+1. Open a **Video** content section → click **Items**
+2. Click **Add New**
+3. Enter:
+   - **Title** *(required)*
+   - **Video Link** — paste a **YouTube** or **Vimeo** URL (e.g. `https://www.youtube.com/watch?v=…`). It is embedded automatically.
+4. Click **Add**.
+
+### Document items
+
+1. Open a **Document** content section → click **Items**
+2. Click **Add New**
+3. Enter:
+   - **Title** *(required)*
+   - **Description** *(optional)*
+   - **File** — paste a direct **URL** to the document (e.g. a PDF). The **Upload** button only accepts images, so non-image documents must be linked by URL.
+4. Click **Add**.
+
+### News articles
+
+1. Open a **Blog News** content section → click **Blog News**
+2. Click **Add New**
+3. Fill in:
+   - **Title** *(required)* — headline
+   - **Short Description** — brief summary shown in the news **listing** and cards
+   - **Description** — full article (rich-text editor); shown on the article **detail** page
+   - **Primary Image** — cover/thumbnail (Upload or URL)
+   - **Publish Date** — when the article appears
+   - **Status** — **Show** (visible) or **Not Show** (hidden)
+   - **Priority** — checkbox to mark as important
+   - **Feature Item** — toggle to highlight/feature this article
+4. Click **Add**.
+
+> News listings on the public site are paginated. **Short Description** appears in the list; **Description** appears when a visitor opens the article.
+
+### Map content
+
+1. Open a **Map** content section → click **Show Map**
+2. Set **latitude** and **longitude** (the default is Phnom Penh: `11.5564, 104.9282`)
+3. Add a **title** and **description** for the marker
+4. Toggle **visible** to show/hide the map
+5. Click **Save**
+
+> Tip: to find coordinates, right-click a place on Google Maps — the lat/lng appears.
+
+### Editing & deleting content
+
+1. In the **Content** list, click the **pencil** (✏️) to edit a section, or the **list** icon to manage its items.
+2. Update fields and **Save**.
+3. Click the **trash** (🗑️) to delete — you'll be asked to confirm.
 
 > ⚠️ **Warning:** Deleted content cannot be recovered.
 
-### Managing Content Items (Photo, Video, Document, News)
+### Draft vs Published
 
-For gallery-type content, you can manage individual items within a content section:
-
-1. Click on a content item to open its detail page
-2. Use the **Items** tab to add, edit, or delete individual photos/videos/documents
-3. Use the **News** tab (for news-type content) to manage news articles
-
-### Adding News Articles
-
-1. Open a **News** type content section
-2. Click **Add New**
-3. Fill in:
-   - **Title** — News headline
-   - **Short Description** — Brief summary shown in listings
-   - **Description** — Full article content (rich text editor)
-   - **Primary Image** — Thumbnail/cover image
-   - **Publish Date** — When the article should appear
-   - **Status** — Toggle **Show** (visible) or **Not Show** (hidden)
-   - **Priority** — Mark as featured/highlighted
-4. Click **Save**
-
-### Managing Map Content
-
-1. Open a **Map** type content section
-2. Go to the **Map** tab
-3. Set the **latitude** and **longitude** coordinates
-4. Add a **title** and **description** for the marker
-5. Toggle **visible** to show/hide the map
-6. Click **Save**
+- **Published** content is live on the public website.
+- **Draft** content is saved but **not visible** to visitors — use it to work on a page before releasing it.
+- Use the **Status** and **Content Type** filters at the top of the content list to find items quickly.
 
 ---
 
@@ -151,6 +194,8 @@ Menus define your website's navigation structure. Each menu item links to a cont
 
 > ⚠️ **Note:** Deleting a menu item does **not** delete its linked content.
 
+> 💡 **This page manages menu *items* (the links).** To change the menu bar's **position** and **alignment**, go to **Settings → Menu** (see [6.6 Menu Position & Alignment](#66-menu-position--alignment)).
+
 ---
 
 ## 5. Media Library
@@ -189,31 +234,34 @@ Settings control the appearance and behavior of your public website.
 
 Go to **Settings → General**
 
-- **Site Title** — Your website name (shown in browser tab and header)
-- **Footer Text** — Text displayed at the bottom of your site
-- **Theme** — Color theme for your website:
+- **Website Title** — your site name (shown in the browser tab and header)
+- **Background Image** — optional background image (upload)
+- **Screen Mode** — **Full Screen** or **Medium**
+- **Footer** — text or HTML for the bottom of the site
+- **Footer Alignment** — **Left**, **Center**, or **Right**
+- **Theme Style** — color theme:
 
-| Theme | Description |
-|-------|-------------|
-| Default | Light/standard theme |
-| Inverse | Dark mode theme |
-| Red | Red color scheme |
-| Green | Green color scheme |
-| Purple | Purple color scheme |
-| Yellow | Yellow color scheme |
+| Value | Theme |
+|-------|-------|
+| Default | Light / standard |
+| Dark | Dark mode |
+| Red | Red scheme |
+| Green | Green scheme |
+| Purple | Purple scheme |
+| Yellow | Yellow scheme |
 
-- **Page Layout** — Overall website layout:
+- **Google Analytics Tracking ID** — for visitor analytics
+- **Widget Chat** — paste a third-party chat widget's embed script
+- **Choose Template Style** — pick the homepage layout by clicking one of the four preview cards:
 
-| Layout | Description |
-|--------|-------------|
-| Classic Multi-Page | Traditional website with separate pages per menu item |
-| Scrolling Single Page | All content on one scrollable page |
-| Magazine Grid | Card-based magazine style layout |
-| Fullscreen Hero | Large hero image focused layout |
+| Card | Layout |
+|------|--------|
+| Classic Multi-Page | Traditional website; a separate page per menu item |
+| Scrolling Single-Page | All sections on one scrollable page |
+| Magazine/News Grid | Card-based magazine layout with a sidebar |
+| Fullscreen Hero | Large full-screen hero image with sections below |
 
-- **Background** — Optional background image/color for the site
-- **Google Analytics Tracking ID** — For visitor analytics
-- **Chat Script** — Third-party chat widget embed code
+Click **Save** to apply. (The **Theme Style** sets colors; the **Template Style** sets the page layout — they are independent.)
 
 ### 6.2 Logo Settings
 
@@ -228,15 +276,11 @@ Go to **Settings → Logo**
 
 Go to **Settings → Banner**
 
-- **Banner Display** — Enable/disable the banner slideshow
-- **Banner Mode** — How banners transition (slide, fade, etc.)
-- **Banner Position** — Where banners appear
+- **Slide Display** — enable/disable the banner slideshow
+- **Slide Mode** — how slides transition
+- **Slide Position** — where the banner appears
 
-### Managing Banner Images
-
-- Add banners with a title, image URL, and optional link
-- Reorder banners by changing their display order
-- Delete banners you no longer need
+**Managing banner images:** add one or more banners, each with a **Title**, **Image** (URL), optional **Link**, and **Size**. Change the display **order** to reorder, and delete banners you no longer need.
 
 ### 6.4 Social Media Links
 
@@ -270,6 +314,15 @@ Go to **Settings → Language**
 
 > ⚠️ **Important:** Each language has its own set of menus and content. Adding a language means you'll need to create menus and content for it.
 
+### 6.6 Menu Position & Alignment
+
+Go to **Settings → Menu**
+
+- **Menu Position** — **Top**, **Middle**, or **Bottom**
+- **Menu Alignment** — **Left**, **Center**, or **Right**
+
+Click **Save**. (This controls the nav bar's placement — different from the **Menu** page, which manages the menu *items/links*.)
+
 ---
 
 ## 7. AI Chat Assistant
@@ -278,7 +331,7 @@ The AI assistant lets you manage your website using natural language — no tech
 
 ### Accessing AI Chat
 
-Look for the **AI Chat** button (💬) in the admin panel.
+From the **Dashboard**, click the **🤖 AI Assistant** quick-action button. This opens the full AI Chat page (`/admin/ai-chat`).
 
 ### What You Can Ask
 
@@ -305,6 +358,13 @@ Look for the **AI Chat** button (💬) in the admin panel.
 - ✅ **Confirm before acting:** The AI explains what it will do before making changes
 - ❌ **Avoid vague requests:** "Make it better" — specify what you want changed
 - ❌ **Don't request file uploads:** The AI cannot upload images; use the Media Library for that
+
+### Confirming & undoing actions
+
+- **Before risky changes**, the AI shows a **preview** with **Confirm** / **Cancel** buttons — nothing is changed until you confirm.
+- **If the AI needs more info** (e.g. "which news section should this go in?"), it shows a dropdown to pick from, then **Submit**.
+- **Undo:** every successful create/update action shows an **Undo** button — click it to reverse that action.
+- **Operation history:** the **history** button in the chat header lists recent operations with their status (completed / pending / failed / rolled back), and an **undo** option where applicable.
 
 ### What the AI Cannot Do
 
@@ -362,11 +422,47 @@ Your website is now live with basic content! You can continue to customize it th
 
 ---
 
+## 10. Roles & Super Admin
+
+Your account's role controls which parts of the admin panel you can see.
+
+| Role | What they can do |
+|------|------------------|
+| **Web Admin** | Full control of their own site: content, menus, media, settings, and managing their site's users |
+| **Normal User** | Can edit content / menus / media and settings, but **cannot** manage users |
+| **Super Admin** | Platform-wide: manages **all tenant domains**, **all users**, and **announcements** |
+
+### Super Admin areas
+
+If you are a Super Admin, the Dashboard shows extra quick actions:
+
+- **Domains** (`/admin/super/domains`) — create and manage every tenant domain. Each domain has its own theme, settings, languages, menus, and content.
+- **Users** (`/admin/super/users`) — view and manage all platform users and assign roles (Super Admin, Web Admin, Normal User).
+- **Announcements** (`/admin/super/announcing`) — create platform-wide announcements.
+
+> Web Admins manage their **own site's** users at **Users** (`/admin/users`); only Super Admins reach the platform-wide areas above.
+
+---
+
+## 11. Making Your Site Bilingual
+
+Each language has its **own menus and content** — they are not automatic translations. To add a second language end-to-end:
+
+1. **Enable the language:** go to **Settings → Language**, add the language (e.g. English) and pick its flag. Set it as default only if visitors should see it first.
+2. **Build that language's menu tree:** go to **Menu**, switch the admin language selector (top-right) to the new language, and create the menu items (Home, About, etc.) — one tree per language.
+3. **Create content for each menu item:** go to **Content**, and for each menu item create the matching content (article, gallery, etc.). The **language comes from the menu item you pick**, so choose menu items in the target language.
+4. **Repeat for banners / logo / media** as needed — some may also need language-specific entries.
+5. **Preview:** open the public site and use the language switcher to confirm both languages render.
+
+> ⚠️ Adding a language does **not** copy your existing menus or content — you create them fresh for that language. Removing a language deletes its menus and content.
+
+---
+
 ## Keyboard Shortcuts & Tips
 
 - Use the **breadcrumb navigation** at the top to go back to previous pages
 - Click the **logo** in the admin header to return to the Dashboard
-- Use **Ctrl+S** (or **Cmd+S**) in the rich text editor to save content
+- Use the **Save** button on each form to save changes (there is no keyboard shortcut)
 - The **language selector** in the top-right lets you switch the admin interface language
 
 ---
@@ -382,4 +478,4 @@ If you encounter issues:
 
 ---
 
-*Last updated: May 2026*
+*Last updated: July 2026*

@@ -50,7 +50,7 @@ Accessible only to `user_level === -1`:
 
 ### AI Chat Assistant (`composables/useAIChat.ts` + `stores/aiChat.ts`)
 
-An in-admin AI assistant that can manage the website via natural language. Capabilities include creating/editing/deleting content and menu items, changing themes and colors, generating articles and SEO keywords, and running quick setup. Uses an async job-based architecture — requests return a job ID, client polls for completion. Limited to 10 questions per user per day. Shows tool-call results inline so the admin can see what actions the AI took.
+An in-admin AI assistant that can manage the website via natural language. Capabilities include creating/editing/deleting content and menu items, changing themes and colors, generating articles and SEO keywords, and running quick setup. Uses an async job-based architecture — requests return a job ID, client polls for completion. Limited to 10 questions per user per day. Shows tool-call results inline so the admin can see what actions the AI took. Assistant replies are rendered as sanitized markdown via `composables/useMarkdown.ts` (marked + DOMPurify, injected with `v-html`).
 
 ### News Parser (`composables/useNewsParser.ts`)
 
@@ -76,21 +76,21 @@ Languages available: Khmer (default), English, Chinese. The domain config from t
 
 ```bash
 npm run dev        # Start dev server on port 8888 (with --logLevel error)
-npm run build      # Production build
+npm run build      # Production build (outputs to .output/)
 npm run generate   # Static site generation
 npm run preview    # Preview production build
 ```
 
-No test framework is configured. Node.js >= 19.0.0 required.
+No test framework and no lint script are configured — verification is manual, via the dev server at `http://localhost:8888`. Node.js >= 19.0.0 is required for dev. **Production runs the build output, not `nuxt`**: the `Dockerfile` (deployed via CapRover — see `captain-definition`) copies `.output/`, installs the server's production deps, and runs `node .output/server/index.mjs` on `node:22-alpine`, port 80.
 
 ## Architecture
 
 ### Two-App Structure
 
-The app splits into a **public site** (SSR) and an **admin panel** (client-side only):
+The app splits into a **public site** (SSR) and a **client-only admin/auth area**. SSR is governed by `routeRules` in `nuxt.config.ts` (top-level default `ssr: true`):
 
-- **Public pages** (`/`, `/pages/[domainId]/[menuId]`, `/article/**`, `/news/[newsId]`, `/legal`): SSR enabled, domain config injected server-side
-- **Admin pages** (`/admin/**`): SSR disabled via route rules, auth-protected by global middleware
+- **SSR enabled**: `/`, `/pages/**`, `/news/**` — public content with domain config injected server-side. `/article/**` and `/legal` have no explicit rule and inherit `ssr: true`.
+- **SSR disabled (client-only)**: `/admin/**` (admin panel, auth-protected) and `/member/**` (`/member/login`, `/member/signup`).
 
 ### Domain Resolution Flow
 
@@ -111,7 +111,7 @@ The app splits into a **public site** (SSR) and an **admin panel** (client-side 
 - Auto-refresh on 401 responses with retry
 - Methods: `get`, `post`, `put`, `delete` — all go through `apiFetch<T>()` returning `ApiResponse<T>`
 - FormData detection: auto-sets Content-Type based on body type
-- Base URL from `runtimeConfig.public.apiBaseUrl` (default: `http://khmerbiz-api.localhost/api/v1`)
+- Base URL and other public values are **environment-driven** via `runtimeConfig.public` — the defaults in `nuxt.config.ts` are empty strings; real values live in `.env`: `apiBaseUrl` ← `NUXT_PUBLIC_API_BASE_URL`, `photoUrl` ← `NUXT_PUBLIC_PHOTO_URL`, `recaptchaSiteKey` ← `NUXT_PUBLIC_RECAPTCHA_SITE_KEY`. (See **Sharp edges** re: the photo var name.)
 
 ### State Management
 
@@ -161,6 +161,7 @@ TypeScript interfaces in `types/`: `api.ts` (`ApiResponse<T>`, `PaginatedRespons
 - **TinyMCE** (`@tinymce/tinymce-vue`) + **Quill** for rich text editing
 - **Leaflet** (`@vue-leaflet/vue-leaflet`) for maps
 - **Google reCAPTCHA v2** — `composables/useRecaptcha.ts` handles widget lifecycle (render, getResponse, reset). Used on signup/login forms.
+- **marked + DOMPurify** — `composables/useMarkdown.ts` renders the AI assistant's replies as sanitized markdown (output injected via `v-html`).
 
 ### Component Organization
 
@@ -169,6 +170,13 @@ Auto-imported with `pathPrefix: false`:
 - `components/public/layout/` — PublicHeader, PublicFooter
 - `components/public/content/` — Content sections (articles, news, videos, photos, documents, maps)
 - `components/admin/layout/` — AdminNavbar, AdminBreadcrumb, AdminFooter, LanguageSelector
+
+### Sharp edges
+
+- **Always use PascalCase for components in templates.** `nuxt.config.ts` sets `vue.compilerOptions.isCustomElement = tag => tag.includes('-')`, so any tag containing a hyphen is treated as a web component — Vue will **not** resolve it as a Vue component and will **not** warn. `<MyComponent />` works; `<my-component />` silently renders as an empty custom element with no error.
+- **`runtimeConfig.public.photoUrl` env-var name.** The key maps to `NUXT_PUBLIC_PHOTO_URL`, but `.env` defines `NUXT_PUBLIC_PHOTO_BASE_URL` (and also `NUXT_PUBLIC_WEBSITE_TITLE` / `NUXT_PUBLIC_WEBSITE_DESCRIPTION`, which have no matching config key). Confirm which variable actually populates `photoUrl` and align the names before relying on it.
+- **`bootstrap` and `axios` are declared in `package.json` but appear unused.** The API layer uses native `fetch` (`composables/useApi.ts`), and Bootstrap's CSS is not imported in `nuxt.config.ts` — yet Bootstrap utility classes (`form-control`, `row`, `col-md-*`) appear in templates and may be inert. Verify before relying on either.
+- **`middleware/` ≠ `server/middleware/`.** A `defineEventHandler` placed in `middleware/` is silently dead code (this was the root cause of the `www.` resolution bug — see Domain Resolution Flow). Server-side request handling goes in `server/middleware/`.
 
 ### Backend API Contract
 

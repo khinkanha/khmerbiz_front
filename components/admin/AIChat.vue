@@ -3,30 +3,17 @@
     <!-- Chat Header -->
     <div class="chat-header">
       <div class="header-left">
-        <span :class="['health-dot', aiHealthy === true ? 'healthy' : aiHealthy === false ? 'unhealthy' : 'unknown']" v-tooltip="aiHealthy ? 'AI service online' : 'AI service unavailable'"></span>
+        <span :class="['health-dot', aiHealthy === true ? 'healthy' : aiHealthy === false ? 'unhealthy' : 'unknown']"
+          v-tooltip="aiHealthy ? 'AI service online' : 'AI service unavailable'"></span>
         <h3>AI Assistant</h3>
-        <Tag
-          v-if="usageInfo"
-          :value="`${usageInfo.remaining_questions}/${usageInfo.daily_limit} questions`"
-          :severity="usageInfo.remaining_questions <= 2 ? 'danger' : 'success'"
-        />
+        <Tag v-if="usageInfo" :value="`${usageInfo.remaining_questions}/${usageInfo.daily_limit} questions`"
+          :severity="usageInfo.remaining_questions <= 2 ? 'danger' : 'success'" />
       </div>
       <div class="header-right">
-        <Button
-          icon="pi pi-history"
-          class="p-button-text"
-          v-tooltip="'Operation history'"
-          @click="toggleHistory"
-          :badge="historyItems.length > 0 ? String(historyItems.length) : undefined"
-          badgeSeverity="info"
-        />
-        <Button
-          icon="pi pi-refresh"
-          class="p-button-text"
-          v-tooltip="'Reset conversation'"
-          @click="handleReset"
-          :disabled="loading"
-        />
+        <Button icon="pi pi-history" class="p-button-text" v-tooltip="'Operation history'" @click="toggleHistory"
+          :badge="historyItems.length > 0 ? String(historyItems.length) : undefined" badgeSeverity="info" />
+        <Button icon="pi pi-refresh" class="p-button-text" v-tooltip="'Reset conversation'" @click="handleReset"
+          :disabled="loading" />
       </div>
     </div>
 
@@ -44,33 +31,20 @@
         <div v-else-if="historyItems.length === 0" class="history-empty">
           No operations yet
         </div>
-        <div
-          v-for="op in historyItems"
-          :key="op.id"
-          class="history-item"
-        >
+        <div v-for="op in historyItems" :key="op.id" class="history-item">
           <div class="history-item-left">
-            <i :class="['pi', getOperationIcon(op.operation_type)]" :style="{ color: getOperationColor(op.operation_type) }"></i>
+            <i :class="['pi', getOperationIcon(op.operation_type)]"
+              :style="{ color: getOperationColor(op.operation_type) }"></i>
             <div class="history-item-info">
               <span class="history-item-desc">{{ formatOperationDescription(op) }}</span>
               <span class="history-item-time">{{ formatOperationTime(op.created_at) }}</span>
             </div>
           </div>
           <div class="history-item-right">
-            <Tag
-              :value="op.status"
-              :severity="getStatusSeverity(op.status)"
-              style="font-size: 0.7rem"
-            />
-            <Button
-              v-if="isRollbackable(op)"
-              icon="pi pi-undo"
-              class="p-button-text p-button-sm"
-              v-tooltip="'Undo this operation'"
-              :loading="rollingBack[op.id]"
-              @click="handleRollback(op.id)"
-              severity="warning"
-            />
+            <Tag :value="op.status" :severity="getStatusSeverity(op.status)" style="font-size: 0.7rem" />
+            <Button v-if="isRollbackable(op)" icon="pi pi-undo" class="p-button-text p-button-sm"
+              v-tooltip="'Undo this operation'" :loading="rollingBack[op.id]" @click="handleRollback(op.id)"
+              severity="warning" />
           </div>
         </div>
       </div>
@@ -90,8 +64,10 @@
           <div class="capability-group">
             <div class="capability-title"><i class="pi pi-bolt"></i> Quick Setup</div>
             <ul class="suggestions">
-              <li @click="useSuggestion('Create a fresh website for my business')">"Create a fresh website for my business"</li>
-              <li @click="useSuggestion('Apply a portfolio template to my site')">"Apply a portfolio template to my site"</li>
+              <li @click="useSuggestion('Create a fresh website for my business')">"Create a fresh website for my
+                business"</li>
+              <li @click="useSuggestion('Apply a portfolio template to my site')">"Apply a portfolio template to my
+                site"</li>
             </ul>
           </div>
           <div class="capability-group">
@@ -99,13 +75,15 @@
             <ul class="suggestions">
               <li @click="useSuggestion('Change my theme to purple')">"Change my theme to purple"</li>
               <li @click="useSuggestion('Switch to magazine layout')">"Switch to magazine layout"</li>
-              <li @click="useSuggestion('Move the logo to the left and menu to the top')">"Move the logo to the left and menu to the top"</li>
+              <li @click="useSuggestion('Move the logo to the left and menu to the top')">"Move the logo to the left and
+                menu to the top"</li>
             </ul>
           </div>
           <div class="capability-group">
             <div class="capability-title"><i class="pi pi-file"></i> Content & Articles</div>
             <ul class="suggestions">
-              <li @click="useSuggestion('Create a new article about our services')">"Create a new article about our services"</li>
+              <li @click="useSuggestion('Create a new article about our services')">"Create a new article about our
+                services"</li>
               <li @click="useSuggestion('Update my home page content')">"Update my home page content"</li>
               <li @click="useSuggestion('Create a new page called Team')">"Create a new page called Team"</li>
             </ul>
@@ -121,25 +99,24 @@
           <div class="capability-group">
             <div class="capability-title"><i class="pi pi-image"></i> Banners & News</div>
             <ul class="suggestions">
-              <li @click="useSuggestion('Create a news article about our latest product launch')">"Create a news article about our latest product launch"</li>
+              <li @click="useSuggestion('Create a news article about our latest product launch')">"Create a news article
+                about our latest product launch"</li>
               <li @click="useSuggestion('Change the banner display style')">"Change the banner display style"</li>
             </ul>
           </div>
           <div class="capability-group">
             <div class="capability-title"><i class="pi pi-search"></i> SEO</div>
             <ul class="suggestions">
-              <li @click="useSuggestion('Generate SEO keywords for my content')">"Generate SEO keywords for my content"</li>
-              <li @click="useSuggestion('Update SEO metadata for my home page')">"Update SEO metadata for my home page"</li>
+              <li @click="useSuggestion('Generate SEO keywords for my content')">"Generate SEO keywords for my content"
+              </li>
+              <li @click="useSuggestion('Update SEO metadata for my home page')">"Update SEO metadata for my home page"
+              </li>
             </ul>
           </div>
         </div>
       </div>
 
-      <div
-        v-for="message in messages"
-        :key="message.id"
-        :class="['message', message.role]"
-      >
+      <div v-for="message in messages" :key="message.id" :class="['message', message.role]">
         <div class="message-header">
           <span class="message-role">
             {{ message.role === 'user' ? 'You' : 'AI Assistant' }}
@@ -149,11 +126,8 @@
           </span>
         </div>
 
-        <div
-          v-if="message.role === 'assistant'"
-          class="message-content markdown-body"
-          v-html="renderMarkdown(message.content)"
-        ></div>
+        <div v-if="message.role === 'assistant'" class="message-content markdown-body"
+          v-html="renderMarkdown(message.content)"></div>
         <div v-else class="message-content">
           {{ message.content }}
         </div>
@@ -164,27 +138,17 @@
             <i class="pi pi-cog"></i>
             Actions performed:
           </div>
-          <div
-            v-for="(tool, index) in message.toolCalls"
-            :key="index"
-            :class="['tool-call', (tool.needsConfirmation || tool.needsInput) ? 'pending' : (tool.success ? 'success' : 'error')]"
-          >
+          <div v-for="(tool, index) in message.toolCalls" :key="index"
+            :class="['tool-call', (tool.needsConfirmation || tool.needsInput) ? 'pending' : (tool.success ? 'success' : 'error')]">
             <div class="tool-call-top">
               <div class="tool-name">
                 <i :class="['pi', getToolIcon(tool.toolName)]"></i>
                 {{ formatToolName(tool.toolName) }}
               </div>
               <!-- Undo button for successful create/update operations -->
-              <Button
-                v-if="tool.success && canRollbackTool(tool.toolName)"
-                icon="pi pi-undo"
-                label="Undo"
-                class="p-button-text p-button-sm"
-                severity="warning"
-                size="small"
-                v-tooltip="'Undo this action'"
-                @click="handleToolRollback(tool, message.id)"
-              />
+              <Button v-if="tool.success && canRollbackTool(tool.toolName)" icon="pi pi-undo" label="Undo"
+                class="p-button-text p-button-sm" severity="warning" size="small" v-tooltip="'Undo this action'"
+                @click="handleToolRollback(tool, message.id)" />
             </div>
 
             <!-- Confirmation UI -->
@@ -194,22 +158,11 @@
                 {{ tool.confirmationPreview }}
               </div>
               <div class="confirmation-actions">
-                <Button
-                  label="Confirm"
-                  icon="pi pi-check"
-                  severity="danger"
-                  size="small"
+                <Button label="Confirm" icon="pi pi-check" severity="danger" size="small"
                   :loading="confirming[tool.confirmationId!]"
-                  @click="handleConfirm(tool.confirmationId!, message.id)"
-                />
-                <Button
-                  label="Cancel"
-                  icon="pi pi-times"
-                  severity="secondary"
-                  size="small"
-                  outlined
-                  @click="handleReject(tool.confirmationId!, message.id)"
-                />
+                  @click="handleConfirm(tool.confirmationId!, message.id)" />
+                <Button label="Cancel" icon="pi pi-times" severity="secondary" size="small" outlined
+                  @click="handleReject(tool.confirmationId!, message.id)" />
               </div>
             </div>
 
@@ -220,23 +173,12 @@
                 {{ tool.inputPrompt || 'Please choose an option to continue' }}
               </div>
               <div class="input-actions">
-                <Dropdown
-                  v-model="inputSelections[tool.inputId]"
-                  :options="tool.options"
-                  optionLabel="label"
-                  optionValue="value"
-                  placeholder="Select a news section…"
-                  class="tool-select"
-                />
-                <Button
-                  label="Submit"
-                  icon="pi pi-check"
-                  severity="primary"
-                  size="small"
+                <Dropdown v-model="inputSelections[tool.inputId]" :options="tool.options" optionLabel="label"
+                  optionValue="value" placeholder="Select a news section…" class="tool-select" />
+                <Button label="Submit" icon="pi pi-check" severity="primary" size="small"
                   :loading="responding[tool.inputId]"
                   :disabled="inputSelections[tool.inputId] === undefined || inputSelections[tool.inputId] === null"
-                  @click="handleRespond(tool, message.id)"
-                />
+                  @click="handleRespond(tool, message.id)" />
               </div>
             </div>
 
@@ -274,23 +216,14 @@
     <!-- Input Area -->
     <div class="input-area">
       <div class="input-wrapper">
-        <Textarea
-          v-model="userInput"
-          placeholder="Ask AI to modify your website..."
-          :disabled="loading || isLimitReached || aiHealthy === false"
-          :autoResize="true"
-          rows="3"
-          @keydown.ctrl.enter="handleSendMessage"
-        />
+        <Textarea v-model="userInput" placeholder="Ask AI to modify your website..."
+          :disabled="loading || isLimitReached || aiHealthy === false" :autoResize="true" rows="3"
+          @keydown.ctrl.enter="handleSendMessage" />
         <div class="input-footer">
           <span class="input-hint">Ctrl + Enter to send</span>
-          <Button
-            icon="pi pi-send"
-            @click="handleSendMessage"
-            :disabled="!canSendMessage || !userInput.trim() || aiHealthy === false"
-            :loading="loading"
-            severity="primary"
-          >
+          <Button icon="pi pi-send" @click="handleSendMessage"
+            :disabled="!canSendMessage || !userInput.trim() || aiHealthy === false" :loading="loading"
+            severity="primary">
             Send
           </Button>
         </div>
@@ -481,8 +414,8 @@ const getToolIcon = (toolName: string): string => {
 
 const canRollbackTool = (toolName: string): boolean => {
   return ['create_article', 'create_menu_with_content', 'create_menu_item',
-          'create_news', 'create_banner', 'update_article', 'update_menu_item',
-          'update_theme', 'update_layout', 'update_logo_position', 'update_menu_position'].includes(toolName);
+    'create_news', 'create_banner', 'update_article', 'update_menu_item',
+    'update_theme', 'update_layout', 'update_logo_position', 'update_menu_position'].includes(toolName);
 };
 
 // ── Error categorization ──
@@ -591,10 +524,10 @@ const formatOperationTime = (dateStr: string): string => {
 .ai-chat-container {
   display: flex;
   flex-direction: column;
-  height: 80%;
+  height: 90%;
   background: white;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: scroll;
 }
 
 .chat-header {
@@ -632,14 +565,17 @@ const formatOperationTime = (dateStr: string): string => {
   display: inline-block;
   flex-shrink: 0;
 }
+
 .health-dot.healthy {
   background: #22c55e;
   box-shadow: 0 0 4px #22c55e80;
 }
+
 .health-dot.unhealthy {
   background: #ef4444;
   box-shadow: 0 0 4px #ef444480;
 }
+
 .health-dot.unknown {
   background: #9ca3af;
 }
@@ -696,6 +632,7 @@ const formatOperationTime = (dateStr: string): string => {
   border-radius: 4px;
   font-size: 0.8rem;
 }
+
 .history-item:hover {
   background: #e5e7eb;
 }
@@ -707,7 +644,7 @@ const formatOperationTime = (dateStr: string): string => {
   min-width: 0;
 }
 
-.history-item-left > i {
+.history-item-left>i {
   flex-shrink: 0;
   font-size: 0.85rem;
 }
@@ -1042,21 +979,26 @@ const formatOperationTime = (dateStr: string): string => {
   gap: 0.4rem;
   margin-top: 0.25rem;
 }
+
 .tool-error i {
   margin-top: 2px;
   flex-shrink: 0;
 }
+
 .tool-error.permission {
   color: #991b1b;
 }
+
 .tool-error.notfound {
   color: #9a3412;
 }
+
 .tool-error.sizelimit,
 .tool-error.ratelimit,
 .tool-error.quality {
   color: #92400e;
 }
+
 .tool-error.generic {
   color: #991b1b;
 }

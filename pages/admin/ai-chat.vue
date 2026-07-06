@@ -1,8 +1,8 @@
 <template>
   <div class="ai-chat-page">
     <div class="page-header">
-      <h1>AI Assistant</h1>
-      <p>Get help with website management, content creation, and more</p>
+      <h1>{{ $t('aiChat.page.title') }}</h1>
+      <p>{{ $t('aiChat.page.subtitle') }}</p>
     </div>
 
     <div class="chat-layout">
@@ -12,67 +12,67 @@
 
       <div class="chat-sidebar">
         <div class="sidebar-section">
-          <h3>What can AI do?</h3>
+          <h3>{{ $t('aiChat.sidebar.capabilitiesTitle') }}</h3>
           <ul class="capability-list">
             <li>
               <i class="pi pi-bolt"></i>
               <div>
-                <strong>Quick Website Setup</strong>
-                <p>Generate a complete website with pages, menus, and content from scratch</p>
+                <strong>{{ $t('aiChat.sidebar.capabilities.setup.title') }}</strong>
+                <p>{{ $t('aiChat.sidebar.capabilities.setup.desc') }}</p>
               </div>
             </li>
             <li>
               <i class="pi pi-th-large"></i>
               <div>
-                <strong>Apply Templates</strong>
-                <p>Business, portfolio, blog, or organization templates with matching themes</p>
+                <strong>{{ $t('aiChat.sidebar.capabilities.templates.title') }}</strong>
+                <p>{{ $t('aiChat.sidebar.capabilities.templates.desc') }}</p>
               </div>
             </li>
             <li>
               <i class="pi pi-palette"></i>
               <div>
-                <strong>Theme & Layout</strong>
-                <p>Change colors (6 themes), layouts (classic, single page, magazine, hero), logo &amp; menu positions</p>
+                <strong>{{ $t('aiChat.sidebar.capabilities.theme.title') }}</strong>
+                <p>{{ $t('aiChat.sidebar.capabilities.theme.desc') }}</p>
               </div>
             </li>
             <li>
               <i class="pi pi-file"></i>
               <div>
-                <strong>Create &amp; Edit Pages</strong>
-                <p>Create articles, update content, delete pages, add new menu sections</p>
+                <strong>{{ $t('aiChat.sidebar.capabilities.pages.title') }}</strong>
+                <p>{{ $t('aiChat.sidebar.capabilities.pages.desc') }}</p>
               </div>
             </li>
             <li>
               <i class="pi pi-bars"></i>
               <div>
-                <strong>Menu Management</strong>
-                <p>Add, rename, reorder, or delete menu items and submenus</p>
+                <strong>{{ $t('aiChat.sidebar.capabilities.menu.title') }}</strong>
+                <p>{{ $t('aiChat.sidebar.capabilities.menu.desc') }}</p>
               </div>
             </li>
             <li>
               <i class="pi pi-image"></i>
               <div>
-                <strong>Banners &amp; News</strong>
-                <p>Create news articles, manage banners, change display styles</p>
+                <strong>{{ $t('aiChat.sidebar.capabilities.banners.title') }}</strong>
+                <p>{{ $t('aiChat.sidebar.capabilities.banners.desc') }}</p>
               </div>
             </li>
             <li>
               <i class="pi pi-search"></i>
               <div>
-                <strong>SEO Optimization</strong>
-                <p>Generate keywords, update meta titles &amp; descriptions</p>
+                <strong>{{ $t('aiChat.sidebar.capabilities.seo.title') }}</strong>
+                <p>{{ $t('aiChat.sidebar.capabilities.seo.desc') }}</p>
               </div>
             </li>
           </ul>
         </div>
     <div class="sidebar-section">
-          <h3>Tips</h3>
+          <h3>{{ $t('aiChat.sidebar.tipsTitle') }}</h3>
           <ul class="tips-list">
-            <li>Be specific about what you want</li>
-            <li>Use natural language - no technical terms needed</li>
-            <li>AI will ask before making major changes</li>
-            <li>All changes can be undone</li>
-            <li>Daily limit resets at midnight</li>
+            <li>{{ $t('aiChat.sidebar.tips.specific') }}</li>
+            <li>{{ $t('aiChat.sidebar.tips.natural') }}</li>
+            <li>{{ $t('aiChat.sidebar.tips.confirm') }}</li>
+            <li>{{ $t('aiChat.sidebar.tips.undo') }}</li>
+            <li>{{ $t('aiChat.sidebar.tips.reset') }}</li>
           </ul>
         </div>
       </div>
