@@ -1338,7 +1338,7 @@ const _routes = [
     name: "admin-ai-chat",
     path: "/admin/ai-chat",
     meta: __nuxt_page_meta$v || {},
-    component: () => import('./ai-chat-DhQLxHBZ.mjs')
+    component: () => import('./ai-chat-B4NLAacg.mjs')
   },
   {
     name: "admin-content-contentId-items",
@@ -1374,7 +1374,7 @@ const _routes = [
     name: "admin",
     path: "/admin",
     meta: __nuxt_page_meta$p || {},
-    component: () => import('./index-ve4VLxya.mjs')
+    component: () => import('./index-B0CrQ-2O.mjs')
   },
   {
     name: "admin-media",
@@ -2478,11 +2478,11 @@ const localeCodes = [
 ];
 const localeLoaders = {
   "en": [{ key: "../i18n/locales/en.json", load: () => import(
-    './en-BnG4whqd.mjs'
+    './en-CLhz3qIo.mjs'
     /* webpackChunkName: "locale__Users_khinkanha_websites_4khweb_khmerbiz_front_i18n_locales_en_json" */
   ), cache: true }],
   "kh": [{ key: "../i18n/locales/kh.json", load: () => import(
-    './kh-B6tsON5y.mjs'
+    './kh-CMImGzo0.mjs'
     /* webpackChunkName: "locale__Users_khinkanha_websites_4khweb_khmerbiz_front_i18n_locales_kh_json" */
   ), cache: true }],
   "ch": [{ key: "../i18n/locales/ch.json", load: () => import(

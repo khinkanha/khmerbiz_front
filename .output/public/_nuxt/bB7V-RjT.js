@@ -1,0 +1,1 @@
+import{at as u,K as o,G as a}from"./B6Vv8kTP.js";const n=u(e=>{const t=o();if(!["/member/login","/member/signup"].includes(e.path)&&!t.isAuthenticated)return a("/member/login")});export{n as default};
