@@ -32,6 +32,11 @@
       :map-data="mapData || {}"
       :section-title="showTitle ? content.title : ''"
     />
+    <ProductCatalog
+      v-else-if="content && content.content_type === ContentType.PRODUCT"
+      :content-id="content.content_id"
+      :section-title="showTitle ? content.title : ''"
+    />
   </div>
 </template>
 

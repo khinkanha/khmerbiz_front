@@ -75,7 +75,7 @@
           <template #title>{{ $t('contentManager.actions') }}</template>
           <template #content>
             <div class="action-links">
-              <Button v-if="contentStore.currentContent?.content_type !== ContentType.ARTICLE"
+              <Button v-if="contentStore.currentContent?.content_type !== ContentType.ARTICLE && contentStore.currentContent?.content_type !== ContentType.PRODUCT"
                 :label="$t('contentManager.list')" icon="pi pi-list" outlined
                 @click="$router.push(`/admin/content/${contentId}/items`)" class="w-full mb-3" />
               <Button v-if="contentStore.currentContent?.content_type === ContentType.NEWS"
@@ -83,7 +83,10 @@
                 @click="$router.push(`/admin/content/${contentId}/news`)" class="w-full mb-3" />
               <Button v-if="contentStore.currentContent?.content_type === ContentType.MAP"
                 :label="$t('contentManager.showMap')" icon="pi pi-map" outlined
-                @click="$router.push(`/admin/content/${contentId}/map`)" class="w-full" />
+                @click="$router.push(`/admin/content/${contentId}/map`)" class="w-full mb-3" />
+              <Button v-if="contentStore.currentContent?.content_type === ContentType.PRODUCT"
+                label="Manage Products" icon="pi pi-shopping-bag" outlined
+                @click="$router.push(`/admin/content/${contentId}/products`)" class="w-full" />
             </div>
           </template>
         </Card>
@@ -142,6 +145,7 @@ const contentTypeOptions = [
   { label: t('contentManager.document'), value: ContentType.DOCUMENT },
   { label: t('contentManager.blogNews'), value: ContentType.NEWS },
   { label: 'Map', value: ContentType.MAP },
+  { label: 'Product / Service', value: ContentType.PRODUCT },
 ]
 
 const menuOptions = computed(() => {

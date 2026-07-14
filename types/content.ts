@@ -10,6 +10,7 @@ export interface Content {
   lang_id: number
   items?: ContentItem[]
   news?: News[]
+  products?: Product[]
 }
 
 export interface ContentItem {
@@ -37,10 +38,45 @@ export interface News {
   priority?: number
 }
 
+// Product/service catalog item. Detail fields (name, price, currency,
+// shortdes, longdes, features[], photos[]) are stored as JSON in the
+// `description` column — same convention as News. Parsed into ProductDetail.
+export interface Product {
+  id: number
+  content_id: number
+  userid: number
+  status: number
+  priority: number
+  create_date: string | null
+  publish_date: string | null
+  description: string | null
+  // Parsed fields (populated by parseProduct):
+  name: string
+  price?: number
+  currency?: string
+  shortdes?: string
+  longdes?: string
+  features?: string[]
+  photos?: string[]
+}
+
+export interface ProductForm {
+  name: string
+  price?: number
+  currency?: string
+  shortdes?: string
+  longdes?: string
+  features: string[]
+  photos: string[]
+  priority?: number
+  status?: number
+}
+
 export interface ContentSection {
   content: Content
   items: ContentItem[]
   news?: News[]
+  products?: Product[]
 }
 
 export enum ContentType {
@@ -50,6 +86,7 @@ export enum ContentType {
   DOCUMENT = 3,
   NEWS = 4,
   MAP = 5,
+  PRODUCT = 6,
 }
 
 export interface ContentForm {

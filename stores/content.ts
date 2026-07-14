@@ -2,10 +2,12 @@ import type {
   Content,
   ContentItem,
   News,
+  Product,
   ContentSection,
   ContentForm,
   ItemForm,
   NewsForm,
+  ProductForm,
   PaginatedResponse,
 } from '~/types'
 import { acceptHMRUpdate, defineStore } from 'pinia'
@@ -18,6 +20,7 @@ export const useContentStore = defineStore('content', () => {
   const contentItems = ref<ContentItem[]>([])
   const newsList = ref<News[]>([])
   const currentNews = ref<News | null>(null)
+  const productList = ref<Product[]>([])
   const pagination = ref({
     page: 1,
     limit: 20,
@@ -446,6 +449,155 @@ export const useContentStore = defineStore('content', () => {
     }
   }
 
+  // ---- Products / Services ----
+  // Detail fields are stored as JSON in Product.description. parseProduct
+  // extracts them onto the top-level object (mirrors parseNewsItem).
+  const parseProduct = (raw: any): Product => {
+    let parsed: any = null
+    if (raw.description && typeof raw.description === 'string') {
+      try {
+        const test = JSON.parse(raw.description)
+        if (test && typeof test === 'object' && !Array.isArray(test)) {
+          parsed = test
+        }
+      } catch {}
+    }
+    return {
+      ...raw,
+      ...(parsed
+        ? {
+            name: parsed.name || '',
+            price: parsed.price,
+            currency: parsed.currency,
+            shortdes: parsed.shortdes || '',
+            longdes: parsed.longdes || '',
+            features: Array.isArray(parsed.features) ? parsed.features : [],
+            photos: Array.isArray(parsed.photos) ? parsed.photos : [],
+          }
+        : {
+            name: raw.name || '',
+            features: [],
+            photos: [],
+          }),
+    }
+  }
+
+  const fetchProducts = async (contentId: number, page: number = 1) => {
+    try {
+      const params = new URLSearchParams({
+        page: String(page),
+        limit: String(pagination.value.limit),
+      })
+      console.log('Fetching products from:', `/content/${contentId}/products?${params}`)
+      const response = await api.get<any>(`/content/${contentId}/products?${params}`)
+      console.log('Fetch products response:', response)
+
+      if (response.success && response.data) {
+        const d = response.data
+        let rawItems: any[] = []
+
+        console.log('Response data structure:', d)
+
+        if (Array.isArray(d)) {
+          rawItems = d
+        } else if (d.items) {
+          rawItems = d.items
+          const pag = d.pagination
+          if (pag) {
+            pagination.value = {
+              page: pag.page,
+              limit: pag.limit,
+              total: pag.total,
+              totalPages: pag.totalPages,
+            }
+          }
+        } else if (d.data && Array.isArray(d.data)) {
+          rawItems = d.data
+        }
+
+        console.log('Raw items before parsing:', rawItems)
+        productList.value = rawItems.map(parseProduct)
+        console.log('Parsed products:', productList.value)
+      } else {
+        console.error('Fetch products failed:', response)
+      }
+    } catch (error) {
+      console.error('Failed to fetch products:', error)
+    }
+  }
+
+  const saveProduct = async (
+    contentId: number,
+    data: ProductForm,
+  ): Promise<{ success: boolean; id?: number }> => {
+    try {
+      const payload: any = {
+        name: data.name,
+        features: data.features || [],
+        photos: data.photos || [],
+      }
+      if (data.price !== undefined && data.price !== null) payload.price = data.price
+      if (data.currency) payload.currency = data.currency
+      if (data.shortdes) payload.shortdes = data.shortdes
+      if (data.longdes) payload.longdes = data.longdes
+      if (data.priority !== undefined) payload.priority = data.priority
+      if (data.status !== undefined) payload.status = data.status
+
+      console.log('Saving product to API:', payload)
+      const response = await api.post<{ id: number; product_id?: number }>(`/content/${contentId}/products`, payload)
+      console.log('API response:', response)
+      if (response.success && response.data) {
+        const id = response.data.product_id || response.data.id
+        console.log('Product saved with ID:', id)
+        return { success: true, id }
+      }
+      console.error('Save failed with response:', response)
+      return { success: false }
+    } catch (error) {
+      console.error('Failed to save product:', error)
+      return { success: false }
+    }
+  }
+
+  const updateProduct = async (
+    contentId: number,
+    id: number,
+    data: Partial<ProductForm>,
+  ): Promise<boolean> => {
+    try {
+      const payload: any = {}
+      if (data.name !== undefined) payload.name = data.name
+      if (data.price !== undefined) payload.price = data.price
+      if (data.currency !== undefined) payload.currency = data.currency
+      if (data.shortdes !== undefined) payload.shortdes = data.shortdes
+      if (data.longdes !== undefined) payload.longdes = data.longdes
+      if (data.features !== undefined) payload.features = data.features
+      if (data.photos !== undefined) payload.photos = data.photos
+      if (data.priority !== undefined) payload.priority = data.priority
+      if (data.status !== undefined) payload.status = data.status
+
+      const response = await api.put(`/content/${contentId}/products/${id}`, payload)
+      return response.success
+    } catch (error) {
+      console.error('Failed to update product:', error)
+      return false
+    }
+  }
+
+  const deleteProduct = async (contentId: number, id: number): Promise<boolean> => {
+    try {
+      const response = await api.delete(`/content/${contentId}/products/${id}`)
+      if (response.success) {
+        productList.value = productList.value.filter(p => p.id !== id)
+        return true
+      }
+      return false
+    } catch (error) {
+      console.error('Failed to delete product:', error)
+      return false
+    }
+  }
+
   const saveMapLocation = async (contentId: number, location: {
     lat: number
     lng: number
@@ -467,6 +619,7 @@ export const useContentStore = defineStore('content', () => {
     contentItems: readonly(contentItems),
     newsList: readonly(newsList),
     currentNews: readonly(currentNews),
+    productList: readonly(productList),
     pagination: readonly(pagination),
     fetchContents,
     fetchContent,
@@ -482,6 +635,10 @@ export const useContentStore = defineStore('content', () => {
     saveNews,
     updateNews,
     deleteNews,
+    fetchProducts,
+    saveProduct,
+    updateProduct,
+    deleteProduct,
     saveMapLocation,
   }
 })

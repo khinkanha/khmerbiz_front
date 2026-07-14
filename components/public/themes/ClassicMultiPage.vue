@@ -162,6 +162,12 @@
                     :items="getContentForMenuItem(child.item_id)!.items"
                     :section-title="child.item_name || ''"
                   />
+                  <ProductCatalog
+                    v-else-if="getContentType(child.item_id) === ContentType.PRODUCT"
+                    :content-id="getContentForMenuItem(child.item_id)!.content.content_id"
+                    :section-title="child.item_name || ''"
+                    :section-description="getContentForMenuItem(child.item_id)!.content.title || ''"
+                  />
                   <ArticleSection
                     v-else
                     :content="getContentForMenuItem(child.item_id)!.content"
@@ -198,6 +204,12 @@
                 <DocumentSection
                   v-else-if="getContentType(menuItem.item_id) === ContentType.DOCUMENT"
                   :items="getContentForMenuItem(menuItem.item_id)!.items"
+                />
+                <ProductCatalog
+                  v-else-if="getContentType(menuItem.item_id) === ContentType.PRODUCT"
+                  :content-id="getContentForMenuItem(menuItem.item_id)!.content.content_id"
+                  :section-title="menuItem.item_name || ''"
+                  :section-description="getContentForMenuItem(menuItem.item_id)!.content.title || ''"
                 />
                 <ArticleSection
                   v-else
@@ -338,11 +350,15 @@ watch(totalPages, (val) => {
 })
 
 onMounted(() => {
+  console.log('ClassicMultiPage - contentSections:', props.contentSections)
+  console.log('ClassicMultiPage - menuTree:', props.menuTree)
   fetchFeaturedNews()
 })
 
 const getContentForMenuItem = (menuItemId: number): ContentSection | undefined => {
-  return props.contentSections.find(cs => cs.content.menu_id === menuItemId)
+  const section = props.contentSections.find(cs => cs.content.menu_id === menuItemId)
+  console.log(`Looking for menu item ${menuItemId}:`, section ? `Found content type ${section.content.content_type}` : 'Not found')
+  return section
 }
 
 const getContentType = (menuItemId: number): ContentType | undefined => {

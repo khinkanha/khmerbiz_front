@@ -18,6 +18,10 @@
             :map-data="parseMapData(contentSection.content)" :section-description="JSON.parse(contentSection.content.description).description" />
           <DocumentSection v-else-if="contentSection.content.content_type === ContentType.DOCUMENT"
             :items="contentSection.items"  :section-description="JSON.parse(contentSection.content.description).description"/>
+          <ProductCatalog v-else-if="contentSection.content.content_type === ContentType.PRODUCT"
+            :content-id="contentSection.content.content_id"
+            :section-title="contentSection.content.title"
+            :section-description="JSON.parse(contentSection.content.description).description"/>
           <ArticleSection v-else :content="contentSection.content" :show-title="true" />
         </section>
       </template>
