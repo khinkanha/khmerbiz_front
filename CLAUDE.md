@@ -2,6 +2,16 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Working Rules (token-saving — always follow)
+
+1. **Do NOT run any `npm` commands.** This includes `npm install`, `npm run dev`, `npm run build`, `npm run generate`, `npm run preview`, `npm ci`, etc. Instead, **request the human to run them** and wait. Never execute them yourself.
+2. **Never read or search inside build/dependency folders.** Do not `cat`, `Read`, `Grep`, `Glob`, or `ls` into (or recursive-search) these directories — they are huge and burn tokens:
+   - `.output/`
+   - `.nuxt/`
+   - `dist/`
+   - `node_modules/`
+   When exploring the codebase, restrict searches to source directories (`components/`, `composables/`, `pages/`, `stores/`, `server/`, `types/`, `i18n/`, `assets/`, `layouts/`, `middleware/`, `plugins/`).
+
 ## Project Overview
 
 Multi-tenant SaaS website builder platform built with Nuxt 3. Organizations sign up, pick a domain, choose a theme, and get a fully functional website with content management, multi-language support, and an AI assistant — all managed through an admin panel. Each domain/subdomain maps to a separate site with its own theme, content, and languages. The frontend connects to a separate backend API (khmerbiz-api).

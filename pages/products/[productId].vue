@@ -5,7 +5,8 @@
         <ProgressSpinner />
       </div>
 
-      <div v-else-if="product" class="product-layout">
+      <template v-else-if="product">
+      <div class="product-layout">
         <!-- Photo gallery -->
         <div class="product-gallery">
           <div class="main-image">
@@ -13,20 +14,48 @@
               v-if="activePhoto"
               :src="`${photoUrl}${activePhoto}`"
               :alt="product.name"
+              @pointerdown="onPointerDown"
+              @pointerup="onPointerUp"
+              @pointercancel="onPointerUp"
             />
             <div v-else class="no-image">
               <i class="pi pi-image"></i>
             </div>
+            <Button
+              v-if="(product.photos?.length || 0) > 1"
+              icon="pi pi-chevron-left"
+              class="gallery-nav gallery-prev"
+              severity="secondary"
+              rounded
+              text
+              :disabled="activePhotoIndex === 0"
+              :aria-label="$t('product.lightbox.previousPhoto')"
+              @click="prevPhoto"
+            />
+            <Button
+              v-if="(product.photos?.length || 0) > 1"
+              icon="pi pi-chevron-right"
+              class="gallery-nav gallery-next"
+              severity="secondary"
+              rounded
+              text
+              :disabled="activePhotoIndex === (product.photos?.length || 0) - 1"
+              :aria-label="$t('product.lightbox.nextPhoto')"
+              @click="nextPhoto"
+            />
+            <span v-if="(product.photos?.length || 0) > 1" class="gallery-counter">
+              {{ activePhotoIndex + 1 }} / {{ product.photos.length }}
+            </span>
           </div>
           <div v-if="product.photos && product.photos.length > 1" class="thumbnails">
             <div
               v-for="(photo, idx) in product.photos"
               :key="idx"
               class="thumbnail"
-              :class="{ active: activePhoto === photo }"
-              @click="activePhoto = photo"
+              :class="{ active: activePhotoIndex === idx }"
+              @click="goToPhoto(Number(idx))"
             >
-              <img :src="`${photoUrl}${photo}`" :alt="`Photo ${idx + 1}`" />
+              <img :src="`${photoUrl}${photo}`" :alt="`Photo ${Number(idx) + 1}`" />
             </div>
           </div>
         </div>
@@ -52,15 +81,57 @@
 
           <div v-if="product.longdes" class="product-description" v-html="product.longdes"></div>
 
-          <NuxtLink
+          <!--<NuxtLink
             v-if="product.content_id"
             :to="backLink"
             class="back-link"
           >
             <i class="pi pi-arrow-left"></i> Back to catalog
-          </NuxtLink>
+          </NuxtLink> -->
         </div>
       </div>
+
+      <!-- Related products carousel -->
+      <section v-if="relatedProducts.length || relatedLoading" class="related-products">
+        <ProgressSpinner v-if="relatedLoading && !relatedProducts.length" class="related-loading" />
+        <Carousel
+          v-if="relatedProducts.length"
+          :value="relatedProducts"
+          :numVisible="4"
+          :numScroll="1"
+          :circular="relatedProducts.length >= 8"
+          :responsiveOptions="responsiveOptions"
+          class="related-carousel"
+        >
+          <template #header>
+            <h2 class="related-title">{{ $t('product.related.title') }}</h2>
+          </template>
+          <template #item="slotProps">
+            <NuxtLink :to="`/products/${slotProps.data.id}`" class="related-card">
+              <div class="related-image">
+                <img
+                  v-if="slotProps.data.photos && slotProps.data.photos.length"
+                  :src="`${photoUrl}${slotProps.data.photos[0]}`"
+                  :alt="slotProps.data.name"
+                />
+                <div v-else class="related-placeholder">
+                  <i class="pi pi-image"></i>
+                </div>
+              </div>
+              <div class="related-info">
+                <h4 class="related-name">{{ slotProps.data.name }}</h4>
+                <div
+                  v-if="slotProps.data.price !== undefined && slotProps.data.price !== null"
+                  class="related-price"
+                >
+                  {{ formatPrice(slotProps.data.price) }}<small v-if="slotProps.data.currency"> {{ slotProps.data.currency }}</small>
+                </div>
+              </div>
+            </NuxtLink>
+          </template>
+        </Carousel>
+      </section>
+      </template>
 
       <div v-else class="empty-state">
         <i class="pi pi-exclamation-circle"></i>
@@ -109,17 +180,104 @@ const { data: product, pending: loading } = await useAsyncData(`product-${produc
   return null
 })
 
-const activePhoto = ref<string>('')
+const activePhotoIndex = ref(0)
 
-watchEffect(() => {
-  if (product.value?.photos?.length) {
-    activePhoto.value = product.value.photos[0]
+const activePhoto = computed(() => product.value?.photos?.[activePhotoIndex.value] || '')
+
+const prevPhoto = () => {
+  if (activePhotoIndex.value > 0) activePhotoIndex.value--
+}
+
+const nextPhoto = () => {
+  const len = product.value?.photos?.length || 0
+  if (activePhotoIndex.value < len - 1) activePhotoIndex.value++
+}
+
+const goToPhoto = (idx: number) => {
+  activePhotoIndex.value = idx
+}
+
+// Keyboard navigation: ArrowLeft / ArrowRight
+const handleKeydown = (e: KeyboardEvent) => {
+  const tag = (e.target as HTMLElement)?.tagName
+  if (tag === 'INPUT' || tag === 'TEXTAREA') return
+  if (e.key === 'ArrowLeft') {
+    e.preventDefault()
+    prevPhoto()
+  } else if (e.key === 'ArrowRight') {
+    e.preventDefault()
+    nextPhoto()
+  }
+}
+
+// Swipe / drag via Pointer Events (touch + mouse)
+const swipeStartX = ref<number | null>(null)
+
+const onPointerDown = (e: PointerEvent) => {
+  swipeStartX.value = e.clientX
+  ;(e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId)
+}
+
+const onPointerUp = (e: PointerEvent) => {
+  if (swipeStartX.value === null) return
+  const delta = e.clientX - swipeStartX.value
+  swipeStartX.value = null
+  if (Math.abs(delta) < 50) return  // ignore tiny / accidental moves
+  if (delta < 0) nextPhoto()
+  else prevPhoto()
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
+})
+
+// Related products (same catalog/content_id, excluding current) — client-only,
+// not SEO-critical. Mirrors the relatedNews pattern in pages/news/[newsId].vue.
+const relatedProducts = ref<any[]>([])
+const relatedLoading = ref(false)
+
+const responsiveOptions = ref([
+  { breakpoint: '1400px', numVisible: 4, numScroll: 1 },
+  { breakpoint: '1100px', numVisible: 3, numScroll: 1 },
+  { breakpoint: '768px', numVisible: 2, numScroll: 1 },
+  { breakpoint: '560px', numVisible: 1, numScroll: 1 },
+])
+
+onMounted(async () => {
+  const contentId = product.value?.content_id
+  if (!contentId) return
+  relatedLoading.value = true
+  try {
+    const collected: any[] = []
+    // Fetch up to 2 pages (~20 raw items), exclude the current product, cap at 20.
+    for (let page = 1; page <= 2 && collected.length < 20; page++) {
+      const res = await $fetch<any>(`${apiBaseUrl}/site/list-products/${contentId}?page=${page}`)
+      if (!res || res.status === false || !res.data) break
+      const items = res.data.items || res.data
+      if (!Array.isArray(items) || items.length === 0) break
+      for (const raw of items) {
+        const parsed = parseProduct(raw)
+        if (String(parsed.id) !== String(productId)) collected.push(parsed)
+        if (collected.length >= 20) break
+      }
+      const totalPages = res.data.pagination?.totalPages
+      if (totalPages && page >= totalPages) break
+    }
+    relatedProducts.value = collected.slice(0, 20)
+  } catch {
+    // silently fail — related section is optional
+  } finally {
+    relatedLoading.value = false
   }
 })
 
 const backLink = computed(() => {
   if (product.value?.content_id) {
-    return `/pages/${route.params.domainId || 0}/${product.value.content_id}`
+    return `/#section-${product.value.content_id}`
   }
   return '/'
 })
@@ -158,6 +316,7 @@ useHead(() => ({
 
 /* ---- Gallery ---- */
 .main-image {
+  position: relative;
   width: 100%;
   aspect-ratio: 1;
   overflow: hidden;
@@ -170,6 +329,53 @@ useHead(() => ({
   width: 100%;
   height: 100%;
   object-fit: cover;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+/* Prev / next arrows */
+.gallery-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.gallery-nav:hover:not(:disabled) {
+  background: #fff;
+}
+
+.gallery-nav:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.gallery-prev {
+  left: 0.5rem;
+}
+
+.gallery-next {
+  right: 0.5rem;
+}
+
+.gallery-counter {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  z-index: 5;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 12px;
 }
 
 .no-image {
@@ -331,6 +537,110 @@ useHead(() => ({
 
 .empty-state i {
   font-size: 2.5rem;
+}
+
+/* ---- Related products carousel ---- */
+.related-products {
+  margin: 2.5rem 0;
+}
+
+.related-loading {
+  display: flex;
+  margin: 0 auto;
+}
+
+.related-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 1rem 0;
+  font-family: var(--font-battambang);
+}
+
+.related-card {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  margin: 0 0.5rem;
+  height: 100%;
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+
+.related-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-3px);
+}
+
+.related-image {
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: #f7fafc;
+  overflow: hidden;
+}
+
+.related-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.related-card:hover .related-image img {
+  transform: scale(1.05);
+}
+
+.related-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #cbd5e0;
+  font-size: 2.5rem;
+}
+
+.related-info {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.related-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0;
+  font-family: var(--font-battambang);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.related-card:hover .related-name {
+  color: var(--primary-color, #3b82f6);
+}
+
+.related-price {
+  margin-top: auto;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary-color, #3b82f6);
+}
+
+.related-price small {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #718096;
 }
 
 /* ---- Responsive ---- */

@@ -9,6 +9,7 @@
     "article": "អត្ថបទ",
     "photo": "រូបភាព",
     "video": "វីដេអូ",
+    "product": "ផលិតផល",
     "videoLink": "តំណរវីដេអូ",
     "mediaUrl": "តំណរភ្ជាប់មីឌៀ",
     "uploadDocument": "ផ្ទុក",
@@ -267,6 +268,46 @@
     "invalidCredentials": "ឈ្មោះអ្នកប្រើប្រាស់ ឬពាក្យសំងាត់មិនត្រឹមត្រូវ",
     "accountExists": "គណនីនេះមានរួចហើយ",
     "accountNotFound": "រកមិនឃើញគណនី"
+  },
+  "product": {
+    "search": {
+      "placeholder": "ស្វែងរកផលិតផល...",
+      "noResults": "រកមិនឃើញផលិតផល",
+      "resultsCount": "រកឃើញ {count} ផលិតផល"
+    },
+    "filter": {
+      "title": "តម្រង",
+      "priceRange": "ចន្លោះតម្លៃ",
+      "minPrice": "តម្លៃទាបបំផុត",
+      "maxPrice": "តម្លៃខ្ពស់បំផុត",
+      "currency": "រូបិយប័ណ្ណ",
+      "sortBy": "តម្រងតាម",
+      "appliedFilters": "តម្រងដែលបានអនុវត្ត",
+      "clearAll": "លុបចេញទាំងអស់",
+      "resetAll": "កំណត់ឡើងវិញ"
+    },
+    "sort": {
+      "featured": "មុខងារពិសេស",
+      "price": "តម្លៃ",
+      "name": "ឈ្មោះ",
+      "newest": "ចាស់បំផុតមកទើបបង្កើត"
+    },
+    "empty": {
+      "noProducts": "មិនទាន់មានផលិតផលនៅឡើយទេ។",
+      "tryAdjusting": "សូមព្យាយាមកែប្រែតម្រងរបស់អ្នក",
+      "clearFilters": "លុបតម្រង"
+    },
+    "lightbox": {
+      "previousPhoto": "រូបមុន",
+      "nextPhoto": "រូបបន្ទាប់",
+      "close": "បិទ"
+    },
+    "related": {
+      "title": "ផលិតផលពាក់ព័ន្ធ"
+    },
+    "pagination": {
+      "of": "នៃ"
+    }
   },
   "aiChat": {
     "page": {

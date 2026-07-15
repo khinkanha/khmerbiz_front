@@ -244,6 +244,46 @@
     "invalidNumber": "请输入有效的数字",
     "invalidDate": "请输入有效的日期"
   },
+  "product": {
+    "search": {
+      "placeholder": "搜索产品...",
+      "noResults": "未找到产品",
+      "resultsCount": "找到 {count} 个产品"
+    },
+    "filter": {
+      "title": "筛选",
+      "priceRange": "价格范围",
+      "minPrice": "最低",
+      "maxPrice": "最高",
+      "currency": "货币",
+      "sortBy": "排序方式",
+      "appliedFilters": "已应用的筛选",
+      "clearAll": "清除全部",
+      "resetAll": "重置全部"
+    },
+    "sort": {
+      "featured": "特色",
+      "price": "价格",
+      "name": "名称",
+      "newest": "最新"
+    },
+    "empty": {
+      "noProducts": "暂无产品。",
+      "tryAdjusting": "尝试调整筛选条件",
+      "clearFilters": "清除筛选"
+    },
+    "lightbox": {
+      "previousPhoto": "上一张照片",
+      "nextPhoto": "下一张照片",
+      "close": "关闭"
+    },
+    "related": {
+      "title": "相关产品"
+    },
+    "pagination": {
+      "of": "共"
+    }
+  },
   "auth": {
     "login": "登录",
     "logout": "退出",

@@ -11,6 +11,7 @@
     "video": "Videos",
     "videoLink": "Video Link",
     "mediaUrl": "Media URL",
+    "product": "Products",
     "uploadDocument": "Upload",
     "document": "Documents",
     "blogNews": "Blog News",
@@ -264,6 +265,46 @@
     "invalidCredentials": "Invalid username or password",
     "accountExists": "An account with this email already exists",
     "accountNotFound": "Account not found"
+  },
+  "product": {
+    "search": {
+      "placeholder": "Search products...",
+      "noResults": "No products found",
+      "resultsCount": "{count} products found"
+    },
+    "filter": {
+      "title": "Filters",
+      "priceRange": "Price Range",
+      "minPrice": "Min",
+      "maxPrice": "Max",
+      "currency": "Currency",
+      "sortBy": "Sort By",
+      "appliedFilters": "Applied Filters",
+      "clearAll": "Clear All",
+      "resetAll": "Reset All"
+    },
+    "sort": {
+      "featured": "Featured",
+      "price": "Price",
+      "name": "Name",
+      "newest": "Newest"
+    },
+    "empty": {
+      "noProducts": "No products available yet.",
+      "tryAdjusting": "Try adjusting your filters",
+      "clearFilters": "Clear Filters"
+    },
+    "lightbox": {
+      "previousPhoto": "Previous photo",
+      "nextPhoto": "Next photo",
+      "close": "Close"
+    },
+    "related": {
+      "title": "Related Products"
+    },
+    "pagination": {
+      "of": "of"
+    }
   },
   "aiChat": {
     "page": {

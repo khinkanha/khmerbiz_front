@@ -5,23 +5,26 @@
         <ProgressSpinner />
         <p>{{ $t('common.loading') }}</p>
       </div>
-
       <template v-else-if="contentSection">
         <section class="section">
           <NewsSection v-if="contentSection.content.content_type === ContentType.NEWS" :items="contentSection.news"
-            :domain-id="Number(domainId)" :content-id="contentSection.content.content_id" :section-description="JSON.parse(contentSection.content.description).description" />
+            :domain-id="Number(domainId)" :content-id="contentSection.content.content_id"
+            :section-description="JSON.parse(contentSection.content.description).description" />
           <PhotoGallery v-else-if="contentSection.content.content_type === ContentType.PHOTO"
-            :items="contentSection.items" :section-description="JSON.parse(contentSection.content.description).description" />
+            :items="contentSection.items"
+            :section-description="JSON.parse(contentSection.content.description).description" />
           <VideoSection v-else-if="contentSection.content.content_type === ContentType.VIDEO"
-            :items="contentSection.items" :section-description="JSON.parse(contentSection.content.description).description" />
+            :items="contentSection.items"
+            :section-description="JSON.parse(contentSection.content.description).description" />
           <MapDisplay v-else-if="contentSection.content.content_type === ContentType.MAP"
-            :map-data="parseMapData(contentSection.content)" :section-description="JSON.parse(contentSection.content.description).description" />
+            :map-data="parseMapData(contentSection.content)"
+            :section-description="JSON.parse(contentSection.content.description).description" />
           <DocumentSection v-else-if="contentSection.content.content_type === ContentType.DOCUMENT"
-            :items="contentSection.items"  :section-description="JSON.parse(contentSection.content.description).description"/>
+            :items="contentSection.items"
+            :section-description="JSON.parse(contentSection.content.description).description" />
           <ProductCatalog v-else-if="contentSection.content.content_type === ContentType.PRODUCT"
-            :content-id="contentSection.content.content_id"
-            :section-title="contentSection.content.title"
-            :section-description="JSON.parse(contentSection.content.description).description"/>
+            :content-id="contentSection.content.content_id" :section-title="contentSection.content.title"
+            :section-description="JSON.parse(contentSection.content.description).description" />
           <ArticleSection v-else :content="contentSection.content" :show-title="true" />
         </section>
       </template>

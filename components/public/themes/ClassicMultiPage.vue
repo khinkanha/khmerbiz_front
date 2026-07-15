@@ -17,19 +17,10 @@
           <section v-if="featuredNews.length > 0" class="section news-section">
             <!-- Featured News: First 2 as large cards -->
             <div v-if="paginatedNews.length > 0" class="featured-grid">
-              <a
-                v-for="news in paginatedNews.slice(0, 2)"
-                :key="news.news_id"
-                href="#"
-                class="featured-card"
-                @click.prevent="goToNews(news)"
-              >
+              <a v-for="news in paginatedNews.slice(0, 2)" :key="news.news_id" href="#" class="featured-card"
+                @click.prevent="goToNews(news)">
                 <div class="featured-card-img">
-                  <img
-                    v-if="news.photo"
-                    :src="`${photoUrl}${news.photo}`"
-                    :alt="news.title"
-                  />
+                  <img v-if="news.photo" :src="`${photoUrl}${news.photo}`" :alt="news.title" />
                   <div v-else class="img-placeholder">
                     <i class="pi pi-image"></i>
                   </div>
@@ -57,11 +48,7 @@
                 <div class="news-media-item">
                   <div class="media-left">
                     <a href="#" @click.prevent="goToNews(news)">
-                      <img
-                        v-if="news.photo"
-                        :src="`${photoUrl}${news.photo}`"
-                        :alt="news.title"
-                      />
+                      <img v-if="news.photo" :src="`${photoUrl}${news.photo}`" :alt="news.title" />
                       <div v-else class="img-placeholder small">
                         <i class="pi pi-image"></i>
                       </div>
@@ -99,12 +86,8 @@
                     &lsaquo;
                   </button>
                 </li>
-                <li
-                  v-for="page in visiblePages"
-                  :key="page"
-                  class="page-item"
-                  :class="{ active: page === currentPage }"
-                >
+                <li v-for="page in visiblePages" :key="page" class="page-item"
+                  :class="{ active: page === currentPage }">
                   <button class="page-link" @click="currentPage = page">{{ page }}</button>
                 </li>
                 <li class="page-item" :class="{ disabled: currentPage === totalPages }">
@@ -122,114 +105,65 @@
           </section>
 
           <!-- Content Sections from Menu Tree -->
-         <template v-for="menuItem in menuTree" :key="menuItem.item_id">
+          <template v-for="menuItem in menuTree" :key="menuItem.item_id">
+
             <!-- Menu items with children -->
             <section
               v-if="menuItem.children && menuItem.children.length > 0 && menuItem.children.some(child => getContentForMenuItem(child.item_id))"
-              class="section"
-              :id="`section-${menuItem.item_id}`"
-            >
-              <div
-                v-for="child in menuItem.children"
-                :key="child.item_id"
-                :id="`section-${child.item_id}`"
-                class="sub-section"
-              >
+              class="section" :id="`section-${menuItem.item_id}`">
+              <div v-for="child in menuItem.children" :key="child.item_id" :id="`section-${child.item_id}`"
+                class="sub-section">
+                {{ "Content Type:" + getContentType(child.item_id) }}
                 <template v-if="getContentForMenuItem(child.item_id)">
-                  <NewsSection
-                    v-if="getContentType(child.item_id) === ContentType.NEWS"
-                    :domain-id="domain.domain_id"
+                  <NewsSection v-if="getContentType(child.item_id) === ContentType.NEWS" :domain-id="domain.domain_id"
                     :content-id="getContentForMenuItem(child.item_id)!.content.content_id"
-                    :section-title="child.item_name || ''"
-                  />
-                  <PhotoGallery
-                    v-else-if="getContentType(child.item_id) === ContentType.PHOTO"
-                    :items="getContentForMenuItem(child.item_id)!.items"
-                    :section-title="child.item_name || ''"
-                  />
-                  <VideoSection
-                    v-else-if="getContentType(child.item_id) === ContentType.VIDEO"
-                    :items="getContentForMenuItem(child.item_id)!.items"
-                    :section-title="child.item_name || ''"
-                  />
-                  <MapDisplay
-                    v-else-if="getContentType(child.item_id) === ContentType.MAP"
+                    :section-title="child.item_name || ''" />
+                  <PhotoGallery v-else-if="getContentType(child.item_id) === ContentType.PHOTO"
+                    :items="getContentForMenuItem(child.item_id)!.items" :section-title="child.item_name || ''" />
+                  <VideoSection v-else-if="getContentType(child.item_id) === ContentType.VIDEO"
+                    :items="getContentForMenuItem(child.item_id)!.items" :section-title="child.item_name || ''" />
+                  <MapDisplay v-else-if="getContentType(child.item_id) === ContentType.MAP"
                     :map-data="parseMapData(getContentForMenuItem(child.item_id)!.content)"
-                    :section-title="child.item_name || ''"
-                  />
-                  <DocumentSection
-                    v-else-if="getContentType(child.item_id) === ContentType.DOCUMENT"
-                    :items="getContentForMenuItem(child.item_id)!.items"
-                    :section-title="child.item_name || ''"
-                  />
-                  <ProductCatalog
-                    v-else-if="getContentType(child.item_id) === ContentType.PRODUCT"
+                    :section-title="child.item_name || ''" />
+                  <DocumentSection v-else-if="getContentType(child.item_id) === ContentType.DOCUMENT"
+                    :items="getContentForMenuItem(child.item_id)!.items" :section-title="child.item_name || ''" />
+                  <ProductCatalog v-else-if="getContentType(child.item_id) === ContentType.PRODUCT"
                     :content-id="getContentForMenuItem(child.item_id)!.content.content_id"
                     :section-title="child.item_name || ''"
-                    :section-description="getContentForMenuItem(child.item_id)!.content.title || ''"
-                  />
-                  <ArticleSection
-                    v-else
-                    :content="getContentForMenuItem(child.item_id)!.content"
-                    :show-title="true"
-                  />
+                    :section-description="getContentForMenuItem(child.item_id)!.content.title || ''" />
+                  <ArticleSection v-else :content="getContentForMenuItem(child.item_id)!.content" :show-title="true" />
                 </template>
               </div>
             </section>
 
             <!-- Menu items without children -->
-            <section
-              v-else-if="getContentForMenuItem(menuItem.item_id)"
-              class="section"
-              :id="`section-${menuItem.item_id}`"
-            >
+            <section v-else-if="getContentForMenuItem(menuItem.item_id)" class="section"
+              :id="`section-${menuItem.item_id}`">
               <template v-if="getContentForMenuItem(menuItem.item_id)">
-                <NewsSection
-                  v-if="getContentType(menuItem.item_id) === ContentType.NEWS"
-                  :domain-id="domain.domain_id"
-                  :content-id="getContentForMenuItem(menuItem.item_id)!.content.content_id"
-                />
-                <PhotoGallery
-                  v-else-if="getContentType(menuItem.item_id) === ContentType.PHOTO"
-                  :items="getContentForMenuItem(menuItem.item_id)!.items"
-                />
-                <VideoSection
-                  v-else-if="getContentType(menuItem.item_id) === ContentType.VIDEO"
-                  :items="getContentForMenuItem(menuItem.item_id)!.items"
-                />
-                <MapDisplay
-                  v-else-if="getContentType(menuItem.item_id) === ContentType.MAP"
-                  :map-data="parseMapData(getContentForMenuItem(menuItem.item_id)!.content)"
-                />
-                <DocumentSection
-                  v-else-if="getContentType(menuItem.item_id) === ContentType.DOCUMENT"
-                  :items="getContentForMenuItem(menuItem.item_id)!.items"
-                />
-                <ProductCatalog
-                  v-else-if="getContentType(menuItem.item_id) === ContentType.PRODUCT"
+                <NewsSection v-if="getContentType(menuItem.item_id) === ContentType.NEWS" :domain-id="domain.domain_id"
+                  :content-id="getContentForMenuItem(menuItem.item_id)!.content.content_id" />
+                <PhotoGallery v-else-if="getContentType(menuItem.item_id) === ContentType.PHOTO"
+                  :items="getContentForMenuItem(menuItem.item_id)!.items" />
+                <VideoSection v-else-if="getContentType(menuItem.item_id) === ContentType.VIDEO"
+                  :items="getContentForMenuItem(menuItem.item_id)!.items" />
+                <MapDisplay v-else-if="getContentType(menuItem.item_id) === ContentType.MAP"
+                  :map-data="parseMapData(getContentForMenuItem(menuItem.item_id)!.content)" />
+                <DocumentSection v-else-if="getContentType(menuItem.item_id) === ContentType.DOCUMENT"
+                  :items="getContentForMenuItem(menuItem.item_id)!.items" />
+                <ProductCatalog v-else-if="getContentType(menuItem.item_id) === ContentType.PRODUCT"
                   :content-id="getContentForMenuItem(menuItem.item_id)!.content.content_id"
                   :section-title="menuItem.item_name || ''"
-                  :section-description="getContentForMenuItem(menuItem.item_id)!.content.title || ''"
-                />
-                <ArticleSection
-                  v-else
-                  :content="getContentForMenuItem(menuItem.item_id)!.content"
-                />
+                  :section-description="getContentForMenuItem(menuItem.item_id)!.content.title || ''" />
+                <ArticleSection v-else :content="getContentForMenuItem(menuItem.item_id)!.content" />
               </template>
             </section>
           </template>
-        
+
           <!-- Social Media Links -->
           <section v-if="socialMedia.length > 0" class="section social-section">
             <div class="social-links-center">
-              <a
-                v-for="social in socialMedia"
-                :key="social.smid"
-                :href="social.link"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="social-icon-link"
-              >
+              <a v-for="social in socialMedia" :key="social.smid" :href="social.link" target="_blank"
+                rel="noopener noreferrer" class="social-icon-link">
                 <i :class="getSocialIcon(social.stype)"></i>
               </a>
             </div>
