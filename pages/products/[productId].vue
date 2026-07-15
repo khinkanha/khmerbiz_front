@@ -65,7 +65,7 @@
           <h1 class="product-name">{{ product.name }}</h1>
 
           <div v-if="product.price !== undefined && product.price !== null" class="product-price">
-            {{ formatPrice(product.price) }}<span v-if="product.currency" class="currency"> {{ product.currency }}</span>
+            {{ formatPrice(product.price) }}&nbsp;<span v-if="product.currency" class="currency"> {{ product.currency }}</span>
           </div>
 
           <p v-if="product.shortdes" class="product-shortdes">{{ product.shortdes }}</p>
@@ -124,7 +124,7 @@
                   v-if="slotProps.data.price !== undefined && slotProps.data.price !== null"
                   class="related-price"
                 >
-                  {{ formatPrice(slotProps.data.price) }}<small v-if="slotProps.data.currency"> {{ slotProps.data.currency }}</small>
+                  {{ formatPrice(slotProps.data.price) }}&nbsp;<small v-if="slotProps.data.currency"> {{ slotProps.data.currency }}</small>
                 </div>
               </div>
             </NuxtLink>
@@ -244,7 +244,7 @@ const responsiveOptions = ref([
   { breakpoint: '1400px', numVisible: 4, numScroll: 1 },
   { breakpoint: '1100px', numVisible: 3, numScroll: 1 },
   { breakpoint: '768px', numVisible: 2, numScroll: 1 },
-  { breakpoint: '560px', numVisible: 1, numScroll: 1 },
+  { breakpoint: '560px', numVisible: 2, numScroll: 1 },
 ])
 
 onMounted(async () => {
@@ -652,6 +652,20 @@ useHead(() => ({
 
   .product-name {
     font-size: 0.9rem;
+  }
+
+  /* Compact related-product cards in the carousel */
+  .related-info {
+    padding: 0.4rem;
+    gap: 0.25rem;
+  }
+
+  .related-name {
+    font-size: 0.75rem;
+  }
+
+  .related-price {
+    font-size: 0.85rem;
   }
 }
 </style>

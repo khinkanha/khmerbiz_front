@@ -178,7 +178,7 @@
               <li v-for="(feat, i) in product.features.slice(0, 3)" :key="i">{{ feat }}</li>
             </ul>
             <div v-if="product.price !== undefined && product.price !== null" class="product-price">
-              {{ formatPrice(product.price) }}<small v-if="product.currency"> {{ product.currency }}</small>
+              {{ formatPrice(product.price) }}&nbsp;<small v-if="product.currency"> {{ product.currency }}</small>
             </div>
           </div>
         </NuxtLink>
@@ -388,7 +388,7 @@ const applyFilters = () => {
 
   // Update pagination
   const filteredTotal = results.length
-  totalPages.value = Math.ceil(filteredTotal / 10) || 1
+  totalPages.value = Math.ceil(filteredTotal / 12) || 1
 
   // Ensure current page is valid
   if (currentPage.value > totalPages.value) {
@@ -396,8 +396,8 @@ const applyFilters = () => {
   }
 
   // Return paginated results
-  const start = (currentPage.value - 1) * 10
-  const end = start + 10
+  const start = (currentPage.value - 1) * 12
+  const end = start + 12
   products.value = results.slice(start, end)
 }
 
@@ -1401,6 +1401,42 @@ watch(() => route.query.page, async (newPage) => {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  /* Dense 4-per-row grid for mobile */
+  .product-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+  }
+
+  .product-card {
+    border-radius: 6px;
+  }
+
+  .product-body {
+    padding: 0.4rem;
+  }
+
+  /* Compact cards: image + name + price only */
+  .product-shortdes,
+  .product-features {
+    display: none;
+  }
+
+  .product-name {
+    font-size: 0.7rem;
+    margin: 0 0 0.25rem 0;
+  }
+
+  .product-price {
+    font-size: 0.8rem;
+  }
+
+  .photo-count {
+    font-size: 0.6rem;
+    padding: 1px 5px;
+    bottom: 4px;
+    right: 4px;
+  }
+
   .search-container {
     flex-direction: column;
     align-items: stretch;
