@@ -75,6 +75,7 @@ const setLanguage = async (langId: number) => {
     }
   }
   await domainStore.setLanguage(langId)
+  navigateTo('/')
 }
 </script>
 

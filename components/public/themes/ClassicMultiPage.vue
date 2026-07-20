@@ -105,59 +105,55 @@
           </section>
 
           <!-- Content Sections from Menu Tree -->
-          <template v-for="menuItem in menuTree" :key="menuItem.item_id">
-
-            <!-- Menu items with children -->
-            <section
-              v-if="menuItem.children && menuItem.children.length > 0 && menuItem.children.some(child => getContentForMenuItem(child.item_id))"
-              class="section" :id="`section-${menuItem.item_id}`">
-              <div v-for="child in menuItem.children" :key="child.item_id" :id="`section-${child.item_id}`"
-                class="sub-section">
-                {{ "Content Type:" + getContentType(child.item_id) }}
-                <template v-if="getContentForMenuItem(child.item_id)">
-                  <NewsSection v-if="getContentType(child.item_id) === ContentType.NEWS" :domain-id="domain.domain_id"
-                    :content-id="getContentForMenuItem(child.item_id)!.content.content_id"
-                    :section-title="child.item_name || ''" />
-                  <PhotoGallery v-else-if="getContentType(child.item_id) === ContentType.PHOTO"
-                    :items="getContentForMenuItem(child.item_id)!.items" :section-title="child.item_name || ''" />
-                  <VideoSection v-else-if="getContentType(child.item_id) === ContentType.VIDEO"
-                    :items="getContentForMenuItem(child.item_id)!.items" :section-title="child.item_name || ''" />
-                  <MapDisplay v-else-if="getContentType(child.item_id) === ContentType.MAP"
-                    :map-data="parseMapData(getContentForMenuItem(child.item_id)!.content)"
-                    :section-title="child.item_name || ''" />
-                  <DocumentSection v-else-if="getContentType(child.item_id) === ContentType.DOCUMENT"
-                    :items="getContentForMenuItem(child.item_id)!.items" :section-title="child.item_name || ''" />
-                  <ProductCatalog v-else-if="getContentType(child.item_id) === ContentType.PRODUCT"
-                    :content-id="getContentForMenuItem(child.item_id)!.content.content_id"
-                    :section-title="child.item_name || ''"
-                    :section-description="getContentForMenuItem(child.item_id)!.content.title || ''" />
-                  <ArticleSection v-else :content="getContentForMenuItem(child.item_id)!.content" :show-title="true" />
-                </template>
-              </div>
-            </section>
-
-            <!-- Menu items without children -->
-            <section v-else-if="getContentForMenuItem(menuItem.item_id)" class="section"
-              :id="`section-${menuItem.item_id}`">
-              <template v-if="getContentForMenuItem(menuItem.item_id)">
-                <NewsSection v-if="getContentType(menuItem.item_id) === ContentType.NEWS" :domain-id="domain.domain_id"
-                  :content-id="getContentForMenuItem(menuItem.item_id)!.content.content_id" />
-                <PhotoGallery v-else-if="getContentType(menuItem.item_id) === ContentType.PHOTO"
-                  :items="getContentForMenuItem(menuItem.item_id)!.items" />
-                <VideoSection v-else-if="getContentType(menuItem.item_id) === ContentType.VIDEO"
-                  :items="getContentForMenuItem(menuItem.item_id)!.items" />
-                <MapDisplay v-else-if="getContentType(menuItem.item_id) === ContentType.MAP"
-                  :map-data="parseMapData(getContentForMenuItem(menuItem.item_id)!.content)" />
-                <DocumentSection v-else-if="getContentType(menuItem.item_id) === ContentType.DOCUMENT"
-                  :items="getContentForMenuItem(menuItem.item_id)!.items" />
-                <ProductCatalog v-else-if="getContentType(menuItem.item_id) === ContentType.PRODUCT"
-                  :content-id="getContentForMenuItem(menuItem.item_id)!.content.content_id"
-                  :section-title="menuItem.item_name || ''"
-                  :section-description="getContentForMenuItem(menuItem.item_id)!.content.title || ''" />
-                <ArticleSection v-else :content="getContentForMenuItem(menuItem.item_id)!.content" />
+          <!--<template v-for="menuItem in menuTree" :key="menuItem.item_id">-->
+          <!-- Menu items with children -->
+          <section v-if="menuTree[0].children && menuTree[0].children.length > 0">
+            <div v-for="child in menuTree[0].children" :key="child.item_id" :id="`section-${child.item_id}`"
+              class="sub-section">
+              <template v-if="getContentForMenuItem(child.item_id)">
+                <NewsSection v-if="getContentType(child.item_id) === ContentType.NEWS" :domain-id="domain.domain_id"
+                  :content-id="getContentForMenuItem(child.item_id)!.content.content_id"
+                  :section-title="child.item_name || ''" />
+                <PhotoGallery v-else-if="getContentType(child.item_id) === ContentType.PHOTO"
+                  :items="getContentForMenuItem(child.item_id)!.items" :section-title="child.item_name || ''" />
+                <VideoSection v-else-if="getContentType(child.item_id) === ContentType.VIDEO"
+                  :items="getContentForMenuItem(child.item_id)!.items" :section-title="child.item_name || ''" />
+                <MapDisplay v-else-if="getContentType(child.item_id) === ContentType.MAP"
+                  :map-data="parseMapData(getContentForMenuItem(child.item_id)!.content)"
+                  :section-title="child.item_name || ''" />
+                <DocumentSection v-else-if="getContentType(child.item_id) === ContentType.DOCUMENT"
+                  :items="getContentForMenuItem(child.item_id)!.items" :section-title="child.item_name || ''" />
+                <ProductCatalog v-else-if="getContentType(child.item_id) === ContentType.PRODUCT"
+                  :content-id="getContentForMenuItem(child.item_id)!.content.content_id"
+                  :section-title="child.item_name || ''"
+                  :section-description="getContentForMenuItem(child.item_id)!.content.title || ''" />
+                <ArticleSection v-else :content="getContentForMenuItem(child.item_id)!.content" :show-title="true" />
               </template>
-            </section>
-          </template>
+            </div>
+          </section>
+
+          <!-- Menu items without children -->
+          <section v-else-if="menuTree.length > 0 && getContentForMenuItem(menuTree[0].item_id)" class="section"
+            :id="`section-${menuTree[0].item_id}`">
+            <template v-if="getContentForMenuItem(menuTree[0].item_id)">
+              <NewsSection v-if="getContentType(menuTree[0].item_id) === ContentType.NEWS" :domain-id="domain.domain_id"
+                :content-id="getContentForMenuItem(menuTree[0].item_id)!.content.content_id" />
+              <PhotoGallery v-else-if="getContentType(menuTree[0].item_id) === ContentType.PHOTO"
+                :items="getContentForMenuItem(menuTree[0].item_id)!.items" />
+              <VideoSection v-else-if="getContentType(menuTree[0].item_id) === ContentType.VIDEO"
+                :items="getContentForMenuItem(menuTree[0].item_id)!.items" />
+              <MapDisplay v-else-if="getContentType(menuTree[0].item_id) === ContentType.MAP"
+                :map-data="parseMapData(getContentForMenuItem(menuTree[0].item_id)!.content)" />
+              <DocumentSection v-else-if="getContentType(menuTree[0].item_id) === ContentType.DOCUMENT"
+                :items="getContentForMenuItem(menuTree[0].item_id)!.items" />
+              <ProductCatalog v-else-if="getContentType(menuTree[0].item_id) === ContentType.PRODUCT"
+                :content-id="getContentForMenuItem(menuTree[0].item_id)!.content.content_id"
+                :section-title="menuTree[0].item_name || ''"
+                :section-description="getContentForMenuItem(menuTree[0].item_id)!.content.title || ''" />
+              <ArticleSection v-else :content="getContentForMenuItem(menuTree[0].item_id)!.content" />
+            </template>
+          </section>
+          <!--</template>-->
 
           <!-- Social Media Links -->
           <section v-if="socialMedia.length > 0" class="section social-section">
@@ -286,6 +282,13 @@ watch(totalPages, (val) => {
 onMounted(() => {
   console.log('ClassicMultiPage - contentSections:', props.contentSections)
   console.log('ClassicMultiPage - menuTree:', props.menuTree)
+  fetchFeaturedNews()
+})
+
+// Re-fetch featured news whenever the set of NEWS sections changes — a language
+// switch reloads contentSections with new content IDs, and fetchFeaturedNews
+// otherwise only runs once on mount.
+watch(newsContentIds, () => {
   fetchFeaturedNews()
 })
 
