@@ -123,21 +123,7 @@
         <div class="form-group">
           <label for="description">{{ $t('contentManager.description') }} *</label>
           <ClientOnly>
-            <TinyMCEEditor
-              v-model="newsForm.description"
-              tinymceScriptSrc="/tinymce/tinymce.min.js"
-              :init="{
-                height: 300,
-                menubar: 'tools',
-                plugins: 'advlist autolink lists link image charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime media table paste',
-                toolbar: 'undo redo | bold italic underline | forecolor backcolor | fontselect | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | fullscreen',
-                branding: false,
-                promotion: false,
-                relative_urls: false,
-                remove_script_host: false,
-                document_base_url: photoUrl,
-              }"
-            />
+            <HtmlBlockEditor v-model="newsForm.description" />
           </ClientOnly>
           <small v-if="newsErrors.description" class="p-error">{{ newsErrors.description }}</small>
         </div>
@@ -215,7 +201,7 @@ definePageMeta({
 
 import { useConfirm } from 'primevue/useconfirm'
 import { ContentType } from '~/types'
-import TinyMCEEditor from '@tinymce/tinymce-vue'
+import HtmlBlockEditor from '~/components/admin/HtmlBlockEditor.vue'
 
 const contentStore = useContentStore()
 const confirm = useConfirm()
