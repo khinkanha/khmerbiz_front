@@ -34,11 +34,17 @@
               <div class="form-group">
                 <label for="description">{{ $t('contentManager.description') }}</label>
                 <ClientOnly>
-                  <BlockEditor
-                    v-model="form.description"
-                    :auto-save-ms="1500"
-                    @save="onBlockEditorSave"
-                  />
+                  <Editor v-model="form.description" tinymceScriptSrc="/tinymce/tinymce.min.js" :init="{
+                    height: 300,
+                    menubar: 'tools',
+                    plugins: 'advlist autolink lists link image charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime media table paste',
+                    toolbar: 'undo redo | bold italic underline | forecolor backcolor | fontselect | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | fullscreen',
+                    branding: false,
+                    promotion: false,
+                    relative_urls: false,
+                    remove_script_host: false,
+                    document_base_url: photoUrl,
+                  }" />
                 </ClientOnly>
               </div>
               <div class="form-group">
@@ -96,7 +102,7 @@ definePageMeta({
 })
 
 import { ContentType } from '~/types'
-import BlockEditor from '~/components/admin/BlockEditor.vue'
+import Editor from '@tinymce/tinymce-vue'
 import { useContentStore } from '~/stores/content'
 import { useDomainStore } from '~/stores/domain'
 import { useAuthStore } from '~/stores/auth'
@@ -228,35 +234,6 @@ console.log('Saving content with form data:', form.value)
     errorMessage.value = error.message || t('common.error')
   } finally {
     saving.value = false
-  }
-}
-
-/**
- * Auto-save handler triggered by BlockEditor (after 1.5s debounce).
- * For new content we can't auto-save (no content_id yet), so this is a no-op.
- * For existing content we do a silent background save (no redirect).
- */
-const onBlockEditorSave = async (json: string) => {
-  if (isNewContent.value) {
-    // Buffer the latest value; will be saved when user clicks Save
-    form.value.description = json
-    return
-  }
-  if (!contentId.value) return
-
-  try {
-    // Silent background save — don't show full saving indicator
-    await contentStore.updateContent(contentId.value, {
-      title: form.value.title,
-      description: json,
-      content_type: form.value.content_type,
-      lang_id: form.value.lang_id!,
-      menu_id: form.value.menu_id!,
-      status: form.value.status?0:1,
-    })
-    // Don't redirect; don't show error toast for auto-save failures
-  } catch (e: any) {
-    console.warn('Auto-save failed:', e?.message || e)
   }
 }
 

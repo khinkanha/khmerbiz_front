@@ -1,4 +1,0 @@
-const blockEditorTest_vue_vue_type_style_index_0_scoped_521c724c_lang = ".block-editor-test[data-v-521c724c]{margin:0 auto;max-width:1000px;padding:24px}.test-section[data-v-521c724c]{background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;margin:24px 0;padding:16px}.test-section h2[data-v-521c724c]{font-size:1.1rem;margin-bottom:12px}.render-box[data-v-521c724c]{background:#fff;border:1px dashed #cbd5e1;border-radius:6px;min-height:100px;padding:16px}.legacy-warning[data-v-521c724c]{background:#fef3c7;border:1px solid #fbbf24;border-radius:4px;color:#78350f;font-size:.9rem;padding:8px 12px}pre[data-v-521c724c]{background:#1e293b;border-radius:6px;color:#f1f5f9;font-size:.8rem;margin-top:8px;overflow-x:auto;padding:12px}ul[data-v-521c724c]{color:#475569;font-size:.85rem}";
-
-export { blockEditorTest_vue_vue_type_style_index_0_scoped_521c724c_lang as b };
-//# sourceMappingURL=block-editor-test-styles-1.mjs-C5RpIYkZ.mjs.map

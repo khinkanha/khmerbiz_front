@@ -1,10 +1,7 @@
 <template>
   <section class="video-section">
     <h2 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h2>
-    <div v-if="(sectionDescriptionSmart?.format === 'tiptap' || sectionDescriptionSmart?.format === 'wrapped-tiptap') && sectionDescriptionSmart.tiptapDoc" class="section-description">
-      <BlockRenderer :doc="sectionDescriptionSmart.tiptapDoc" />
-    </div>
-    <div v-else-if="sectionDescription" class="section-description" v-html="sectionDescription"></div>
+    <div v-if="sectionDescription" class="section-description" v-html="sectionDescription"></div>
 
     <div class="video-grid">
       <div v-for="item in items" :key="item.item_id" class="video-item">
@@ -28,9 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import type { ContentItem } from '~/types'
-import { parseSmartDescription } from '~/utils/tiptapFormat'
 
 interface Props {
   items: ContentItem[]
@@ -38,12 +33,10 @@ interface Props {
   sectionDescription?: string
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   sectionTitle: '',
   sectionDescription: '',
 })
-
-const sectionDescriptionSmart = computed(() => parseSmartDescription(props.sectionDescription))
 
 const getEmbedUrl = (url: string): string | null => {
   if (!url) return null
