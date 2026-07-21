@@ -1,10 +1,7 @@
 <template>
   <section class="news-section">
     <h2 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h2>
-    <div v-if="(sectionDescriptionSmart?.format === 'tiptap' || sectionDescriptionSmart?.format === 'wrapped-tiptap') && sectionDescriptionSmart.tiptapDoc" class="section-description">
-      <BlockRenderer :doc="sectionDescriptionSmart.tiptapDoc" />
-    </div>
-    <div v-else-if="sectionDescription" class="section-description" v-html="sectionDescription"></div>
+    <div v-if="sectionDescription" class="section-description" v-html="sectionDescription"></div>
     <div v-if="loading" class="loading-state">
       <ProgressSpinner />
     </div>
@@ -86,9 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import { parseNewsItem } from '~/composables/useNewsParser'
-import { parseSmartDescription } from '~/utils/tiptapFormat'
 
 interface Props {
   domainId: number
@@ -105,8 +100,6 @@ const props = withDefaults(defineProps<Props>(), {
   moreLink: '',
   sectionDescription: '',
 })
-
-const sectionDescriptionSmart = computed(() => parseSmartDescription(props.sectionDescription))
 
 const config = useRuntimeConfig()
 const photoUrl = config.public.photoUrl
