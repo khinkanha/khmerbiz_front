@@ -1,0 +1,4 @@
+const _menuId__vue_vue_type_style_index_0_scoped_cabc2f38_lang = ".page-content[data-v-cabc2f38]{background-color:#fff;min-height:60vh}.container[data-v-cabc2f38]{margin:0 auto;max-width:1200px;padding:0 1rem}.section[data-v-cabc2f38]{padding:1.5rem 0}.section-header[data-v-cabc2f38]{margin-bottom:1.25rem}.section-title[data-v-cabc2f38]{color:var(--text-color,#1a202c);font-family:var(--font-battambang);font-size:.85rem;font-weight:700;margin:0}.loading-state[data-v-cabc2f38]{align-items:center;display:flex;flex-direction:column;gap:1rem;justify-content:center;padding:4rem 0}.loading-state p[data-v-cabc2f38]{color:#718096;margin:0}.empty-state[data-v-cabc2f38]{color:#718096;padding:4rem 0;text-align:center}";
+
+export { _menuId__vue_vue_type_style_index_0_scoped_cabc2f38_lang as _ };
+//# sourceMappingURL=_menuId_-styles-1.mjs-Db5zzLkk.mjs.map

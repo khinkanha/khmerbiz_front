@@ -1,7 +1,10 @@
 <template>
   <section :class="['product-catalog', `lang-${currentLocale}`]">
     <h2 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h2>
-    <div v-if="sectionDescription" class="section-description" v-html="sectionDescription"></div>
+    <div v-if="(sectionDescriptionSmart?.format === 'tiptap' || sectionDescriptionSmart?.format === 'wrapped-tiptap') && sectionDescriptionSmart.tiptapDoc" class="section-description">
+      <BlockRenderer :doc="sectionDescriptionSmart.tiptapDoc" />
+    </div>
+    <div v-else-if="sectionDescription" class="section-description" v-html="sectionDescription"></div>
 
     <!-- Search and Filter Bar -->
     <div v-if="!loading && allProducts.length > 0" class="search-container">
@@ -225,6 +228,9 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import { parseSmartDescription } from '~/utils/tiptapFormat'
+
 interface Props {
   contentId: number
   sectionTitle?: string
@@ -235,6 +241,8 @@ const props = withDefaults(defineProps<Props>(), {
   sectionTitle: '',
   sectionDescription: '',
 })
+
+const sectionDescriptionSmart = computed(() => parseSmartDescription(props.sectionDescription))
 
 const config = useRuntimeConfig()
 const photoUrl = config.public.photoUrl

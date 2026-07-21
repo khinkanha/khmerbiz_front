@@ -125,21 +125,7 @@
         <div class="form-group">
           <label>Full Description</label>
           <ClientOnly>
-            <TinyMCEEditor
-              v-model="form.longdes"
-              tinymceScriptSrc="/tinymce/tinymce.min.js"
-              :init="{
-                height: 250,
-                menubar: 'tools',
-                plugins: 'advlist autolink lists link image charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime media table paste',
-                toolbar: 'undo redo | bold italic underline | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | fullscreen',
-                branding: false,
-                promotion: false,
-                relative_urls: false,
-                remove_script_host: false,
-                document_base_url: photoUrl,
-              }"
-            />
+            <HtmlBlockEditor v-model="form.longdes" />
           </ClientOnly>
         </div>
 
@@ -196,7 +182,7 @@ definePageMeta({
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
 import { ContentType } from '~/types'
-import TinyMCEEditor from '@tinymce/tinymce-vue'
+import HtmlBlockEditor from '~/components/admin/HtmlBlockEditor.vue'
 import MediaPicker from '~/components/admin/MediaPicker.vue'
 
 const contentStore = useContentStore()

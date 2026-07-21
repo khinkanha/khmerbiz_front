@@ -1,13 +1,20 @@
 <template>
   <section class="article-section">
     <div v-if="content" class="article-container">
-      <div class="article-content" v-html="decodedDescription"></div>
+      <!-- New Tiptap format (direct or wrapped by backend): render blocks as Vue components -->
+      <div v-if="(smart?.format === 'tiptap' || smart?.format === 'wrapped-tiptap') && smart.tiptapDoc" class="article-content">
+        <BlockRenderer :doc="smart.tiptapDoc" />
+      </div>
+      <!-- Legacy TinyMCE format: keep using v-html for backward compat -->
+      <div v-else class="article-content" v-html="decodedDescription"></div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { Content } from '~/types'
+import { parseSmartDescription } from '~/utils/tiptapFormat'
 
 interface Props {
   content: Content
@@ -17,6 +24,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   showTitle: true,
 })
+
+const smart = computed(() => parseSmartDescription(props.content.description))
 
 const decodeContentDescription = (content: Content) => {
   if (!content.description || typeof content.description !== 'string') {
@@ -37,99 +46,4 @@ const decoded = computed(() => decodeContentDescription(props.content))
 const decodedDescription = computed(() => decoded.value.description)
 </script>
 
-<style scoped>
-.article-section {
-  padding: 2rem 0;
-}
-
-.article-container {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.article-title {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #1a202c;
-  margin: 0 0 1rem 0;
-  font-family: var(--font-battambang);
-}
-
-.article-content {
-  line-height: 1.8;
-  color: #4a5568;
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-}
-
-/* Force all AI-generated content to be mobile-responsive */
-.article-content :deep(table) {
-  display: block;
-  width: 100% !important;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.article-content :deep(td),
-.article-content :deep(th) {
-  word-break: break-word;
-}
-
-.article-content :deep(div),
-.article-content :deep(section),
-.article-content :deep(article),
-.article-content :deep(main),
-.article-content :deep(figure) {
-  max-width: 100% !important;
-  box-sizing: border-box;
-}
-
-.article-content :deep(pre),
-.article-content :deep(code) {
-  max-width: 100%;
-  overflow-x: auto;
-}
-
-.article-content :deep(h1),
-.article-content :deep(h2),
-.article-content :deep(h3),
-.article-content :deep(h4),
-.article-content :deep(h5),
-.article-content :deep(h6) {
-  font-family: var(--font-battambang);
-  font-weight: 600;
-  margin-top: 1.5rem;
-  margin-bottom: 0.75rem;
-  color: #1a202c;
-}
-
-.article-content :deep(p) {
-  margin-bottom: 1rem;
-}
-
-.article-content :deep(img) {
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-  margin: 1rem 0;
-}
-
-.article-content :deep(a) {
-  color: #667eea;
-  text-decoration: none;
-}
-
-.article-content :deep(a:hover) {
-  text-decoration: underline;
-}
-
-.article-content :deep(ul),
-.article-content :deep(ol) {
-  padding-left: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.article-content :deep(li) {
-  margin-bottom: 0.5rem;
-}
-</style>
+<style scoped></style>
