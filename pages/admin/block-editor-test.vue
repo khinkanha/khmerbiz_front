@@ -93,7 +93,7 @@ function onSave(label: string, value: string) {
 
 const tiptapDoc = computed(() => {
   const smart = parseSmartDescription(tiptapSample.value)
-  return smart?.format === 'tiptap' ? smart.tiptapDoc : null
+  return smart?.format === 'tiptap' || smart?.format === 'wrapped-tiptap' ? smart.tiptapDoc : null
 })
 
 const legacySmart = computed(() => parseSmartDescription(legacySample.value))

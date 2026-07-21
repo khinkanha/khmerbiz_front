@@ -1,8 +1,8 @@
 <template>
   <section class="article-section">
     <div v-if="content" class="article-container">
-      <!-- New Tiptap format: render blocks as Vue components -->
-      <div v-if="smart?.format === 'tiptap' && smart.tiptapDoc" class="article-content">
+      <!-- New Tiptap format (direct or wrapped by backend): render blocks as Vue components -->
+      <div v-if="(smart?.format === 'tiptap' || smart?.format === 'wrapped-tiptap') && smart.tiptapDoc" class="article-content">
         <BlockRenderer :doc="smart.tiptapDoc" />
       </div>
       <!-- Legacy TinyMCE format: keep using v-html for backward compat -->

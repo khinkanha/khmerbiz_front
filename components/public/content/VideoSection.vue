@@ -1,7 +1,7 @@
 <template>
   <section class="video-section">
     <h2 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h2>
-    <div v-if="sectionDescriptionSmart?.format === 'tiptap' && sectionDescriptionSmart.tiptapDoc" class="section-description">
+    <div v-if="(sectionDescriptionSmart?.format === 'tiptap' || sectionDescriptionSmart?.format === 'wrapped-tiptap') && sectionDescriptionSmart.tiptapDoc" class="section-description">
       <BlockRenderer :doc="sectionDescriptionSmart.tiptapDoc" />
     </div>
     <div v-else-if="sectionDescription" class="section-description" v-html="sectionDescription"></div>
