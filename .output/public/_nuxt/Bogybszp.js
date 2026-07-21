@@ -1,1 +1,0 @@
-import{_ as t,c as n,a as s,o}from"./DBVhs97N.js";const r={};function a(l,e){return o(),n("div",null,[...e[0]||(e[0]=[s("h1",null,"Test Page",-1),s("p",null,"This is a test page for development purposes.",-1)])])}const p=t(r,[["render",a]]);export{p as default};
