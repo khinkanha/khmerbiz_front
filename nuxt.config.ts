@@ -81,6 +81,7 @@ export default defineNuxtConfig(<any>{
     '~/assets/css/themes/purple.css',
     '~/assets/css/themes/yellow.css',
     '~/assets/css/admin.css',
+    '~/assets/css/blocks.css',
     '@fortawesome/fontawesome-free/css/all.min.css',
     'primeicons/primeicons.css',
     'leaflet/dist/leaflet.css',

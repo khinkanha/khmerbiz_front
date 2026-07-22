@@ -33,19 +33,16 @@
 
               <div class="form-group">
                 <label for="description">{{ $t('contentManager.description') }}</label>
-                <ClientOnly>
-                  <Editor v-model="form.description" tinymceScriptSrc="/tinymce/tinymce.min.js" :init="{
-                    height: 300,
-                    menubar: 'tools',
-                    plugins: 'advlist autolink lists link image charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime media table paste',
-                    toolbar: 'undo redo | bold italic underline | forecolor backcolor | fontselect | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | fullscreen',
-                    branding: false,
-                    promotion: false,
-                    relative_urls: false,
-                    remove_script_host: false,
-                    document_base_url: photoUrl,
-                  }" />
-                </ClientOnly>
+                <div class="description-editor" style="display:block">
+                  <ClientOnly>
+                    <!--<BlockPalette class="description-editor__palette" @insert="insertWidget" />-->
+                    <Editor v-model="form.description" tinymceScriptSrc="/tinymce/tinymce.min.js" :init="editorInit"
+                      class="description-editor__field" />
+
+                  </ClientOnly>
+                </div>
+                <BlockWidgetDialog v-model:visible="dialog.visible" :type="dialog.type" :data="dialog.data"
+                  @save="saveWidget" @delete="deleteWidget" @duplicate="duplicateWidget" />
               </div>
               <div class="form-group">
                 <label for="menu">{{ $t('menuManager.menuName') }} *</label>
@@ -75,7 +72,8 @@
           <template #title>{{ $t('contentManager.actions') }}</template>
           <template #content>
             <div class="action-links">
-              <Button v-if="contentStore.currentContent?.content_type !== ContentType.ARTICLE && contentStore.currentContent?.content_type !== ContentType.PRODUCT"
+              <Button
+                v-if="contentStore.currentContent?.content_type !== ContentType.ARTICLE && contentStore.currentContent?.content_type !== ContentType.PRODUCT"
                 :label="$t('contentManager.list')" icon="pi pi-list" outlined
                 @click="$router.push(`/admin/content/${contentId}/items`)" class="w-full mb-3" />
               <Button v-if="contentStore.currentContent?.content_type === ContentType.NEWS"
@@ -84,9 +82,9 @@
               <Button v-if="contentStore.currentContent?.content_type === ContentType.MAP"
                 :label="$t('contentManager.showMap')" icon="pi pi-map" outlined
                 @click="$router.push(`/admin/content/${contentId}/map`)" class="w-full mb-3" />
-              <Button v-if="contentStore.currentContent?.content_type === ContentType.PRODUCT"
-                label="Manage Products" icon="pi pi-shopping-bag" outlined
-                @click="$router.push(`/admin/content/${contentId}/products`)" class="w-full" />
+              <Button v-if="contentStore.currentContent?.content_type === ContentType.PRODUCT" label="Manage Products"
+                icon="pi pi-shopping-bag" outlined @click="$router.push(`/admin/content/${contentId}/products`)"
+                class="w-full" />
             </div>
           </template>
         </Card>
@@ -103,6 +101,19 @@ definePageMeta({
 
 import { ContentType } from '~/types'
 import Editor from '@tinymce/tinymce-vue'
+import {
+  createWidgetHtml,
+  previewHtml,
+  encodePayload,
+  readWidget,
+  parseDragMarker,
+  getKbDrag,
+  setKbDrag,
+} from '~/utils/blockWidgets'
+import type { KbWidgetType } from '~/utils/blockWidgets'
+// TinyMCE renders inside an isolated iframe, so the page's global blocks.css
+// never reaches the editor content. Import it raw and inject via content_style.
+import blocksCss from '~/assets/css/blocks.css?raw'
 import { useContentStore } from '~/stores/content'
 import { useDomainStore } from '~/stores/domain'
 import { useAuthStore } from '~/stores/auth'
@@ -131,7 +142,7 @@ const form = ref({
   content_type: ContentType.ARTICLE,
   lang_id: null as number | null,
   menu_id: null as number | null,
-  status: 0 as  number,
+  status: 0 as number,
 })
 
 const errors = ref<Record<string, string>>({})
@@ -171,6 +182,179 @@ watch(() => form.value.menu_id, (menuId) => {
   }
 })
 
+// ---- Low-code widget editor (drag/drop components inside TinyMCE) ----
+const editorRef = shallowRef<any>(null)
+
+const dialog = reactive({
+  visible: false,
+  type: null as KbWidgetType | null,
+  data: {} as any,
+  node: null as any,
+})
+
+const insertWidget = (type: KbWidgetType) => {
+  const editor = editorRef.value
+  if (!editor) return
+  editor.focus()
+  const html = createWidgetHtml(type)
+  // editor.insertContent exists in TinyMCE 4+; execCommand is the universal fallback.
+  if (typeof editor.insertContent === 'function') {
+    editor.insertContent(html)
+  } else {
+    editor.execCommand('mceInsertContent', false, html)
+  }
+  editor.undoManager.add()
+}
+
+const openWidgetForNode = (type: KbWidgetType, data: any, node: any) => {
+  dialog.type = type
+  dialog.data = data
+  dialog.node = node
+  dialog.visible = true
+}
+
+const saveWidget = (data: any) => {
+  const editor = editorRef.value
+  const node = dialog.node
+  if (!editor || !node || !dialog.type) {
+    dialog.visible = false
+    return
+  }
+  node.setAttribute('data-kb-payload', encodePayload(data))
+  editor.dom.setHTML(node, previewHtml(dialog.type, data))
+  editor.undoManager.add()
+  editor.nodeChanged()
+  dialog.visible = false
+}
+
+const deleteWidget = () => {
+  const editor = editorRef.value
+  const node = dialog.node
+  if (editor && node) {
+    node.remove()
+    editor.undoManager.add()
+    editor.nodeChanged()
+  }
+  dialog.visible = false
+}
+
+const duplicateWidget = () => {
+  const editor = editorRef.value
+  const node = dialog.node
+  if (editor && node && node.parentNode) {
+    node.parentNode.insertBefore(node.cloneNode(true), node.nextSibling)
+    editor.undoManager.add()
+    editor.nodeChanged()
+  }
+  dialog.visible = false
+}
+
+// Editor-only "click to edit" chrome. Kept out of blocks.css so it never shows
+// on the public site (stored widgets keep the mceNonEditable class).
+const KB_EDITOR_CHROME = `
+.kb-widget.mceNonEditable { position: relative; display: block; margin: 12px 0; padding: 10px; border: 1px dashed #93c5fd; border-radius: 8px; background: #f8fbff; cursor: pointer; user-select: none; }
+.kb-widget.mceNonEditable:hover { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
+.kb-widget.mceNonEditable::after { content: "click to edit"; position: absolute; top: -9px; right: 10px; font-size: 10px; line-height: 1; padding: 2px 6px; background: #3b82f6; color: #fff; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.04em; }
+`
+
+// TinyMCE init: existing config + `noneditable` plugin, a whitelist so widget
+// markup survives serialization, and a `setup` callback wiring the toolbar
+// menu button, click-to-edit, and drag-into-editor.
+const editorInit = computed(() => ({
+  height: 360,
+  menubar: 'tools',
+  plugins:
+    'noneditable advlist autolink lists link image charmap print preview anchor searchreplace visualblocks code fullscreen insertdatetime media table paste',
+  toolbar:
+    'undo redo | bold italic underline | forecolor backcolor | fontselect | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | kbinsert | fullscreen',
+  branding: false,
+  promotion: false,
+  relative_urls: false,
+  remove_script_host: false,
+  document_base_url: photoUrl,
+  content_style: blocksCss + KB_EDITOR_CHROME,
+  extended_valid_elements:
+    'div[class|style|contenteditable|data-kb-type|data-kb-payload],img[src|alt|class|style|width|height],figure[class|style],figcaption[class|style],hr[class|style],a[href|class|target|rel|style],h3[class|style],h4[class|style],p[class|style],span[class|style],ul[class|style],li[class|style],blockquote[class|style],details[class|style|open],summary[class|style],iframe[src|class|style|allow|allowfullscreen|loading|width|height|title],video[src|class|style|controls|preload|width|height]',
+  setup(editor: any) {
+    editorRef.value = editor
+
+    // One toolbar menu button listing all insertable components.
+    // Uses the TinyMCE 4 API (the app self-hosts TinyMCE 4.8 from /tinymce/):
+    // addButton with type 'menubutton' + `onclick` menu items — NOT the v5+
+    // editor.ui.registry.addMenuButton / `onAction` API.
+    editor.addButton('kbinsert', {
+      type: 'menubutton',
+      text: t('blockEditor.components'),
+      tooltip: t('blockEditor.insert'),
+      menu: [
+        { text: t('blockEditor.card'), onclick: () => insertWidget('card') },
+        { text: t('blockEditor.checklist'), onclick: () => insertWidget('checkbox') },
+        { text: t('blockEditor.button'), onclick: () => insertWidget('button') },
+        { text: t('blockEditor.image'), onclick: () => insertWidget('image') },
+        { text: t('blockEditor.divider'), onclick: () => insertWidget('divider') },
+        { text: t('blockEditor.columns'), onclick: () => insertWidget('columns') },
+        { text: t('blockEditor.spacer'), onclick: () => insertWidget('spacer') },
+        { text: t('blockEditor.icon'), onclick: () => insertWidget('icon') },
+        { text: t('blockEditor.stats'), onclick: () => insertWidget('stats') },
+        { text: t('blockEditor.callout'), onclick: () => insertWidget('callout') },
+        { text: t('blockEditor.contact'), onclick: () => insertWidget('contact') },
+        { text: t('blockEditor.gallery'), onclick: () => insertWidget('gallery') },
+        { text: t('blockEditor.quote'), onclick: () => insertWidget('quote') },
+        { text: t('blockEditor.accordion'), onclick: () => insertWidget('accordion') },
+        { text: t('blockEditor.video'), onclick: () => insertWidget('video') },
+      ],
+    })
+
+    // Click a widget → open its edit dialog.
+    editor.on('click', (e: any) => {
+      const target = e.target && e.target.nodeType === 3 ? e.target.parentNode : e.target
+      const info = readWidget(target)
+      if (!info) return
+      const el = target.closest ? target.closest('.kb-widget') : null
+      openWidgetForNode(info.type, info.data, el)
+    })
+
+    // Drop a component dragged from the palette → insert at the drop position.
+    // TinyMCE 4 doesn't expose a drop range like v5+; compute the caret from the
+    // pointer coordinates (relative to the editor iframe) and fall back to the
+    // current caret on any failure.
+    editor.on('drop', (e: any) => {
+      const marker =
+        e.dataTransfer &&
+        (e.dataTransfer.getData('application/x-kb-block') || e.dataTransfer.getData('text/plain'))
+      const type = parseDragMarker(marker) || getKbDrag()
+      setKbDrag(null)
+      if (!type) return // not one of ours — let TinyMCE handle it
+      e.preventDefault()
+      try {
+        const doc = editor.getDoc()
+        const area = editor.getContentAreaContainer && editor.getContentAreaContainer()
+        const rect =
+          area && area.getBoundingClientRect ? area.getBoundingClientRect() : { left: 0, top: 0 }
+        const x = (e.clientX || 0) - (rect as any).left
+        const y = (e.clientY || 0) - (rect as any).top
+        let rng: any = null
+        if (typeof doc.caretRangeFromPoint === 'function') {
+          rng = doc.caretRangeFromPoint(x, y)
+        } else if (typeof doc.caretPositionFromPoint === 'function') {
+          const pos = doc.caretPositionFromPoint(x, y)
+          if (pos) {
+            rng = doc.createRange()
+            rng.setStart(pos.offsetNode, pos.offset)
+            rng.collapse(true)
+          }
+        }
+        if (rng && editor.selection && editor.selection.setRng) {
+          editor.selection.setRng(rng)
+        }
+      } catch {
+        /* fall back to current caret */
+      }
+      insertWidget(type)
+    })
+  },
+}))
+
 const validateForm = (): boolean => {
   errors.value = {}
 
@@ -201,7 +385,7 @@ const handleSave = async () => {
   }
 
   saving.value = true
-console.log('Saving content with form data:', form.value)
+  console.log('Saving content with form data:', form.value)
   try {
     let result: boolean | { success: boolean; id?: number }
 
@@ -212,7 +396,7 @@ console.log('Saving content with form data:', form.value)
         content_type: form.value.content_type,
         lang_id: form.value.lang_id!,
         menu_id: form.value.menu_id!,
-        status: form.value.status?0:1,
+        status: form.value.status ? 0 : 1,
       })
     } else {
       result = await contentStore.updateContent(contentId.value!, {
@@ -221,7 +405,7 @@ console.log('Saving content with form data:', form.value)
         content_type: form.value.content_type,
         lang_id: form.value.lang_id!,
         menu_id: form.value.menu_id!,
-        status: form.value.status?0:1,
+        status: form.value.status ? 0 : 1,
       })
     }
 
@@ -252,7 +436,7 @@ onMounted(async () => {
       content_type: raw.content_type,
       lang_id: raw.lang_id,
       menu_id: raw.menu_id ?? null,
-      status: raw.status?0:1,
+      status: raw.status ? 0 : 1,
     }
   }
 
@@ -328,6 +512,32 @@ onMounted(async () => {
 .status-toggle span {
   font-size: 0.875rem;
   color: #4a5568;
+}
+
+.description-editor {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.description-editor__field {
+  flex: 1;
+  min-width: 0;
+}
+
+.description-editor__palette {
+  flex: none;
+  width: 220px;
+}
+
+@media (max-width: 900px) {
+  .description-editor {
+    flex-direction: column;
+  }
+
+  .description-editor__palette {
+    width: 100%;
+  }
 }
 
 .action-links {
