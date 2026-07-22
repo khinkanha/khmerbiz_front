@@ -24,6 +24,7 @@ export default defineNuxtConfig(<any>{
       apiBaseUrl: '',
       photoUrl: '',
       recaptchaSiteKey: '',
+      recaptchaEnabled: false,
     },
   },
 

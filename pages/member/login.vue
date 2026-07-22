@@ -7,14 +7,16 @@
         <form @submit.prevent="handleLogin">
           <div class="form-group">
             <label for="username">{{ $t('auth.username') }}</label>
-            <input type="text" id="username" v-model="form.username" class="form-control" :placeholder="$t('auth.username')" />
+            <input type="text" id="username" v-model="form.username" class="form-control"
+              :placeholder="$t('auth.username')" />
           </div>
           <div class="form-group">
             <label for="password">{{ $t('auth.password') }}</label>
-            <input type="password" id="password" v-model="form.password" class="form-control" :placeholder="$t('auth.password')" />
+            <input type="password" id="password" v-model="form.password" class="form-control"
+              :placeholder="$t('auth.password')" />
           </div>
           <div class="form-group">
-            <div id="recaptcha-login"></div>
+            <div v-if="useRuntimeConfig().public.recaptchaEnabled" id="recaptcha-login"></div>
           </div>
           <button type="submit" class="btn btn-danger" :disabled="loading">
             <i class="fa fa-sign-in-alt"></i> {{ $t('auth.login') }}
@@ -35,7 +37,8 @@ definePageMeta({
 
 import { useAuthStore } from '~/stores/auth'
 import { useRecaptcha } from '~/composables/useRecaptcha'
-
+const config = useRuntimeConfig()
+const recapchaenable = config.public.recaptchaEnabled
 const authStore = useAuthStore()
 const { t } = useI18n()
 const { render: renderRecaptcha, getResponse: getRecaptchaResponse, reset: resetRecaptcha } = useRecaptcha()
@@ -49,7 +52,9 @@ const loading = ref(false)
 const errorMessage = ref('')
 
 onMounted(() => {
-  renderRecaptcha('recaptcha-login')
+  if(recapchaenable) {
+    renderRecaptcha('recaptcha-login')
+  }
 })
 
 const handleLogin = async () => {
@@ -60,14 +65,19 @@ const handleLogin = async () => {
     return
   }
 
-  const recaptchaToken = getRecaptchaResponse()
-  if (!recaptchaToken) {
-    errorMessage.value = 'Please complete the reCAPTCHA'
-    return
+  var recaptchaToken = getRecaptchaResponse()
+  if (recapchaenable) {
+
+    if (!recaptchaToken) {
+      errorMessage.value = 'Please complete the reCAPTCHA'
+      return
+    }
   }
 
   loading.value = true
-
+ if(!recapchaenable) {
+    recaptchaToken = ''
+  }
   try {
     const result = await authStore.login({
       username: form.value.username,
