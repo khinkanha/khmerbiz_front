@@ -1372,13 +1372,13 @@ const _routes = [
     name: "admin-content-contentId-products",
     path: "/admin/content/:contentId()/products",
     meta: __nuxt_page_meta$u || {},
-    component: () => import('./products-DlD7pWXq.mjs')
+    component: () => import('./products-C5goa8U8.mjs')
   },
   {
     name: "admin-content-id",
     path: "/admin/content/:id()",
     meta: __nuxt_page_meta$t || {},
-    component: () => import('./_id_-DtdlRzCM.mjs')
+    component: () => import('./_id_-C13f4Spd.mjs')
   },
   {
     name: "admin-content",
@@ -1518,13 +1518,13 @@ const _routes = [
     name: "index",
     path: "/",
     meta: __nuxt_page_meta$6 || {},
-    component: () => import('./index-C1HkXi82.mjs')
+    component: () => import('./index-aYL2L-hA.mjs')
   },
   {
     name: "member-login",
     path: "/member/login",
     meta: __nuxt_page_meta$5 || {},
-    component: () => import('./login-DLTiRfCJ.mjs')
+    component: () => import('./login-CR_bjMba.mjs')
   },
   {
     name: "member-signup",
@@ -2506,16 +2506,16 @@ const localeCodes = [
 ];
 const localeLoaders = {
   "en": [{ key: "../i18n/locales/en.json", load: () => import(
-    './en-B6eb-dyJ.mjs'
-    /* webpackChunkName: "locale__Users_admin_dev_website_khmerbiz_khmerbiz_front_i18n_locales_en_json" */
+    './en-CxrACamk.mjs'
+    /* webpackChunkName: "locale__Users_khinkanha_websites_4khweb_khmerbiz_front_i18n_locales_en_json" */
   ), cache: true }],
   "kh": [{ key: "../i18n/locales/kh.json", load: () => import(
-    './kh-DBhJWw0U.mjs'
-    /* webpackChunkName: "locale__Users_admin_dev_website_khmerbiz_khmerbiz_front_i18n_locales_kh_json" */
+    './kh-CX2pI2Hl.mjs'
+    /* webpackChunkName: "locale__Users_khinkanha_websites_4khweb_khmerbiz_front_i18n_locales_kh_json" */
   ), cache: true }],
   "ch": [{ key: "../i18n/locales/ch.json", load: () => import(
     './ch-DaAS-uuo.mjs'
-    /* webpackChunkName: "locale__Users_admin_dev_website_khmerbiz_khmerbiz_front_i18n_locales_ch_json" */
+    /* webpackChunkName: "locale__Users_khinkanha_websites_4khweb_khmerbiz_front_i18n_locales_ch_json" */
   ), cache: true }]
 };
 const vueI18nConfigs = [];
@@ -2525,7 +2525,7 @@ const normalizedLocales = [
     "name": "English",
     "files": [
       {
-        "path": "/Users/admin/dev/website/khmerbiz/khmerbiz_front/i18n/locales/en.json"
+        "path": "/Users/khinkanha/websites/4khweb/khmerbiz_front/i18n/locales/en.json"
       }
     ]
   },
@@ -2534,7 +2534,7 @@ const normalizedLocales = [
     "name": "ខ្មែរ",
     "files": [
       {
-        "path": "/Users/admin/dev/website/khmerbiz/khmerbiz_front/i18n/locales/kh.json"
+        "path": "/Users/khinkanha/websites/4khweb/khmerbiz_front/i18n/locales/kh.json"
       }
     ]
   },
@@ -2543,7 +2543,7 @@ const normalizedLocales = [
     "name": "中文",
     "files": [
       {
-        "path": "/Users/admin/dev/website/khmerbiz/khmerbiz_front/i18n/locales/ch.json"
+        "path": "/Users/khinkanha/websites/4khweb/khmerbiz_front/i18n/locales/ch.json"
       }
     ]
   }
@@ -36335,7 +36335,7 @@ const plugins = [
 const layouts = {
   admin: defineAsyncComponent(() => import('./admin-Dd2dgCSw.mjs')),
   blank: defineAsyncComponent(() => import('./blank-CPiFi3ag.mjs')),
-  default: defineAsyncComponent(() => import('./default-DpMMptJA.mjs'))
+  default: defineAsyncComponent(() => import('./default-BRY8Jj7B.mjs'))
 };
 const LayoutLoader = defineComponent({
   name: "LayoutLoader",
