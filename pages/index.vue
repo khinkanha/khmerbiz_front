@@ -135,8 +135,7 @@ const loadContent = async () => {
       }
     }
     contentSections.value = sections
-  console.log('Loaded contentSections:', sections)
-  console.log('Menu tree:', domainStore.menuTree)
+  
   }
 
   // Fallback: if no content loaded, fetch the first menu item's content

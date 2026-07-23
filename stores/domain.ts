@@ -14,6 +14,10 @@ export const useDomainStore = defineStore('domain', () => {
   const socialMedia = ref<SocialMedia[]>([])
   const menuTree = ref<MenuItem[]>([])
   const menuCache = ref<Record<number, MenuItem[]>>({})
+  // Flips to true once resolveDomain has finished (config + menu attempted).
+  // The public layout keeps its loader visible until this is true, so the real
+  // theme/menu are ready before the page is allowed to mount and render.
+  const resolved = ref(false)
 
   // Hydrate from server-injected config if available (avoids re-fetching on client)
   const hydrateFromServer = (): boolean => {
@@ -48,6 +52,7 @@ export const useDomainStore = defineStore('domain', () => {
           : languages.value[0].lang_id
         await setLanguage(langToUse)
       }
+      resolved.value = true
       return
     }
 
@@ -90,6 +95,8 @@ export const useDomainStore = defineStore('domain', () => {
       }
     } catch (error) {
       console.error('Failed to resolve domain:', error)
+    } finally {
+      resolved.value = true
     }
   }
 
@@ -189,6 +196,7 @@ export const useDomainStore = defineStore('domain', () => {
     banners: readonly(banners),
     socialMedia: readonly(socialMedia),
     menuTree: readonly(menuTree),
+    resolved: readonly(resolved),
     resolveDomain,
     hydrateFromServer,
     setLanguage,

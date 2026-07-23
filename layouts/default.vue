@@ -1,5 +1,12 @@
 <template>
-  <div class="public-layout" :class="themeClass">
+  <!-- Full-screen loader until the domain has fully resolved on the client
+       (config + menu). Holding the loader until `resolved` is true avoids flashing
+       the default theme and prevents the page from mounting before its menu is ready. -->
+  <div v-if="!isReady" class="app-loading">
+    <ProgressSpinner />
+  </div>
+
+  <div v-else class="public-layout" :class="themeClass">
     <PublicHeader />
     <BannerSlideshow v-if="showBanner" :banners="domainStore.banners" :class="bannerPosClass" />
     <main class="main-content">
@@ -18,6 +25,12 @@ const { getThemeClass } = useTheme()
 const route = useRoute()
 
 const settings = computed(() => domainStore.settings)
+
+// The themed shell renders only after the domain has fully resolved on the client
+// (config + menu). Gating on `resolved` (not just `settings`) ensures the menu tree
+// is loaded before the page mounts, so the homepage doesn't misread an empty
+// (still-loading) menu as "under construction".
+const isReady = computed(() => domainStore.resolved)
 
 const themeClass = computed(() => {
   if (domainStore.settings) {
@@ -59,15 +72,22 @@ const showPlugin = computed(() => Number(settings.value?.plugin_mode) === 1)
 
 onMounted(async () => {
   
-  if (!domainStore.domain) {
-    domainStore.hydrateFromServer()
-    await domainStore.resolveDomain()
-  }
+  domainStore.hydrateFromServer()
+  await domainStore.resolveDomain()
   setFromSetting(domainStore.settings)
 })
 </script>
 
 <style scoped>
+.app-loading {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+}
+
 .public-layout {
   min-height: 100vh;
   display: flex;
