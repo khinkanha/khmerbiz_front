@@ -13,6 +13,10 @@ export const useDomainStore = defineStore('domain', () => {
   const banners = ref<Banner[]>([])
   const socialMedia = ref<SocialMedia[]>([])
   const menuTree = ref<MenuItem[]>([])
+  // The Site Designer design, shipped inside GET /site/config. Captured here so
+  // the design store's public loader can read it (the SSR domain-resolver that
+  // would inject __NUXT_DESIGN__ is currently dead code — see CLAUDE.md).
+  const siteDesign = ref<any>(null)
   const menuCache = ref<Record<number, MenuItem[]>>({})
   // Flips to true once resolveDomain has finished (config + menu attempted).
   // The public layout keeps its loader visible until this is true, so the real
@@ -28,6 +32,7 @@ export const useDomainStore = defineStore('domain', () => {
       languages.value = data.languages
       banners.value = data.banners
       socialMedia.value = data.socialMedia
+      siteDesign.value = data.design ?? null
       delete (window as any).__NUXT_SITE_CONFIG__
       return true
     }
@@ -76,6 +81,7 @@ export const useDomainStore = defineStore('domain', () => {
         languages: Language[]
         banners: Banner[]
         socialMedia: SocialMedia[]
+        design?: any
       }>(endpoint)
 
       if (response.success && response.data) {
@@ -84,6 +90,7 @@ export const useDomainStore = defineStore('domain', () => {
         languages.value = response.data.languages
         banners.value = response.data.banners
         socialMedia.value = response.data.socialMedia
+        siteDesign.value = response.data.design ?? null
 
         if (languages.value.length > 0) {
           const savedLangId = getSavedLangId()
@@ -196,6 +203,7 @@ export const useDomainStore = defineStore('domain', () => {
     banners: readonly(banners),
     socialMedia: readonly(socialMedia),
     menuTree: readonly(menuTree),
+    siteDesign: readonly(siteDesign),
     resolved: readonly(resolved),
     resolveDomain,
     hydrateFromServer,

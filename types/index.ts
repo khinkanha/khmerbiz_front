@@ -1,4 +1,5 @@
 export * from './content'
+export * from './design'
 export * from './domain'
 export * from './menu'
 export * from './setting'

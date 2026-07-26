@@ -1,6 +1,11 @@
 <template>
+  <!-- Loading: wait for domain + design + content so the right template renders without a flash -->
+  <div v-if="isLoading" class="loading">
+    <ProgressSpinner />
+  </div>
+
   <!-- Under Construction: domain has no menus/content -->
-  <div v-if="showUnderConstruction" class="under-construction">
+  <div v-else-if="showUnderConstruction" class="under-construction">
     <div class="uc-content">
       <div class="uc-icon">
         <i class="pi pi-building"></i>
@@ -11,6 +16,9 @@
       <p class="uc-subtext">We're working hard to bring you an amazing experience. Please check back soon!</p>
     </div>
   </div>
+
+  <!-- Site Designer page -->
+  <DesignerPage v-else-if="isDesignerMode" :sections="designerSections" :content-sections="contentSections" />
 
   <!-- Normal theme rendering -->
   <component v-else-if="themeComponent" :is="themeComponent"
@@ -24,18 +32,32 @@
 
 <script setup lang="ts">
 import { useDomainStore } from '~/stores/domain'
+import { useDesignStore } from '~/stores/design'
 import type { ContentSection } from '~/types'
 import ClassicMultiPage from '~/components/public/themes/ClassicMultiPage.vue'
 import ScrollingSinglePage from '~/components/public/themes/ScrollingSinglePage.vue'
 import MagazineGrid from '~/components/public/themes/MagazineGrid.vue'
 import FullscreenHero from '~/components/public/themes/FullscreenHero.vue'
+import DesignerPage from '~/components/public/DesignerPage.vue'
 
 definePageMeta({
   layout: 'default',
 })
 
 const domainStore = useDomainStore()
+const designStore = useDesignStore()
 const api = useApi()
+
+// Site Designer (page_style === 4): render the composed homepage sections.
+const designerSections = computed(() => designStore.design?.pages?.home?.sections ?? [])
+// When the Designer is active but has NO sections, fall back to the Classic
+// template (menu content) — the original homepage behaviour.
+const effectivePageStyle = computed(() => {
+  const ps = Number(domainStore.settings?.page_style)
+  if (ps === 4 && designerSections.value.length === 0) return 0
+  return ps
+})
+const isDesignerMode = computed(() => effectivePageStyle.value === 4)
 
 const isLoading = ref(true)
 const hasNoContent = ref(false)
@@ -59,7 +81,7 @@ const themeComponent = computed(() => {
       2: 'MagazineGrid',
       3: 'FullscreenHero',
     }
-    const name = styles[domainStore.settings.page_style] || 'ClassicMultiPage'
+    const name = styles[effectivePageStyle.value] || 'ClassicMultiPage'
     return themeMap[name]
   }
   return null
@@ -90,7 +112,7 @@ const loadContent = async () => {
   if (!domainId) return
 
   // For non-ClassicMultiPage themes, fetch home content
-  if (domainStore.settings && domainStore.settings.page_style !== 0) {
+  if (domainStore.settings && effectivePageStyle.value !== 0) {
     const response = await api.get<any[]>(`/site/home?domain_id=${domainId}`)
     if (response.success && response.data) {
       const items = Array.isArray(response.data) ? response.data : [response.data]
@@ -159,6 +181,9 @@ onMounted(async () => {
   if (!domainStore.domain) {
     domainStore.hydrateFromServer()
     await domainStore.resolveDomain()
+  }
+  if (!designStore.design) {
+    await designStore.loadPublicDesign()
   }
   await loadContent()
 

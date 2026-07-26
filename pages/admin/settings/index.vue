@@ -91,6 +91,17 @@
         </div>
       </div>
 
+      <!-- Site Designer (moved here from the top nav, below Template Style) -->
+      <div class="form-group designer-block">
+        <label class="tpl-label">Site Designer</label>
+        <div class="designer-row">
+          <span class="designer-help">Build a custom homepage with drag &amp; drop blocks, your own colors, header &amp; footer. When left empty, the homepage keeps showing the menu content from the template above.</span>
+          <NuxtLink to="/admin/builder" class="btn btn-primary designer-btn">
+            <i class="fa fa-paint-brush"></i> Open Designer
+          </NuxtLink>
+        </div>
+      </div>
+
       <div v-if="successMessage" class="alert alert-success">{{ successMessage }}</div>
       <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
       <button type="submit" class="btn btn-danger" :disabled="saving">
@@ -144,6 +155,10 @@ const templates = [
   {
     id: 3, name: 'Fullscreen Hero', color: '#764ba2', desc: 'Full-screen hero with sections',
     preview: '<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 10px;height:20px;background:rgba(0,0,0,.35)"><div style="width:28px;height:7px;border-radius:2px;background:rgba(255,255,255,.5)"></div><div><b style="display:inline-block;width:16px;height:3px;background:rgba(255,255,255,.35);margin-left:3px"></b><b style="display:inline-block;width:16px;height:3px;background:rgba(255,255,255,.35);margin-left:3px"></b></div></div><div style="height:60px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.8);margin-bottom:5px"></div><div style="width:55%;height:4px;background:rgba(255,255,255,.7);border-radius:2px;margin-bottom:3px"></div><div style="width:30%;height:4px;background:rgba(255,255,255,.5);border-radius:2px"></div></div>'
+  },
+  {
+    id: 4, name: 'Site Designer', color: '#7c3aed', desc: 'Drag & drop your own layout',
+    preview: '<img src="/designer-preview.svg" alt="Site Designer" style="width:100%;height:100%;object-fit:cover;display:block"/>'
   },
 ]
 
@@ -302,5 +317,36 @@ onMounted(async () => {
   .template-picker {
     grid-template-columns: 1fr;
   }
+}
+
+.designer-block {
+  border: 1px solid #e4e4e4;
+  border-radius: 12px;
+  padding: 14px 16px;
+  background: #faf8ff;
+}
+.designer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.designer-help {
+  font-size: 13px;
+  color: #6b7280;
+  flex: 1;
+  min-width: 220px;
+}
+.designer-btn {
+  background: #7c3aed;
+  border-color: #7c3aed;
+  color: #fff;
+  white-space: nowrap;
+}
+.designer-btn:hover {
+  background: #6d28d9;
+  border-color: #6d28d9;
+  color: #fff;
 }
 </style>
