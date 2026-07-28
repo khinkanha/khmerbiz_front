@@ -7,10 +7,11 @@
           <!-- About / Site Info -->
           <div class="footer-section footer-about">
             <div class="footer-brand">
-              <img v-if="settings?.logo" :src="photoUrl + settings.logo" :alt="settings?.title || 'Logo'" class="footer-logo" />
+              <img v-if="settings?.logo" :src="photoUrl + settings.logo" :alt="settings?.title || 'Logo'"
+                class="footer-logo" />
               <h3 v-if="settings?.title">{{ settings.title }}</h3>
             </div>
-            <div v-if="settings?.footer" class="footer-text" :class="footerAlignClass" v-html="settings.footer"></div>
+            <!-- <div v-if="settings?.footer" class="footer-text" :class="footerAlignClass" v-html="settings.footer"></div>-->
           </div>
 
           <!-- Social Media -->
@@ -21,7 +22,7 @@
                 rel="noopener noreferrer" class="social-link">
 
                 <i :class="getSocialIcon(social.stype)"></i>
-                
+
               </a>
             </div>
           </div>
@@ -32,7 +33,8 @@
     <!-- Bottom Bar -->
     <div class="footer-bottom">
       <div class="container">
-        <p>&copy; {{ currentYear }} {{ settings?.title || 'Company' }}. All rights reserved.</p>
+        <div v-if="settings?.footer" class="footer-text" :class="footerAlignClass" v-html="settings.footer" />
+
       </div>
     </div>
   </footer>
@@ -117,9 +119,17 @@ const footerAlignClass = computed(() => {
   line-height: 1.7;
 }
 
-.footer-text.text-left { text-align: left; }
-.footer-text.text-center { text-align: center; }
-.footer-text.text-right { text-align: right; }
+.footer-text.text-left {
+  text-align: left;
+}
+
+.footer-text.text-center {
+  text-align: center;
+}
+
+.footer-text.text-right {
+  text-align: right;
+}
 
 .footer-text :deep(p) {
   margin: 0;
@@ -145,7 +155,7 @@ const footerAlignClass = computed(() => {
 /* Social Links */
 .social-links {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 0.5rem;
 }
 
@@ -184,7 +194,7 @@ const footerAlignClass = computed(() => {
 .footer-bottom {
   background-color: var(--primary-dark, #111827);
   padding: 0.85rem 0;
-  text-align: center;
+  
 }
 
 .footer-bottom p {

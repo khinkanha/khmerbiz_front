@@ -19,7 +19,7 @@ export interface Setting {
   banner_pos: number | null
   plugin_mode: number | null
   background: string | null
-  footer_align: number
+  footer_align: number | null
   theme: number
   tracking_id: string | null
   chat_script: string | null

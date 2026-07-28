@@ -36,9 +36,9 @@
           <div class="form-group">
             <label>{{ $t('settings.footerAlignment') }}</label>
             <select v-model="form.footer_align" class="form-control">
-              <option value="1">Left</option>
-              <option value="2">Center</option>
-              <option value="3">Right</option>
+              <option :value="1">Left</option>
+              <option :value="2">Center</option>
+              <option :value="3">Right</option>
             </select>
           </div>
         </div>
@@ -60,7 +60,8 @@
         <div class="col-md-6">
           <div class="form-group">
             <label>{{ $t('settings.googleAnalytics') }}</label>
-            <input type="text" v-model="form.tracking_id" class="form-control" :placeholder="$t('settings.googleAnalytics')" />
+            <input type="text" v-model="form.tracking_id" class="form-control"
+              :placeholder="$t('settings.googleAnalytics')" />
           </div>
         </div>
       </div>
@@ -73,13 +74,8 @@
       <div class="form-group">
         <label class="tpl-label">Choose Template Style</label>
         <div class="template-picker">
-          <div
-            v-for="tpl in templates"
-            :key="tpl.id"
-            class="tpl-card"
-            :class="{ selected: form.page_style == tpl.id }"
-            @click="form.page_style = tpl.id"
-          >
+          <div v-for="tpl in templates" :key="tpl.id" class="tpl-card" :class="{ selected: form.page_style == tpl.id }"
+            @click="form.page_style = tpl.id">
             <div class="tpl-bar" :style="{ background: tpl.color }"></div>
             <div class="tpl-preview" v-html="tpl.preview"></div>
             <div class="tpl-meta">
@@ -95,7 +91,8 @@
       <div class="form-group designer-block">
         <label class="tpl-label">Site Designer</label>
         <div class="designer-row">
-          <span class="designer-help">Build a custom homepage with drag &amp; drop blocks, your own colors, header &amp; footer. When left empty, the homepage keeps showing the menu content from the template above.</span>
+          <span class="designer-help">Build a custom homepage with drag &amp; drop blocks, your own colors, header &amp;
+            footer. When left empty, the homepage keeps showing the menu content from the template above.</span>
           <NuxtLink to="/admin/builder" class="btn btn-primary designer-btn">
             <i class="fa fa-paint-brush"></i> Open Designer
           </NuxtLink>
@@ -128,7 +125,7 @@ const form = ref({
   tracking_id: '',
   chat_script: '',
   footer: '',
-  footer_align: '1',
+  footer_align: 1,
   s_mode: '1',
   background: '',
 })
@@ -202,7 +199,7 @@ onMounted(async () => {
       tracking_id: s.tracking_id || '',
       chat_script: s.chat_script || '',
       footer: s.footer || '',
-      footer_align: String(s.footer_align || 1),
+      footer_align: Number(s.footer_align || 1),
       s_mode: String(s.s_mode || 1),
       background: s.background || '',
     }
@@ -325,6 +322,7 @@ onMounted(async () => {
   padding: 14px 16px;
   background: #faf8ff;
 }
+
 .designer-row {
   display: flex;
   align-items: center;
@@ -332,18 +330,21 @@ onMounted(async () => {
   gap: 14px;
   flex-wrap: wrap;
 }
+
 .designer-help {
   font-size: 13px;
   color: #6b7280;
   flex: 1;
   min-width: 220px;
 }
+
 .designer-btn {
   background: #7c3aed;
   border-color: #7c3aed;
   color: #fff;
   white-space: nowrap;
 }
+
 .designer-btn:hover {
   background: #6d28d9;
   border-color: #6d28d9;
