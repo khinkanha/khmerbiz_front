@@ -88,7 +88,7 @@ export const useSettingStore = defineStore('setting', () => {
 
   const updateBanner = async (data: Partial<Setting>): Promise<boolean> => {
     const response = await api.put('/settings/banner', data)
-    console.log('Update settings response:', response)
+    
     if (response.success) {
       if (settings.value) {
         settings.value = { ...settings.value, ...data }

@@ -7,7 +7,7 @@
           <!-- About / Site Info -->
           <div class="footer-section footer-about">
             <div class="footer-brand">
-              <img v-if="settings?.logo" :src="photoUrl + settings.logo" :alt="settings?.title || 'Logo'"
+              <img v-if="settings?.mobile_logo" :src="photoUrl + settings.mobile_logo" :alt="settings?.title || 'Logo'"
                 class="footer-logo" />
               <h3 v-if="settings?.title">{{ settings.title }}</h3>
             </div>

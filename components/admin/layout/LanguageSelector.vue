@@ -1,21 +1,11 @@
 <template>
-  <div class="language-selector" :class="{ dark }">
-    <Button
-      @click="toggleMenu"
-      class="language-button"
-      text
-    >
-      <img
-        v-if="currentLanguage"
-        :src="`/flag/${flagMap(currentLanguage.flag)}`"
-        :alt="currentLanguage.lang_name"
-        class="flag-icon"
-      />
-      <span v-if="currentLanguage">{{ currentLanguage.lang_code?.toUpperCase() }}</span>
-      <i class="pi pi-chevron-down"></i>
-    </Button>
+  <div class="lang2">
+    <div v-for="lang in domainStore.languages" :key="lang.lang_id">
 
-    <Menu ref="menuRef" :model="languageMenuItems" :popup="true" />
+      <Button @click="() => setLanguage(lang.lang_id)" class="language-button" text
+        :class="lang.lang_id === currentLanguage.lang_id ? 'active-language' : ''"> <img
+          :src="`/flag/${flagMap(lang.flag)}`" :alt="lang.lang_name" class="flag-icon" /></Button>
+    </div>
   </div>
 </template>
 
@@ -107,5 +97,22 @@ const setLanguage = async (langId: number) => {
 
 .language-selector.dark .language-button:hover {
   color: #fff;
+}
+
+.active-language {
+  .flag-icon {
+    width: 22px;
+    height: 17px;
+
+  }
+
+}
+
+.lang2 {
+  display: flex;
+  align-items: center;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+
 }
 </style>

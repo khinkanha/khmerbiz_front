@@ -44,12 +44,25 @@
                 <BlockWidgetDialog v-model:visible="dialog.visible" :type="dialog.type" :data="dialog.data"
                   @save="saveWidget" @delete="deleteWidget" @duplicate="duplicateWidget" />
               </div>
-              <div class="form-group">
-                <label for="menu">{{ $t('menuManager.menuName') }} *</label>
-                <Dropdown id="menu" v-model="form.menu_id" :options="menuOptions" optionLabel="item_name"
-                  optionValue="item_id" :placeholder="$t('menuManager.selectMenu')"
-                  :class="{ 'p-invalid': errors.menu_id }" showClear />
-                <small v-if="errors.menu_id" class="p-error">{{ errors.menu_id }}</small>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="lang">{{ $t('menuManager.language') }} *</label>
+                    <Dropdown id="lang" v-model="form.lang_id" :options="languageOptions" optionLabel="lang_name"
+                      optionValue="lang_id" placeholder="Select language" :class="{ 'p-invalid': errors.lang_id }" />
+                    <small v-if="errors.lang_id" class="p-error">{{ errors.lang_id }}</small>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="menu">{{ $t('menuManager.menuName') }} *</label>
+                    <Dropdown id="menu" v-model="form.menu_id" :options="menuOptions" optionLabel="item_name"
+                      optionValue="item_id" :disabled="form.lang_id == null"
+                      :placeholder="form.lang_id == null ? 'Select language first' : $t('menuManager.selectMenu')"
+                      :class="{ 'p-invalid': errors.menu_id }" showClear />
+                    <small v-if="errors.menu_id" class="p-error">{{ errors.menu_id }}</small>
+                  </div>
+                </div>
               </div>
 
               <div class="form-group">
@@ -100,6 +113,7 @@ definePageMeta({
 })
 
 import { ContentType } from '~/types'
+import type { Language } from '~/types'
 import Editor from '@tinymce/tinymce-vue'
 import {
   createWidgetHtml,
@@ -117,12 +131,10 @@ import blocksCss from '~/assets/css/blocks.css?raw'
 import { useContentStore } from '~/stores/content'
 import { useDomainStore } from '~/stores/domain'
 import { useAuthStore } from '~/stores/auth'
-import { useMenuStore } from '~/stores/menu'
 
 const contentStore = useContentStore()
 const domainStore = useDomainStore()
 const authStore = useAuthStore()
-const menuStore = useMenuStore()
 const config = useRuntimeConfig()
 const photoUrl = config.public.photoUrl
 const { t } = useI18n()
@@ -159,26 +171,31 @@ const contentTypeOptions = [
   { label: 'Product / Service', value: ContentType.PRODUCT },
 ]
 
+const api = useApi()
+const allMenus = ref<any[]>([])
+const languageOptions = computed(() => domainStore.languages as Language[])
+
 const menuOptions = computed(() => {
-  const flatten = (items: any[], prefix = ''): any[] => {
-    const result: any[] = []
-    for (const item of items) {
-      const label = prefix + (item.item_name || '')
-      result.push({ item_id: item.item_id, item_name: label, lang_id: item.lang_id })
-      if (item.children?.length) {
-        result.push(...flatten(item.children, label + ' → '))
-      }
-    }
-    return result
-  }
-  return flatten([...menuStore.menuTree])
+  // Filter the full menu list by the selected language. allMenus is fetched
+  // with a high limit so items past the default page-of-10 (e.g. "Video") are
+  // included; dedupe by item_id because /menus joins tblcontent.
+  const seen = new Set<number>()
+  return allMenus.value
+    .filter(m => form.value.lang_id != null && m.lang_id === form.value.lang_id)
+    .filter(m => {
+      if (seen.has(m.item_id)) return false
+      seen.add(m.item_id)
+      return true
+    })
+    .map(m => ({ item_id: m.item_id, item_name: m.item_name }))
 })
 
-watch(() => form.value.menu_id, (menuId) => {
-  if (menuId == null) return
-  const selected = menuOptions.value.find((opt: any) => opt.item_id === menuId)
-  if (selected?.lang_id) {
-    form.value.lang_id = selected.lang_id
+// Language is the driver now: when it changes, drop a menu that no longer
+// belongs to the selected language (keep it if still valid, e.g. on initial load).
+watch(() => form.value.lang_id, () => {
+  if (form.value.menu_id != null &&
+    !menuOptions.value.some(m => m.item_id === form.value.menu_id)) {
+    form.value.menu_id = null
   }
 })
 
@@ -385,7 +402,6 @@ const handleSave = async () => {
   }
 
   saving.value = true
-  console.log('Saving content with form data:', form.value)
   try {
     let result: boolean | { success: boolean; id?: number }
 
@@ -423,23 +439,38 @@ const handleSave = async () => {
 
 onMounted(async () => {
   await domainStore.resolveDomain(authStore.user?.domain_id)
-  await menuStore.fetchAllMenuTree()
 
-
-  await contentStore.fetchContent(contentId.value!)
-  if (contentStore.currentContent) {
-    const raw = contentStore.currentContent as any
-    const desc1 = JSON.parse(raw.description)
-    form.value = {
-      title: desc1.title,
-      description: desc1.description,
-      content_type: raw.content_type,
-      lang_id: raw.lang_id,
-      menu_id: raw.menu_id ?? null,
-      status: raw.status ? 0 : 1,
+  // Pull every menu for the domain (high limit, not the default page of 10) so
+  // the language filter has the full set to filter — including items past #10.
+  try {
+    const res = await api.get<any>('/menus?limit=1000')
+    if (res.success && res.data) {
+      allMenus.value = (res.data.items || res.data)
     }
+  } catch (e) {
+    console.error('Failed to fetch menus:', e)
   }
 
+  if (contentId.value) {
+    await contentStore.fetchContent(contentId.value)
+    if (contentStore.currentContent) {
+      const raw = contentStore.currentContent as any
+      const desc1 = JSON.parse(raw.description)
+      form.value = {
+        title: desc1.title,
+        description: desc1.description,
+        content_type: raw.content_type,
+        lang_id: raw.lang_id,
+        menu_id: raw.menu_id ?? null,
+        status: raw.status ? 0 : 1,
+      }
+    }
+  } else {
+    // New content: default the language to the domain's default language so the
+    // menu dropdown isn't empty/disabled on first load.
+    const def = languageOptions.value.find(l => l.is_default === 1) || languageOptions.value[0]
+    if (def) form.value.lang_id = def.lang_id
+  }
 })
 </script>
 

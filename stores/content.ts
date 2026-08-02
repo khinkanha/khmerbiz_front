@@ -488,16 +488,11 @@ export const useContentStore = defineStore('content', () => {
         page: String(page),
         limit: String(pagination.value.limit),
       })
-      console.log('Fetching products from:', `/content/${contentId}/products?${params}`)
       const response = await api.get<any>(`/content/${contentId}/products?${params}`)
-      console.log('Fetch products response:', response)
-
+     
       if (response.success && response.data) {
         const d = response.data
         let rawItems: any[] = []
-
-        console.log('Response data structure:', d)
-
         if (Array.isArray(d)) {
           rawItems = d
         } else if (d.items) {
@@ -515,9 +510,8 @@ export const useContentStore = defineStore('content', () => {
           rawItems = d.data
         }
 
-        console.log('Raw items before parsing:', rawItems)
         productList.value = rawItems.map(parseProduct)
-        console.log('Parsed products:', productList.value)
+       
       } else {
         console.error('Fetch products failed:', response)
       }
@@ -543,12 +537,12 @@ export const useContentStore = defineStore('content', () => {
       if (data.priority !== undefined) payload.priority = data.priority
       if (data.status !== undefined) payload.status = data.status
 
-      console.log('Saving product to API:', payload)
+     
       const response = await api.post<{ id: number; product_id?: number }>(`/content/${contentId}/products`, payload)
-      console.log('API response:', response)
+      
       if (response.success && response.data) {
         const id = response.data.product_id || response.data.id
-        console.log('Product saved with ID:', id)
+        
         return { success: true, id }
       }
       console.error('Save failed with response:', response)

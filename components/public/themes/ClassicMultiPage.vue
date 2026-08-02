@@ -280,8 +280,6 @@ watch(totalPages, (val) => {
 })
 
 onMounted(() => {
-  console.log('ClassicMultiPage - contentSections:', props.contentSections)
-  console.log('ClassicMultiPage - menuTree:', props.menuTree)
   fetchFeaturedNews()
 })
 
@@ -294,7 +292,6 @@ watch(newsContentIds, () => {
 
 const getContentForMenuItem = (menuItemId: number): ContentSection | undefined => {
   const section = props.contentSections.find(cs => cs.content.menu_id === menuItemId)
-  console.log(`Looking for menu item ${menuItemId}:`, section ? `Found content type ${section.content.content_type}` : 'Not found')
   return section
 }
 

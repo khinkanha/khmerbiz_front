@@ -18,9 +18,13 @@
         <NuxtLink to="/admin/menu/add" class="btn btn-success"><i class="fa fa-plus"></i></NuxtLink>
       </div>
 
-      <DataTable :value="flatMenuItems" :loading="loading" :paginator="true" :rows="pagination.limit"
-        :totalRecords="pagination.total" :lazy="true" @page="onPageChange" :rowsPerPageOptions="[10, 20, 50]"
-        stripedRows>
+      <div class="text-right" style="margin-bottom:10px">
+        <Dropdown v-model="selectedLangId" :options="languageOptions" optionLabel="lang_name" optionValue="lang_id"
+          placeholder="Select language" />
+      </div>
+
+      <DataTable :value="flatMenuItems" :loading="loading" :paginator="true" :rows="10"
+        :rowsPerPageOptions="[10, 20, 50]" stripedRows>
         <Column header="#" :style="{ width: '80px' }">
           <template #body="{ index }">
             {{ index + 1 }}
@@ -79,28 +83,45 @@ definePageMeta({ layout: 'admin', middleware: 'auth' })
 
 import { useMenuStore } from '~/stores/menu'
 import { useDomainStore } from '~/stores/domain'
+import { useAuthStore } from '~/stores/auth'
 import type { Language } from '~/types'
 
 const menuStore = useMenuStore()
 const domainStore = useDomainStore()
+const authStore = useAuthStore()
 
+const api = useApi()
 const loading = ref(false)
 const selectedLangId = ref<number>(0)
 const clearMsg = ref(false)
+const allMenus = ref<any[]>([])
 
 const languageOptions = computed(() => domainStore.languages as Language[])
-const pagination = computed(() => menuStore.pagination)
+
+// Fetch every menu for the domain (high limit, not the default page of 10), then
+// filter client-side by the selected language — the /menus endpoint has no
+// lang_id filter of its own.
+const fetchAllMenus = async () => {
+  loading.value = true
+  try {
+    const res = await api.get<any>('/menus?limit=1000')
+    if (res.success && res.data) {
+      allMenus.value = res.data.items || res.data
+    }
+  } catch (e) {
+    console.error('Failed to fetch menus:', e)
+  } finally {
+    loading.value = false
+  }
+}
 
 const flatMenuItems = computed(() => {
-  const flatten = (items: any[], depth = 0): any[] => {
-    const result: any[] = []
-    for (const item of items) {
-      result.push({ ...item, _depth: depth })
-      if (item.children?.length) result.push(...flatten(item.children, depth + 1))
-    }
-    return result
-  }
-  return flatten([...menuStore.menuItems])
+  const seen = new Set<number>()
+  return allMenus.value
+    .filter(m => selectedLangId.value && m.lang_id === selectedLangId.value)
+    .filter(m => { if (seen.has(m.item_id)) return false; seen.add(m.item_id); return true })
+    .sort((a, b) => (a.item_order || 0) - (b.item_order || 0))
+    .map(m => ({ ...m, _depth: 0 }))
 })
 
 const flagMap = (flag: number) => {
@@ -119,53 +140,39 @@ const getLanguageByLangId = (langId: number): Language | undefined => {
   return domainStore.languages.find(l => l.lang_id === langId)
 }
 
-const onPageChange = (event: any) => {
-  loading.value = true
-  menuStore.fetchMenuItems(event.page + 1).finally(() => { loading.value = false })
-}
-
-const handleLanguageChange = async () => {
-  if (selectedLangId.value) {
-    loading.value = true
-    await menuStore.fetchMenuTree(selectedLangId.value)
-    loading.value = false
-  }
-}
-
 const handleClearCache = async () => {
-  const api = useApi();
-  await api.post(`/menus/clear-cache`, { "domainId": domainStore.domain.domain_id });
+  await api.post(`/menus/clear-cache`, { domainId: domainStore.domain?.domain_id })
   menuStore.clearCache()
   domainStore.clearCache()
   clearMsg.value = true
-  if (selectedLangId.value) menuStore.fetchMenuTree(selectedLangId.value)
+  await fetchAllMenus()
   setTimeout(() => { clearMsg.value = false }, 3000)
 }
 
 const confirmDelete = async (item: any) => {
   if (confirm('Are you sure?')) {
     await menuStore.deleteMenuItem(item.item_id)
-    if (selectedLangId.value) await menuStore.fetchMenuTree(selectedLangId.value)
+    await fetchAllMenus()
   }
 }
 
 const handleReorder = async (item: any, direction: 'up' | 'down') => {
   if (loading.value) return
-  loading.value = true
   const ok = await menuStore.reorderMenu(item.item_id, direction)
   if (ok) {
     // Ordering changed — invalidate cached menu trees so the public site reflects it
     menuStore.clearCache()
     domainStore.clearCache()
+    await fetchAllMenus()
   }
-  await menuStore.fetchMenuItems(pagination.value.page)
-  loading.value = false
 }
 
 onMounted(async () => {
-  loading.value = true
-  await menuStore.fetchMenuItems()
-  loading.value = false
+  await domainStore.resolveDomain(authStore.user?.domain_id)
+  // default to the domain's default language
+  const def = languageOptions.value.find(l => l.is_default === 1) || languageOptions.value[0]
+  if (def) selectedLangId.value = def.lang_id
+  await fetchAllMenus()
 })
 </script>
 
