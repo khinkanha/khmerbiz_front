@@ -1,1 +1,0 @@
-import{at as u,L as o,G as a}from"./B0LYbUGn.js";const n=u(e=>{const t=o();if(!["/member/login","/member/signup"].includes(e.path)&&!t.isAuthenticated)return a("/member/login")});export{n as default};
