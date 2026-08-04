@@ -1,22 +1,31 @@
 <template>
-  <!-- Full-screen loader until the domain has fully resolved on the client
-       (config + menu). Holding the loader until `resolved` is true avoids flashing
-       the default theme and prevents the page from mounting before its menu is ready. -->
-  <div v-if="!isReady" class="app-loading">
-    <ProgressSpinner />
-  </div>
+  <div class="public-layout" :class="themeClass" :style="designStyleVars">
+    <!-- Header/banner render only after the domain has resolved (client-side) so the
+         real theme/menu are used. The page (<slot/>) renders immediately — including
+         during SSR — so page-level <head> tags (Open Graph for link previews) reach
+         the server-rendered HTML that social scrapers (Facebook/LINE/Google) read. -->
+    <template v-if="isReady">
+      <DesignerHeader v-if="isDesignerMode" />
+      <PublicHeader v-else />
+      <BannerSlideshow v-if="showBanner" :banners="domainStore.banners" :class="bannerPosClass" />
+    </template>
 
-  <div v-else class="public-layout" :class="themeClass" :style="designStyleVars">
-    <DesignerHeader v-if="isDesignerMode" />
-    <PublicHeader v-else />
-    <BannerSlideshow v-if="showBanner" :banners="domainStore.banners" :class="bannerPosClass" />
     <main class="main-content">
       <slot />
     </main>
-    <DesignerFooter v-if="isDesignerMode" />
-    <PublicFooter v-else />
-    <!-- Custom chat/script injection (chat_script + plugin_mode) -->
-    <div v-if="showPlugin && settings?.chat_script" v-html="settings.chat_script"></div>
+
+    <template v-if="isReady">
+      <DesignerFooter v-if="isDesignerMode" />
+      <PublicFooter v-else />
+      <!-- Custom chat/script injection (chat_script + plugin_mode) -->
+      <div v-if="showPlugin && settings?.chat_script" v-html="settings.chat_script"></div>
+    </template>
+  </div>
+
+  <!-- Full-screen loader overlay until the domain resolves on the client. It sits
+       on top (position: fixed) so the page beneath still mounts and SSRs while hidden. -->
+  <div v-if="!isReady" class="app-loading">
+    <ProgressSpinner />
   </div>
 </template>
 
@@ -103,6 +112,7 @@ onMounted(async () => {
 .app-loading {
   position: fixed;
   inset: 0;
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
