@@ -25,7 +25,6 @@ import { useSeo } from '~/composables/useSeo'
 
 const authStore = useAuthStore()
 const domainStore = useDomainStore()
-const { setFromSetting } = useSeo()
 
 const settings = computed(() => domainStore.settings)
 
@@ -39,7 +38,7 @@ useHead({
 
 watch(settings, (val) => {
   if (val) {
-    setFromSetting(val)
+  //  setFromSetting(val)
   }
 }, { immediate: true })
 

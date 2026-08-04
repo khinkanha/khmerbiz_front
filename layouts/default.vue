@@ -46,7 +46,15 @@ const themeClass = computed(() => {
   }
   return 'theme-default'
 })
-const {setFromSetting}=useSeo()
+const { setFromSetting } = useSeo()
+
+// Browser-tab title for the public site — always the website title from Settings.
+// Uses titleTemplate (not title) so it overrides any page-level title set by
+// individual pages (Home, article, news, products). Scoped to this public layout
+// only — the admin/member layouts are unaffected.
+useHead({
+  titleTemplate: () => domainStore.settings?.title || '',
+})
 
 // Banner display logic — only for ClassicMultiPage style (page_style === 0):
 // banner_mode: 0=off, 1=on
@@ -82,7 +90,7 @@ const bannerPosClass = computed(() => {
 const showPlugin = computed(() => Number(settings.value?.plugin_mode) === 1)
 
 onMounted(async () => {
-  
+
   domainStore.hydrateFromServer()
   designStore.hydrateFromServer()       // zero-flash once the backend ships design
   await domainStore.resolveDomain()

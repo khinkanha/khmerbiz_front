@@ -1543,7 +1543,7 @@ const _routes = [
     name: "news-newsId",
     path: "/news/:newsId()",
     meta: __nuxt_page_meta$3 || {},
-    component: () => import('./_newsId_-Ca7veOZo.mjs')
+    component: () => import('./_newsId_-DkHW0DWR.mjs')
   },
   {
     name: "pages-domainId-contentId",
@@ -1555,7 +1555,7 @@ const _routes = [
     name: "pages-domainId-menuId",
     path: "/pages/:domainId()/:menuId()",
     meta: __nuxt_page_meta$1 || {},
-    component: () => import('./_menuId_-DS2d4Mj0.mjs')
+    component: () => import('./_menuId_-B8T_2y-D.mjs')
   },
   {
     name: "products-productId",
@@ -36340,9 +36340,9 @@ const plugins = [
   primevue_7rYYRZQLyx
 ];
 const layouts = {
-  admin: defineAsyncComponent(() => import('./admin-CE261R8Q.mjs')),
+  admin: defineAsyncComponent(() => import('./admin-B2_SzLsC.mjs')),
   blank: defineAsyncComponent(() => import('./blank-CPiFi3ag.mjs')),
-  default: defineAsyncComponent(() => import('./default-BldGuB06.mjs'))
+  default: defineAsyncComponent(() => import('./default-D3qxYVeB.mjs'))
 };
 const LayoutLoader = defineComponent({
   name: "LayoutLoader",

@@ -121,7 +121,7 @@ export const useSeo = () => {
     const name = siteName(setting)
 
     setMeta({
-      title: name ? `${content.title} | ${name}` : content.title,
+      title: name,
       description: truncate(stripHtml(body)),
       image: photoPath ? `${photoUrl}${photoPath}` : logoUrl(setting),
       icon: logoUrl(setting),
