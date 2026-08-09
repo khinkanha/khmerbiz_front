@@ -16,7 +16,7 @@
       <div class="dp-stage" :class="[deviceClass, themeClass]" :style="tokenStyle">
         <DesignerHeader />
         <main class="dp-main">
-          <DesignerPage :sections="homeSections" />
+          <DesignerPage :sections="currentSections" />
         </main>
         <DesignerFooter />
       </div>
@@ -32,7 +32,7 @@ import DesignerHeader from '~/components/public/DesignerHeader.vue'
 import DesignerFooter from '~/components/public/DesignerFooter.vue'
 import DesignerPage from '~/components/public/DesignerPage.vue'
 
-const { homeSections, style, domainId } = useSiteDesigner()
+const { currentSections, style, domainId } = useSiteDesigner()
 const domainStore = useDomainStore()
 
 const device = ref<'desktop' | 'tablet' | 'mobile'>('desktop')

@@ -133,14 +133,26 @@ export const useDesignStore = defineStore('design', () => {
   // Public path: no auth, no /admin/design call (visitors aren't logged in).
   // Reads the design shipped inside GET /site/config (captured by the domain
   // store). Falls back to seed only when no design exists yet.
+  //
+  // IMPORTANT: child page onMounted runs BEFORE the layout's onMounted, so the
+  // domain store may not have called resolveDomain() yet when this runs. We must
+  // wait for it (or the siteDesign below is null and we'd seed an EMPTY design,
+  // which would then short-circuit every later caller via `if (design.value)
+  // return` and the real design would never load). This is what stopped designed
+  // sub-pages from rendering.
   const loadPublicDesign = async (domainId?: number | null) => {
     if (design.value) return // already loaded (e.g. via hydrateFromServer)
     const id = resolveDomainId(domainId)
     muted++
     try {
       if (hydrateFromServer()) return
-      let cfgDesign: any = null
-      try { cfgDesign = (useDomainStore() as any).siteDesign } catch { /* store not ready */ }
+      const ds = useDomainStore()
+      // Ensure GET /site/config has run so siteDesign can be read. resolveDomain
+      // is idempotent (early-returns when the domain is already loaded).
+      if (!ds.resolved) {
+        try { await ds.resolveDomain(id ?? undefined) } catch { /* ignore */ }
+      }
+      const cfgDesign = ds.siteDesign
       if (cfgDesign) {
         design.value = normalize(cfgDesign, id)
         dirty.value = false
@@ -253,59 +265,97 @@ export const useDesignStore = defineStore('design', () => {
     dirty.value = true
   }
 
-  // ---- Phase 2: page section composition (homepage) ------------------------
+  // ---- Phase 2 + Pages: page section composition ----------------------------
+  //
+  // Sections live under design.pages[<key>].sections. The admin builder edits a
+  // "current page" (currentPageKey, default 'home'); the public renderer reads
+  // whichever page matches the route. Page keys are stable slugs (item_url with
+  // a leading slash, or 'home') so a design survives language switches — menu
+  // item_ids differ per language, but URLs do not.
 
-  const homeSections = computed<SectionSlot[]>(() => design.value?.pages?.home?.sections ?? [])
+  /** Page the admin builder is currently editing. */
+  const currentPageKey = ref<string>('home')
+
+  /** Sections for a given page key (read-only view of the document). */
+  const pageSections = (key: string): SectionSlot[] =>
+    design.value?.pages?.[key]?.sections ?? []
+
+  /** Sections for the page currently being edited. */
+  const currentSections = computed<SectionSlot[]>(() => pageSections(currentPageKey.value))
+
+  /** Back-compat alias for the homepage (used by older consumers). */
+  const homeSections = computed<SectionSlot[]>(() => pageSections('home'))
+
+  /** Page keys that have at least one designed section. */
+  const designedPageKeys = computed<string[]>(() => {
+    const pages = design.value?.pages ?? {}
+    return Object.keys(pages).filter((k) => (pages[k]?.sections?.length ?? 0) > 0)
+  })
+
+  /** Switch the page the builder edits. Creates an empty page entry on demand. */
+  const setCurrentPage = (key: string) => {
+    currentPageKey.value = key
+    const d = design.value
+    if (d && !d.pages?.[key]) {
+      design.value = { ...d, pages: { ...d.pages, [key]: { sections: [] } } }
+      // NOTE: not setting dirty — adding an empty page is not a user edit.
+    }
+  }
+
+  /** Remove a page's design entirely (reverts it to the default theme). */
+  const clearPage = (key: string) => {
+    const d = design.value
+    if (!d?.pages?.[key]) return
+    const pages = { ...d.pages }
+    delete pages[key]
+    design.value = { ...d, pages }
+    dirty.value = true
+    if (currentPageKey.value === key) currentPageKey.value = 'home'
+  }
+
+  /** Immutably replace a page's sections array. */
+  const replaceSections = (key: string, sections: SectionSlot[]) => {
+    const d = ensureDesign()
+    design.value = { ...d, pages: { ...d.pages, [key]: { sections } } }
+    dirty.value = true
+  }
 
   const addSection = (slot: SectionSlot) => {
-    const d = ensureDesign()
-    const home = d.pages?.home ?? { sections: [] as SectionSlot[] }
-    design.value = {
-      ...d,
-      pages: { ...d.pages, home: { sections: [...home.sections, slot] } },
-    }
-    dirty.value = true
+    const key = currentPageKey.value
+    replaceSections(key, [...pageSections(key), slot])
   }
 
   const updateSection = (index: number, slot: SectionSlot) => {
-    const d = design.value
-    if (!d?.pages?.home) return
-    const sections = [...d.pages.home.sections]
+    const key = currentPageKey.value
+    const sections = [...pageSections(key)]
     if (index < 0 || index >= sections.length) return
     sections[index] = slot
-    design.value = { ...d, pages: { ...d.pages, home: { sections } } }
-    dirty.value = true
+    replaceSections(key, sections)
   }
 
   const removeSection = (index: number) => {
-    const d = design.value
-    if (!d?.pages?.home) return
-    const sections = d.pages.home.sections.filter((_, i) => i !== index)
-    design.value = { ...d, pages: { ...d.pages, home: { sections } } }
-    dirty.value = true
+    const key = currentPageKey.value
+    const sections = pageSections(key).filter((_, i) => i !== index)
+    replaceSections(key, sections)
   }
 
   const moveSection = (from: number, to: number) => {
-    const d = design.value
-    if (!d?.pages?.home) return
-    const sections = [...d.pages.home.sections]
+    const key = currentPageKey.value
+    const sections = [...pageSections(key)]
     if (from < 0 || from >= sections.length || to < 0 || to >= sections.length) return
     const [moved] = sections.splice(from, 1)
     sections.splice(to, 0, moved)
-    design.value = { ...d, pages: { ...d.pages, home: { sections } } }
-    dirty.value = true
+    replaceSections(key, sections)
   }
 
   const duplicateSection = (index: number) => {
-    const d = design.value
-    if (!d?.pages?.home) return
-    const sections = [...d.pages.home.sections]
+    const key = currentPageKey.value
+    const sections = [...pageSections(key)]
     const orig = sections[index]
     if (!orig) return
     const copy = JSON.parse(JSON.stringify(orig)) as SectionSlot
     sections.splice(index + 1, 0, copy)
-    design.value = { ...d, pages: { ...d.pages, home: { sections } } }
-    dirty.value = true
+    replaceSections(key, sections)
   }
 
   // ---- Phase 3: header / footer composition --------------------------------
@@ -335,6 +385,9 @@ export const useDesignStore = defineStore('design', () => {
     design: readonly(design),
     style: readonly(style),
     homeSections: readonly(homeSections),
+    currentSections: readonly(currentSections),
+    currentPageKey: readonly(currentPageKey),
+    designedPageKeys: readonly(designedPageKeys),
     homeHeader: readonly(homeHeader),
     homeFooter: readonly(homeFooter),
     loading: readonly(loading),
@@ -353,6 +406,9 @@ export const useDesignStore = defineStore('design', () => {
     applyPreset,
     applyDesignPreset,
     resetStyle,
+    pageSections,
+    setCurrentPage,
+    clearPage,
     addSection,
     updateSection,
     removeSection,

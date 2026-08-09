@@ -1,6 +1,22 @@
 <template>
-  <div class="content-page">
-    <div v-if="loading" class="loading-state">
+  <!--
+    Handles every /pages/:domainId/:id URL. Two render modes, matching the
+    admin Pages panel badges:
+      • DESIGN   — page_style === 4 AND this page has designed sections → DesignerPage
+      • DEFAULT  — otherwise → original content renderer (ContentRenderer)
+    The route param (:id) is the menu item_id, which is also the key the design
+    store uses under design.pages.
+  -->
+  <div class="page-content">
+    <!-- DESIGN: composed in the Site Designer -->
+    <DesignerPage
+      v-if="useDesignerForThisPage"
+      :sections="designedSections"
+      :content-sections="contentSection ? [contentSection] : []"
+    />
+
+    <!-- DEFAULT: original content rendering -->
+    <div v-else-if="loading" class="loading-state">
       <ProgressSpinner />
     </div>
 
@@ -24,6 +40,9 @@
 <script setup lang="ts">
 import { ContentType } from '~/types'
 import type { ContentSection } from '~/types'
+import { useDesignStore } from '~/stores/design'
+import { menuIdToPageKey } from '~/utils/designerSections'
+import DesignerPage from '~/components/public/DesignerPage.vue'
 
 definePageMeta({
   layout: 'default',
@@ -31,6 +50,7 @@ definePageMeta({
 
 const route = useRoute()
 const domainStore = useDomainStore()
+const designStore = useDesignStore()
 const api = useApi()
 
 const domainId = route.params.domainId as string
@@ -39,7 +59,16 @@ const contentId = route.params.contentId as string
 const loading = ref(true)
 const contentSection = ref<ContentSection | null>(null)
 
-// Fetch content section
+// ---- DESIGN vs DEFAULT resolution ------------------------------------------
+// DESIGN badge in the Pages panel = page_style 4 AND this page (keyed by its
+// menu item_id, which is what the route receives as contentId) has at least one
+// designed section. Anything else falls back to the DEFAULT content renderer.
+const pageKey = computed(() => menuIdToPageKey(contentId))
+const designedSections = computed(() => designStore.design?.pages?.[pageKey.value]?.sections ?? [])
+const isDesignerMode = computed(() => Number(domainStore.settings?.page_style) === 4)
+const useDesignerForThisPage = computed(() => isDesignerMode.value && designedSections.value.length > 0)
+
+// Fetch content section (used by the DEFAULT path; harmless when DESIGN renders).
 const fetchContent = async () => {
   loading.value = true
   try {
@@ -61,10 +90,17 @@ const fetchContent = async () => {
 }
 
 onMounted(async () => {
+  // Resolve the domain ourselves (child onMounted runs before the layout's) so
+  // loadPublicDesign() finds siteDesign instead of seeding an empty design.
   if (!domainStore.domain) {
     domainStore.hydrateFromServer()
-    await domainStore.resolveDomain()
+    try { await domainStore.resolveDomain(Number(domainId)) } catch { /* ignore */ }
   }
+  if (!designStore.design) {
+    try { await designStore.loadPublicDesign(Number(domainId)) } catch { /* ignore */ }
+  }
+  // Only the DEFAULT path needs content; but it's cheap to fetch and keeps the
+  // DESIGN→DEFAULT switch seamless if a design is later cleared.
   await fetchContent()
 })
 
@@ -78,7 +114,7 @@ useHead(() => ({
 </script>
 
 <style scoped>
-.content-page {
+.page-content {
   min-height: 60vh;
   background-color: #fff;
 }

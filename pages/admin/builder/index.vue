@@ -66,13 +66,9 @@
             <FooterPanel />
           </div>
 
-          <!-- PAGES (Phase 2/4) -->
-          <div v-show="activeTab === 'pages'" class="panel">
-            <Placeholder
-              icon="pi pi-file"
-              title="Pages — Phase 2"
-              text="Choose which page you are designing (Home, About…) and manage custom pages."
-            />
+          <!-- PAGES (multi-page designer management) -->
+          <div v-show="activeTab === 'pages'" class="panel wide">
+            <PagesPanel @navigate="onNavigate" />
           </div>
 
           <!-- PREVIEW (Phase 4) -->
@@ -93,7 +89,7 @@ import BuildPanel from '~/components/admin/designer/BuildPanel.vue'
 import HeaderPanel from '~/components/admin/designer/HeaderPanel.vue'
 import FooterPanel from '~/components/admin/designer/FooterPanel.vue'
 import PreviewPanel from '~/components/admin/designer/PreviewPanel.vue'
-import Placeholder from '~/components/admin/designer/Placeholder.vue'
+import PagesPanel from '~/components/admin/designer/PagesPanel.vue'
 
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 
@@ -109,7 +105,7 @@ const tabs = [
   { id: 'build', label: 'Build page', icon: 'pi pi-th-large', soon: false },
   { id: 'header', label: 'Header', icon: 'pi pi-bars', soon: false },
   { id: 'footer', label: 'Footer', icon: 'pi pi-directions', soon: false },
-  { id: 'pages', label: 'Pages', icon: 'pi pi-file', soon: true },
+  { id: 'pages', label: 'Pages', icon: 'pi pi-file', soon: false },
   { id: 'preview', label: 'Preview', icon: 'pi pi-eye', soon: false },
 ] as const
 
@@ -120,6 +116,13 @@ const handleSave = async () => {
   if (ok) {
     lastSaved.value = true
     setTimeout(() => (lastSaved.value = false), 3000)
+  }
+}
+
+// PagesPanel → jump to a tab (e.g. after picking a page to edit).
+const onNavigate = (tab: string) => {
+  if (tab === 'build' || tab === 'pages' || tab === 'style' || tab === 'header' || tab === 'footer' || tab === 'preview') {
+    activeTab.value = tab
   }
 }
 

@@ -57,7 +57,11 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const domainStore = useDomainStore()
-const isClassicTemplate = computed(() => domainStore.settings?.page_style === 0)
+// Inline NewsSection is allowed on the Classic template AND in Designer mode
+// (page_style 4), where each section renders independently on the page.
+const isClassicTemplate = computed(() =>
+  domainStore.settings?.page_style === 0 || domainStore.settings?.page_style === 4
+)
 
 const isContentSection = (val: any): val is ContentSection => {
   return val != null && 'content' in val && 'items' in val

@@ -9,12 +9,12 @@
         <div class="palette-grid">
           <button
             v-for="item in g.items"
-            :key="item.type"
+            :key="paletteKey(item)"
             type="button"
             class="palette-tile"
             draggable="true"
-            @dragstart="onPaletteDragStart($event, item.type)"
-            @click="onAdd(item.type)"
+            @dragstart="onPaletteDragStart($event, item)"
+            @click="onAdd(item)"
           >
             <i :class="item.icon" />
             <span>{{ item.label }}</span>
@@ -26,7 +26,17 @@
     <!-- Canvas / section list (right) -->
     <div class="canvas-col">
       <div class="canvas-head">
-        <h4 class="col-title">Homepage layout</h4>
+        <div class="page-picker">
+          <span class="editing-label">Editing:</span>
+          <Dropdown
+            :model-value="currentPageKey"
+            :options="pageOptions"
+            option-label="label"
+            option-value="value"
+            class="page-select"
+            @update:model-value="onSelectPage"
+          />
+        </div>
         <div class="canvas-actions">
           <Button
             label="Set as homepage"
@@ -45,7 +55,7 @@
         @drop="onCanvasDrop($event, 0)"
       >
         <i class="pi pi-th-large" />
-        <p>Your homepage is empty.</p>
+        <p>{{ currentPageKey === 'home' ? 'Your homepage is empty.' : 'This page is empty.' }}</p>
         <span>Click or drag a block from the left to start.</span>
       </div>
 
@@ -71,7 +81,7 @@
           <div class="row-tools">
             <button class="tool" title="Move up" :disabled="i === 0" @click="moveSection(i, i - 1)"><i class="pi pi-arrow-up" /></button>
             <button class="tool" title="Move down" :disabled="i === sections.length - 1" @click="moveSection(i, i + 1)"><i class="pi pi-arrow-down" /></button>
-            <button class="tool" title="Edit" @click="openEdit(i)"><i class="pi pi-pencil" /></button>
+            <button class="tool" :class="{ muted: !isEditable(slot) }" :title="isEditable(slot) ? 'Edit' : 'No settings'" :disabled="!isEditable(slot)" @click="openEdit(i)"><i class="pi pi-pencil" /></button>
             <button class="tool" title="Duplicate" @click="duplicateSection(i)"><i class="pi pi-clone" /></button>
             <button class="tool danger" title="Delete" @click="removeSection(i)"><i class="pi pi-trash" /></button>
           </div>
@@ -79,69 +89,130 @@
       </ul>
 
       <p class="canvas-foot">
-        Drag rows to reorder, or use the arrows. Click <strong>Set as homepage</strong> to make this layout live
-        (switches the template to the Designer).
+        Drag rows to reorder, or use the arrows. Banner and social blocks need no
+        editing — they show the tenant's published banners / social links. Content blocks
+        bind to a menu item. Click <strong>Set as homepage</strong> to make this layout live.
       </p>
     </div>
 
-    <!-- Edit dialog (reused from the article widget editor) -->
+    <!-- Edit dialogs -->
     <BlockWidgetDialog
-      v-model:visible="dialogVisible"
-      :type="editType"
-      :data="editData"
-      @save="onDialogSave"
-      @delete="onDialogDelete"
+      v-model:visible="widgetDialog"
+      :type="widgetType"
+      :data="widgetData"
+      @save="onWidgetSave"
+      @delete="onWidgetDelete"
       @duplicate="onDialogDuplicate"
+    />
+
+    <ContentSlotDialog
+      v-model:visible="contentDialog"
+      :content-type="contentEdit.contentType"
+      :menu-id="contentEdit.menuId"
+      @save="onContentSave"
+      @delete="onDialogDelete"
     />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useSiteDesigner } from '~/composables/useSiteDesigner'
+import { useMenuStore } from '~/stores/menu'
 import BlockWidgetDialog from '~/components/admin/blocks/BlockWidgetDialog.vue'
+import ContentSlotDialog from '~/components/admin/designer/ContentSlotDialog.vue'
 import {
   DESIGNER_PALETTE,
-  makeWidgetSlot,
+  makeSlotFromPalette,
   slotIcon,
   slotLabel,
+  menuIdToPageKey,
+  HOME_PAGE_KEY,
+  CONTENT_TYPE_META,
+  type PaletteItem,
 } from '~/utils/designerSections'
 import type { KbWidgetType } from '~/utils/blockWidgets'
-import type { SectionSlot, WidgetSlot } from '~/types'
+import type { SectionSlot, WidgetSlot, ContentSlot, MenuItem } from '~/types'
 
 const {
-  homeSections,
+  currentSections,
+  currentPageKey,
+  designedPageKeys,
   addSection,
   updateSection,
   removeSection,
   moveSection,
   duplicateSection,
+  setCurrentPage,
   save,
   activateHomepage,
 } = useSiteDesigner()
 
-// homeSections is a readonly computed ref; alias for template brevity.
-const sections = homeSections
+const menuStore = useMenuStore()
 
-// ---- add from palette ----
-const onAdd = (type: KbWidgetType) => {
-  addSection(makeWidgetSlot(type))
+// currentSections is a readonly computed ref; alias for template brevity.
+const sections = currentSections
+
+// ---- page selector ---------------------------------------------------------
+
+// Flatten the menu tree into leaf items (anything that can be a page).
+const flattenLeaves = (items: readonly MenuItem[], acc: MenuItem[] = []): MenuItem[] => {
+  for (const it of items) {
+    if (it.children && it.children.length > 0) flattenLeaves(it.children, acc)
+    else acc.push(it)
+  }
+  return acc
 }
 
-// palette drag -> drop onto canvas end / empty area appends
-const paletteDragType = ref<KbWidgetType | null>(null)
-const onPaletteDragStart = (e: DragEvent, type: KbWidgetType) => {
-  paletteDragType.value = type
-  e.dataTransfer?.setData('text/plain', type)
+const pageOptions = computed(() => {
+  const leaves = flattenLeaves(menuStore.menuTree as MenuItem[] ?? [])
+  const opts: { label: string; value: string }[] = [
+    { label: 'Home', value: HOME_PAGE_KEY },
+  ]
+  const seen = new Set<string>([HOME_PAGE_KEY])
+  for (const m of leaves) {
+    const key = menuIdToPageKey(m.item_id)
+    if (seen.has(key)) continue
+    seen.add(key)
+    opts.push({ label: m.item_name || `Menu #${m.item_id}`, value: key })
+  }
+  return opts
+})
+
+const onSelectPage = (key: string) => setCurrentPage(key)
+
+// Make sure the menu tree is loaded for the page selector.
+onMounted(async () => {
+  if (!menuStore.menuTree.length) {
+    try { await menuStore.fetchAllMenuTree() } catch { /* ignore */ }
+  }
+  // If the current page key somehow isn't valid, fall back to home.
+  if (currentPageKey.value !== HOME_PAGE_KEY && !pageOptions.value.some((p) => p.value === currentPageKey.value)) {
+    setCurrentPage(HOME_PAGE_KEY)
+  }
+})
+
+// ---- add from palette (now kind-aware) -------------------------------------
+const onAdd = (item: PaletteItem) => {
+  addSection(makeSlotFromPalette(item))
+}
+
+// palette drag -> drop
+const paletteDragItem = ref<PaletteItem | null>(null)
+const paletteKey = (item: PaletteItem): string =>
+  item.kind === 'widget' ? `w-${item.type}` : item.kind === 'content' ? `c-${item.contentType}` : `b-${item.kind}`
+const onPaletteDragStart = (e: DragEvent, item: PaletteItem) => {
+  paletteDragItem.value = item
+  e.dataTransfer?.setData('text/plain', paletteKey(item))
   if (e.dataTransfer) e.dataTransfer.effectAllowed = 'copy'
 }
 const onCanvasDrop = (e: DragEvent, _index: number) => {
-  if (paletteDragType.value) {
-    addSection(makeWidgetSlot(paletteDragType.value))
+  if (paletteDragItem.value) {
+    addSection(makeSlotFromPalette(paletteDragItem.value))
   }
-  paletteDragType.value = null
+  paletteDragItem.value = null
 }
 
-// ---- reorder existing rows (native HTML5 DnD) ----
+// ---- reorder existing rows (native HTML5 DnD) ------------------------------
 const dragIndex = ref<number | null>(null)
 const dragOverIndex = ref<number | null>(null)
 const onRowDragStart = (i: number) => { dragIndex.value = i }
@@ -149,47 +220,79 @@ const onRowDragEnd = () => { dragIndex.value = null; dragOverIndex.value = null 
 const onRowDrop = (i: number) => {
   if (dragIndex.value !== null && dragIndex.value !== i) {
     moveSection(dragIndex.value, i)
-  } else if (paletteDragType.value) {
+  } else if (paletteDragItem.value) {
     // dropped a palette item onto a row -> insert at that position
-    const slot = makeWidgetSlot(paletteDragType.value)
-    addSection(slot)
+    addSection(makeSlotFromPalette(paletteDragItem.value))
     const last = sections.value.length - 1
     if (last >= 0) moveSection(last, i)
   }
   dragIndex.value = null
   dragOverIndex.value = null
-  paletteDragType.value = null
+  paletteDragItem.value = null
 }
 
-// ---- edit dialog ----
-const dialogVisible = ref(false)
-const editIndex = ref<number | null>(null)
-const editType = ref<KbWidgetType | null>(null)
-const editData = ref<any>({})
+// ---- edit dialog dispatch (by slot kind) -----------------------------------
+const isEditable = (slot: SectionSlot): boolean => slot.kind === 'widget' || slot.kind === 'content'
+
+const widgetDialog = ref(false)
+const widgetType = ref<KbWidgetType | null>(null)
+const widgetData = ref<any>({})
+const widgetEditIndex = ref<number | null>(null)
+
+const contentDialog = ref(false)
+const contentEdit = reactive<{ index: number | null; contentType: number; menuId?: number }>({
+  index: null,
+  contentType: 0,
+  menuId: undefined,
+})
 
 const openEdit = (i: number) => {
   const slot = sections.value[i]
-  if (!slot || slot.kind !== 'widget') return
-  editIndex.value = i
-  editType.value = slot.type
-  editData.value = JSON.parse(JSON.stringify(slot.payload))
-  dialogVisible.value = true
-}
-const onDialogSave = (data: any) => {
-  if (editIndex.value === null || !editType.value) return
-  const slot: WidgetSlot = { kind: 'widget', type: editType.value, payload: data }
-  updateSection(editIndex.value, slot)
-  dialogVisible.value = false
-}
-const onDialogDelete = () => {
-  if (editIndex.value !== null) removeSection(editIndex.value)
-  dialogVisible.value = false
-}
-const onDialogDuplicate = () => {
-  if (editIndex.value !== null) duplicateSection(editIndex.value)
+  if (!slot) return
+  if (slot.kind === 'widget') {
+    widgetEditIndex.value = i
+    widgetType.value = slot.type
+    widgetData.value = JSON.parse(JSON.stringify(slot.payload))
+    widgetDialog.value = true
+  } else if (slot.kind === 'content') {
+    contentEdit.index = i
+    contentEdit.contentType = slot.contentType
+    contentEdit.menuId = slot.menuId
+    contentDialog.value = true
+  }
 }
 
-// ---- activate as homepage ----
+const onWidgetSave = (data: any) => {
+  if (widgetEditIndex.value === null || !widgetType.value) return
+  const slot: WidgetSlot = { kind: 'widget', type: widgetType.value, payload: data }
+  updateSection(widgetEditIndex.value, slot)
+  widgetDialog.value = false
+  widgetEditIndex.value = null
+}
+const onContentSave = (payload: { contentType: number; menuId?: number }) => {
+  if (contentEdit.index === null) return
+  const slot: ContentSlot = { kind: 'content', contentType: payload.contentType }
+  if (payload.menuId !== undefined) slot.menuId = payload.menuId
+  updateSection(contentEdit.index, slot)
+  contentDialog.value = false
+  contentEdit.index = null
+}
+
+const onWidgetDelete = () => {
+  if (widgetEditIndex.value !== null) removeSection(widgetEditIndex.value)
+  widgetDialog.value = false
+  widgetEditIndex.value = null
+}
+const onDialogDelete = () => {
+  if (contentEdit.index !== null) removeSection(contentEdit.index)
+  contentDialog.value = false
+  contentEdit.index = null
+}
+const onDialogDuplicate = () => {
+  if (widgetEditIndex.value !== null) duplicateSection(widgetEditIndex.value)
+}
+
+// ---- activate as homepage --------------------------------------------------
 const activating = ref(false)
 const onActivate = async () => {
   activating.value = true
@@ -202,15 +305,40 @@ const onActivate = async () => {
 }
 const activatedMsg = ref(false)
 
-// ---- row excerpt ----
+// ---- row excerpt -----------------------------------------------------------
+const menuNameFor = (menuId: number): string | null => {
+  const find = (items: readonly MenuItem[]): MenuItem | null => {
+    for (const it of items) {
+      if (it.item_id === menuId) return it
+      if (it.children?.length) {
+        const c = find(it.children)
+        if (c) return c
+      }
+    }
+    return null
+  }
+  const m = find(menuStore.menuTree as MenuItem[] ?? [])
+  return m?.item_name ?? null
+}
+
 const excerpt = (slot: SectionSlot): string => {
-  if (slot.kind !== 'widget') return ''
-  const p = slot.payload || {}
-  if (typeof p.title === 'string' && p.title) return p.title
-  if (Array.isArray(p.items) && p.items.length) return `${p.items.length} items`
-  if (typeof p.text === 'string' && p.text) return p.text.slice(0, 60)
-  if (typeof p.label === 'string' && p.label) return p.label
-  return 'Empty — click to edit'
+  if (slot.kind === 'widget') {
+    const p = slot.payload || {}
+    if (typeof p.title === 'string' && p.title) return p.title
+    if (Array.isArray(p.items) && p.items.length) return `${p.items.length} items`
+    if (typeof p.text === 'string' && p.text) return p.text.slice(0, 60)
+    if (typeof p.label === 'string' && p.label) return p.label
+    return 'Empty — click to edit'
+  }
+  if (slot.kind === 'content') {
+    const typeLabel = CONTENT_TYPE_META[slot.contentType]?.label ?? 'content'
+    if (slot.menuId !== undefined) {
+      const name = menuNameFor(slot.menuId)
+      return name ? `${typeLabel} · ${name}` : `${typeLabel} · menu #${slot.menuId}`
+    }
+    return `${typeLabel} · auto`
+  }
+  return slot.kind === 'banner' ? 'Tenant banners' : 'Tenant social links'
 }
 </script>
 
@@ -284,6 +412,25 @@ const excerpt = (slot: SectionSlot): string => {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 10px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.page-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.editing-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+}
+.page-select {
+  min-width: 200px;
+}
+.canvas-actions {
+  display: flex;
+  gap: 8px;
 }
 .empty-canvas {
   border: 2px dashed #cbd5e1;
@@ -382,6 +529,9 @@ const excerpt = (slot: SectionSlot): string => {
 .tool:disabled {
   opacity: 0.3;
   cursor: not-allowed;
+}
+.tool.muted {
+  opacity: 0.35;
 }
 .tool.danger:hover {
   background: #fef2f2;

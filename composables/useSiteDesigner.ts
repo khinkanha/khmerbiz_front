@@ -22,6 +22,9 @@ export const useSiteDesigner = () => {
   const design = computed(() => store.design)
   const style = computed(() => store.style)
   const homeSections = computed(() => store.homeSections)
+  const currentSections = computed(() => store.currentSections)
+  const currentPageKey = computed(() => store.currentPageKey)
+  const designedPageKeys = computed(() => store.designedPageKeys)
   const homeHeader = computed(() => store.homeHeader)
   const homeFooter = computed(() => store.homeFooter)
   const loading = computed(() => store.loading)
@@ -51,6 +54,9 @@ export const useSiteDesigner = () => {
     design,
     style,
     homeSections,
+    currentSections,
+    currentPageKey,
+    designedPageKeys,
     homeHeader,
     homeFooter,
     loading,
@@ -71,7 +77,10 @@ export const useSiteDesigner = () => {
     applyPreset: (themeIndex: number) => store.applyPreset(themeIndex),
     applyDesignPreset: (preset: DesignPreset) => store.applyDesignPreset(preset),
     resetStyle: () => store.resetStyle(),
-    // page sections (Phase 2)
+    // page sections (Phase 2 + Pages)
+    pageSections: (key: string) => store.pageSections(key),
+    setCurrentPage: (key: string) => store.setCurrentPage(key),
+    clearPage: (key: string) => store.clearPage(key),
     addSection: (slot: SectionSlot) => store.addSection(slot),
     updateSection: (index: number, slot: SectionSlot) => store.updateSection(index, slot),
     removeSection: (index: number) => store.removeSection(index),
