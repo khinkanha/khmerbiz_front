@@ -21,6 +21,7 @@
 <style scoped>
 .admin-footer {
   position: inherit;
+  align-items: center;
   bottom: 0;
   overflow: scroll;
   background-color: white;

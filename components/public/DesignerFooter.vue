@@ -57,6 +57,10 @@ const domainId = computed(() => domainStore.domain?.domain_id)
 
 const footer = computed<FooterDesign>(() => designStore.design?.footer ?? defaultFooter())
 const colCount = computed(() => footer.value.columns.length || 1)
+
+// Emit the configured chat widget (tblsetting.chat_script) as a real <script>
+// at body-close so the vendor snippet bootstraps itself.
+useChatWidget()
 </script>
 
 <style scoped>

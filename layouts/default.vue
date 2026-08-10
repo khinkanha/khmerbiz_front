@@ -17,8 +17,6 @@
     <template v-if="isReady">
       <DesignerFooter v-if="isDesignerMode" />
       <PublicFooter v-else />
-      <!-- Custom chat/script injection (chat_script + plugin_mode) -->
-      <div v-if="showPlugin && settings?.chat_script" v-html="settings.chat_script"></div>
     </template>
   </div>
 
@@ -94,9 +92,6 @@ const bannerPosClass = computed(() => {
   if (pos === 3) return 'banner-pos-bottom'
   return ''
 })
-
-// plugin_mode: 0=off, 1=on
-const showPlugin = computed(() => Number(settings.value?.plugin_mode) === 1)
 
 onMounted(async () => {
 

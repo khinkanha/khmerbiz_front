@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container mt-5">
     <div v-if="errorMessage" class="alert alert-danger">
       {{ errorMessage }}
       <ul v-if="fieldErrors.length" style="margin-top:5px;margin-bottom:0">
@@ -13,13 +13,15 @@
         <div class="col-md-6">
           <div class="form-group">
             <label for="username">{{ $t('userManager.username') }}</label>
-            <input type="text" id="username" v-model="form.username" class="form-control" :placeholder="$t('userManager.username')" />
+            <input type="text" id="username" v-model="form.username" class="form-control"
+              :placeholder="$t('userManager.username')" />
           </div>
         </div>
         <div class="col-md-6">
           <div class="form-group">
             <label for="fullname">{{ $t('userManager.fullName') }}</label>
-            <input type="text" id="fullname" v-model="form.full_name" class="form-control" :placeholder="$t('userManager.fullName')" />
+            <input type="text" id="fullname" v-model="form.full_name" class="form-control"
+              :placeholder="$t('userManager.fullName')" />
           </div>
         </div>
       </div>
@@ -27,13 +29,15 @@
         <div class="col-md-6">
           <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" id="password" v-model="form.password" class="form-control" placeholder="Min 6 characters" />
+            <input type="password" id="password" v-model="form.password" class="form-control"
+              placeholder="Min 6 characters" />
           </div>
         </div>
         <div class="col-md-6">
           <div class="form-group">
             <label for="email">{{ $t('userManager.email') }}</label>
-            <input type="email" id="email" v-model="form.email" class="form-control" :placeholder="$t('userManager.email')" />
+            <input type="email" id="email" v-model="form.email" class="form-control"
+              :placeholder="$t('userManager.email')" />
           </div>
         </div>
       </div>
@@ -41,22 +45,24 @@
         <div class="col-md-6">
           <div class="form-group">
             <label for="phone">{{ $t('userManager.phone') }}</label>
-            <input type="text" id="phone" v-model="form.phone" class="form-control" :placeholder="$t('userManager.phone')" />
+            <input type="text" id="phone" v-model="form.phone" class="form-control"
+              :placeholder="$t('userManager.phone')" />
           </div>
         </div>
         <div class="col-md-6">
           <div class="form-group">
             <label for="domain_name">Website Domain</label>
-            <input type="text" id="domain_name" v-model="form.domain_name" class="form-control" placeholder="e.g. mycompany.khmerbiz-front.localhost" />
+            <input type="text" id="domain_name" v-model="form.domain_name" class="form-control"
+              placeholder="e.g. mycompany.khmerbiz-front.localhost" />
             <small class="text-muted">This will be your website address</small>
           </div>
         </div>
       </div>
-      <button type="submit" class="btn btn-danger" :disabled="loading">
+      <button type="submit" class="btn btn-info" :disabled="loading">
         <i class="fa fa-floppy-o"></i> {{ $t('auth.signup') }}
       </button>
       &nbsp;
-      <NuxtLink to="/member/login" class="btn btn-info">{{ $t('auth.login') }}</NuxtLink>
+      <NuxtLink to="/member/login" class="btn btn-warning">{{ $t('auth.login') }}</NuxtLink>
     </form>
   </div>
 </template>

@@ -48,6 +48,10 @@ const domainStore = useDomainStore()
 const config = useRuntimeConfig()
 const photoUrl = config.public.photoUrl || ''
 
+// Emit the configured chat widget (tblsetting.chat_script) as a real <script>
+// at body-close so the vendor snippet bootstraps itself.
+useChatWidget()
+
 const settings = computed(() => domainStore.settings)
 const socialMedia = computed(() => domainStore.socialMedia)
 

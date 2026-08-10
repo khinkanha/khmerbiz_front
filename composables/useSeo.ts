@@ -93,17 +93,6 @@ export const useSeo = () => {
         ],
       })
     }
-
-    if (setting.chat_script) {
-      useHead({
-        script: [
-          {
-            innerHTML: setting.chat_script,
-            type: 'text/javascript',
-          },
-        ],
-      })
-    }
   }
 
   // ── article SEO — only call for content_type === ARTICLE ──

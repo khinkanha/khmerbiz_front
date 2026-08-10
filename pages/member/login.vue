@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container mt-5">
     <div class="row">
       <div class="col-md-6 col-md-offset-3">
         <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
@@ -18,11 +18,13 @@
           <div class="form-group">
             <div v-if="useRuntimeConfig().public.recaptchaEnabled" id="recaptcha-login"></div>
           </div>
-          <button type="submit" class="btn btn-danger" :disabled="loading">
-            <i class="fa fa-sign-in-alt"></i> {{ $t('auth.login') }}
-          </button>
-          &nbsp;
-          <NuxtLink to="/member/signup" class="btn btn-info">{{ $t('auth.signup') }}</NuxtLink>
+          <div class="row" style="align-items:center !important; justify-content:center !important; margin-top:10px">
+            <button type="submit" class="btn btn-info" :disabled="loading">
+              <i class="fa fa-sign-in-alt"></i> {{ $t('auth.login') }}
+            </button>
+            &nbsp;
+            <NuxtLink to="/member/signup" class="btn btn-warning">{{ $t('auth.signup') }}</NuxtLink>
+          </div>
         </form>
       </div>
     </div>
@@ -52,7 +54,7 @@ const loading = ref(false)
 const errorMessage = ref('')
 
 onMounted(() => {
-  if(recapchaenable) {
+  if (recapchaenable) {
     renderRecaptcha('recaptcha-login')
   }
 })
@@ -75,7 +77,7 @@ const handleLogin = async () => {
   }
 
   loading.value = true
- if(!recapchaenable) {
+  if (!recapchaenable) {
     recaptchaToken = ''
   }
   try {
