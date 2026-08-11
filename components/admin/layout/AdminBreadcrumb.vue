@@ -1,21 +1,24 @@
 <template>
-  <div class="container" v-if="authStore.isAuthenticated">
+  <div class="container-fluid" v-if="authStore.isAuthenticated">
     <ol class="breadcrumb" v-if="breadcrumbs.length">
       <li v-for="(crumb, i) in breadcrumbs" :key="i" :class="{ active: i === breadcrumbs.length - 1 }">
         <NuxtLink v-if="crumb.to" :to="crumb.to">{{ crumb.label }}</NuxtLink>
         <span v-else>{{ crumb.label }}</span>
       </li>
     </ol>
-    <div v-if="route.path === '/admin'" class="container"><br /></div>
-    <br />
-    <p class="pull-right breadcrumb-actions" v-if="hasDomain">
-      <button class="btn btn-default" @click="toggleLang" style="font-weight: bold">
-        {{ currentLangText }}
-      </button>
-      <a class="btn btn-default" :href="'http://' + domainName" target="_blank" title="Click here to see your website">
-        <i class="fa fa-globe"></i> <strong>{{ domainName }}</strong>
-      </a>
-    </p>
+    <div class="container-fluid">
+      <div style="padding-top:2rem;">
+        <p class="pull-right breadcrumb-actions" v-if="hasDomain">
+          <button class="btn btn-default" @click="toggleLang" style="font-weight: bold">
+            {{ currentLangText }}
+          </button>
+          <a class="btn btn-default mr-2" :href="'http://' + domainName" target="_blank"
+            title="Click here to see your website">
+            <i class="fa fa-globe"></i> <strong>{{ domainName }}</strong>
+          </a>
+        </p>
+      </div>
+    </div>
     <div class="clearfix"></div>
 
     <!-- Alert messages -->
@@ -33,7 +36,6 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth'
 import { useDomainStore } from '~/stores/domain'
-import { useI18n } from '#imports'
 
 const authStore = useAuthStore()
 const domainStore = useDomainStore()
@@ -91,6 +93,10 @@ const breadcrumbs = computed(() => {
     crumbs.push({ label: 'Profile' })
   } else if (path === '/admin/password') {
     crumbs.push({ label: 'Password' })
+  } else if (path === '/admin/builder') {
+    crumbs.push({ label: 'Website Builder' })
+  } else if (path === '/admin') {
+    crumbs.push({ label: 'Dashboard' })
   }
 
   return crumbs
@@ -101,10 +107,6 @@ provide('setAlertError', (msg: string) => { alertError.value = msg })
 </script>
 
 <style scoped>
-.container {
-  margin-top: 5px;
-}
-
 .breadcrumb-actions {
   margin-top: -38px;
   margin-bottom: 10px;

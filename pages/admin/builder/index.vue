@@ -1,5 +1,5 @@
 <template>
-  <div class="designer-page">
+  <div class="container-fluid">
     <!-- Toolbar -->
     <div class="toolbar">
       <div class="title">
@@ -8,29 +8,20 @@
         <span v-if="domainName" class="domain">{{ domainName }}</span>
       </div>
       <div class="grow" />
-      <button class="tool-btn" :disabled="!canUndo" title="Undo (Ctrl+Z)" @click="undo"><i class="pi pi-undo" /></button>
-      <button class="tool-btn" :disabled="!canRedo" title="Redo (Ctrl+Shift+Z)" @click="redo"><i class="pi pi-refresh" /></button>
+      <button class="tool-btn" :disabled="!canUndo" title="Undo (Ctrl+Z)" @click="undo"><i
+          class="pi pi-undo" /></button>
+      <button class="tool-btn" :disabled="!canRedo" title="Redo (Ctrl+Shift+Z)" @click="redo"><i
+          class="pi pi-refresh" /></button>
       <span v-if="dirty" class="badge dirty">Unsaved changes</span>
       <span v-else-if="lastSaved" class="badge ok">Saved ✓</span>
-      <Button
-        label="Save design"
-        icon="pi pi-save"
-        :loading="saving"
-        :disabled="!dirty"
-        @click="handleSave"
-      />
+      <Button label="Save design" icon="pi pi-save" :loading="saving" :disabled="!dirty" @click="handleSave" />
     </div>
 
     <div class="designer-body">
       <!-- Left rail: tabs -->
       <nav class="tabs">
-        <button
-          v-for="t in tabs"
-          :key="t.id"
-          class="tab"
-          :class="{ on: activeTab === t.id, soon: t.soon }"
-          @click="activeTab = t.id"
-        >
+        <button v-for="t in tabs" :key="t.id" class="tab" :class="{ on: activeTab === t.id, soon: t.soon }"
+          @click="activeTab = t.id">
           <i :class="t.icon" />
           <span>{{ t.label }}</span>
           <small v-if="t.soon">soon</small>
@@ -47,7 +38,8 @@
             <StylePanel />
             <aside class="live-note">
               <i class="pi pi-info-circle" />
-              <span>Open the public site in another tab to see your colors live. In production this re-themes instantly with no flash.</span>
+              <span>Open the public site in another tab to see your colors live. In production this re-themes instantly
+                with no flash.</span>
             </aside>
           </div>
 
@@ -143,29 +135,33 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
 
 <style scoped>
 .designer-page {
-  padding: 18px 22px 40px;
-  max-width: 1100px;
-  margin: 0 auto;
+
+  margin: 10px auto;
 }
+
 .toolbar {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 18px;
 }
+
 .title {
   display: flex;
   align-items: center;
   gap: 10px;
 }
+
 .title h1 {
   font-size: 20px;
   margin: 0;
 }
+
 .title i {
   color: #3b82f6;
   font-size: 18px;
 }
+
 .domain {
   font-size: 12px;
   color: #64748b;
@@ -173,9 +169,11 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   padding: 3px 9px;
   border-radius: 20px;
 }
+
 .grow {
   flex: 1;
 }
+
 .tool-btn {
   width: 34px;
   height: 34px;
@@ -187,34 +185,41 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   display: grid;
   place-items: center;
 }
+
 .tool-btn:hover:not(:disabled) {
   border-color: #3b82f6;
   color: #1d4ed8;
   background: #eff6ff;
 }
+
 .tool-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
+
 .badge {
   font-size: 12px;
   font-weight: 600;
   padding: 4px 10px;
   border-radius: 20px;
 }
+
 .badge.dirty {
   color: #b45309;
   background: #fef3c7;
 }
+
 .badge.ok {
   color: #166534;
   background: #dcfce7;
 }
+
 .designer-body {
   display: flex;
   gap: 18px;
   align-items: flex-start;
 }
+
 .tabs {
   display: flex;
   flex-direction: column;
@@ -222,6 +227,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   width: 190px;
   flex-shrink: 0;
 }
+
 .tab {
   display: flex;
   align-items: center;
@@ -237,19 +243,23 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   text-align: left;
   position: relative;
 }
+
 .tab i {
   font-size: 15px;
   width: 16px;
   text-align: center;
 }
+
 .tab:hover {
   background: #f8fafc;
 }
+
 .tab.on {
   background: #eff6ff;
   color: #1d4ed8;
   border-color: #dbeafe;
 }
+
 .tab small {
   margin-left: auto;
   font-size: 9px;
@@ -258,6 +268,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   letter-spacing: 0.04em;
   color: #94a3b8;
 }
+
 .panel-area {
   flex: 1;
   min-width: 0;
@@ -267,6 +278,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   padding: 22px;
   min-height: 420px;
 }
+
 .state {
   display: flex;
   align-items: center;
@@ -275,15 +287,18 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   color: #64748b;
   padding: 60px 0;
 }
+
 .panel {
   display: flex;
   flex-direction: column;
   gap: 18px;
   max-width: 520px;
 }
+
 .panel.wide {
   max-width: none;
 }
+
 .live-note {
   display: flex;
   gap: 9px;
@@ -296,6 +311,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   color: #475569;
   line-height: 1.5;
 }
+
 .live-note i {
   color: #3b82f6;
   margin-top: 1px;

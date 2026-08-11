@@ -1,6 +1,6 @@
 <template>
   <div class="admin-footer">
-    <div class="container text-center">
+    <div class="container">
       <p>
         KHMER.BIZ |
         <a href="/docs/USER_GUIDE.html" target="_blank">
@@ -9,8 +9,7 @@
         <a href="https://t.me/cambodiawebhosting" target="_blank">
           <i class="fa-brands fa-telegram fa-lg"></i> cambodiawebhosting
         </a> |
-        <a href="https://www.youtube.com/@cambodiawebhosting"
-          target="_blank">
+        <a href="https://www.youtube.com/@cambodiawebhosting" target="_blank">
           <i class="fa-brands fa-youtube text-danger fa-lg"></i> Cambodia Web Hosting
         </a>
       </p>
@@ -21,16 +20,17 @@
 <style scoped>
 .admin-footer {
   position: inherit;
-  align-items: center;
+  display: flex;
   bottom: 0;
-  overflow: scroll;
-  background-color: white;
+  background-color: transparent;
   padding: 5px;
   z-index: 12;
   font-weight: bold;
-  border-top: 1px solid #ddd;
   margin-top: 20px;
-  width: 100%;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+
 }
 
 .admin-footer p {
