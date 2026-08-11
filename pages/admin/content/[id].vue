@@ -33,7 +33,24 @@
 
               <div class="form-group">
                 <label for="description">{{ $t('contentManager.description') }}</label>
-                <div class="description-editor" style="display:block">
+                <!-- Map content: the rich description editor + a pin picker +
+                     on/off toggle. The description is rendered above the map on
+                     the public site; the location is saved via
+                     PUT /content/:id/map after the content row exists. -->
+                <template v-if="form.content_type === ContentType.MAP">
+                  <div class="description-editor" style="display:block; margin-bottom: 1rem;">
+                    <ClientOnly>
+                      <Editor v-model="mapDescription" tinymceScriptSrc="/tinymce/tinymce.min.js" :init="editorInit"
+                        class="description-editor__field" />
+                    </ClientOnly>
+                  </div>
+                  <MapPicker
+                    v-model="mapValue"
+                    :label-visible="$t('contentManager.show')"
+                    :label-hidden="$t('contentManager.notShow')"
+                  />
+                </template>
+                <div v-else class="description-editor" style="display:block">
                   <ClientOnly>
                     <!--<BlockPalette class="description-editor__palette" @insert="insertWidget" />-->
                     <Editor v-model="form.description" tinymceScriptSrc="/tinymce/tinymce.min.js" :init="editorInit"
@@ -86,15 +103,15 @@
           <template #content>
             <div class="action-links">
               <Button
-                v-if="contentStore.currentContent?.content_type !== ContentType.ARTICLE && contentStore.currentContent?.content_type !== ContentType.PRODUCT"
+                v-if="[ContentType.PHOTO, ContentType.VIDEO, ContentType.DOCUMENT, ContentType.NEWS].includes(contentStore.currentContent?.content_type as ContentType)"
                 :label="$t('contentManager.list')" icon="pi pi-list" outlined
                 @click="$router.push(`/admin/content/${contentId}/items`)" class="w-full mb-3" />
               <Button v-if="contentStore.currentContent?.content_type === ContentType.NEWS"
                 :label="$t('contentManager.blogNews')" icon="pi pi-news" outlined
                 @click="$router.push(`/admin/content/${contentId}/news`)" class="w-full mb-3" />
-              <Button v-if="contentStore.currentContent?.content_type === ContentType.MAP"
+              <!--<Button v-if="contentStore.currentContent?.content_type === ContentType.MAP"
                 :label="$t('contentManager.showMap')" icon="pi pi-map" outlined
-                @click="$router.push(`/admin/content/${contentId}/map`)" class="w-full mb-3" />
+                @click="$router.push(`/admin/content/${contentId}/map`)" class="w-full mb-3" />-->
               <Button v-if="contentStore.currentContent?.content_type === ContentType.PRODUCT" label="Manage Products"
                 icon="pi pi-shopping-bag" outlined @click="$router.push(`/admin/content/${contentId}/products`)"
                 class="w-full" />
@@ -114,6 +131,7 @@ definePageMeta({
 
 import { ContentType } from '~/types'
 import type { Language } from '~/types'
+import type { MapPickerValue } from '~/components/admin/MapPicker.vue'
 import Editor from '@tinymce/tinymce-vue'
 import {
   createWidgetHtml,
@@ -160,6 +178,22 @@ const form = ref({
 const errors = ref<Record<string, string>>({})
 const saving = ref(false)
 const errorMessage = ref('')
+
+// Map content state: the pinned location + on/off toggle. Default center is
+// Phnom Penh. Populated from content.description on edit; saved via
+// PUT /content/:id/map (not the generic content update, which would clobber
+// the map JSON with a TinyMCE-style {title,description} object).
+const mapValue = ref<MapPickerValue>({
+  lat: 11.5564,
+  lng: 104.9282,
+  zoom: 13,
+  visible: 1,
+})
+// Plain-text description shown above the map on the public site. Stored in the
+// map JSON's `description` slot alongside lat/lng/visible.
+const mapDescription = ref('')
+// Track whether a saved pin exists (used to require a pin before saving a MAP).
+const mapHasPin = computed(() => isFinite(mapValue.value.lat) && isFinite(mapValue.value.lng))
 
 const contentTypeOptions = [
   { label: t('contentManager.article'), value: ContentType.ARTICLE },
@@ -401,35 +435,67 @@ const handleSave = async () => {
     return
   }
 
+  // MAP content requires a pinned location before it can be saved.
+  if (form.value.content_type === ContentType.MAP && !mapHasPin.value) {
+    errorMessage.value = t('contentManager.searchLocation')
+    return
+  }
+
   saving.value = true
   try {
     let result: boolean | { success: boolean; id?: number }
+    const isMap = form.value.content_type === ContentType.MAP
+
+    // For MAP content, OMIT `description` from the generic payload. The backend
+    // create/update services wrap {title, description} into JSON, which would
+    // clobber the map's {lat,lng,...} JSON. The map JSON (including the plain
+    // description) is written separately via PUT /content/:id/map below.
+    const basePayload: Record<string, any> = {
+      title: form.value.title,
+      content_type: form.value.content_type,
+      lang_id: form.value.lang_id!,
+      menu_id: form.value.menu_id!,
+      status: form.value.status ? 0 : 1,
+    }
+    if (!isMap) {
+      basePayload.description = form.value.description
+    }
 
     if (isNewContent.value) {
-      result = await contentStore.saveContent({
-        title: form.value.title,
-        description: form.value.description,
-        content_type: form.value.content_type,
-        lang_id: form.value.lang_id!,
-        menu_id: form.value.menu_id!,
-        status: form.value.status ? 0 : 1,
-      })
+      result = await contentStore.saveContent(basePayload as any)
     } else {
-      result = await contentStore.updateContent(contentId.value!, {
-        title: form.value.title,
-        description: form.value.description,
-        content_type: form.value.content_type,
-        lang_id: form.value.lang_id!,
-        menu_id: form.value.menu_id!,
-        status: form.value.status ? 0 : 1,
-      })
+      result = await contentStore.updateContent(contentId.value!, basePayload as any)
     }
 
-    if (result === true || (typeof result === 'object' && result.success)) {
-      router.push('/admin/content')
-    } else {
+    const success = result === true || (typeof result === 'object' && result.success)
+    if (!success) {
       errorMessage.value = t('common.error')
+      return
     }
+
+    // Persist the pinned map location now that the content row exists. For a
+    // brand-new content, use the id returned by saveContent.
+    if (isMap) {
+      const targetId = isNewContent.value
+        ? (typeof result === 'object' && result.id) ? result.id : null
+        : contentId.value
+      if (targetId) {
+        const savedMap = await contentStore.saveMapLocation(targetId, {
+          title: form.value.title,
+          description: mapDescription.value,
+          lat: mapValue.value.lat,
+          lng: mapValue.value.lng,
+          zoom: mapValue.value.zoom,
+          visible: mapValue.value.visible,
+        })
+        if (!savedMap) {
+          errorMessage.value = t('common.error')
+          return
+        }
+      }
+    }
+
+    router.push('/admin/content')
   } catch (error: any) {
     errorMessage.value = error.message || t('common.error')
   } finally {
@@ -463,6 +529,19 @@ onMounted(async () => {
         lang_id: raw.lang_id,
         menu_id: raw.menu_id ?? null,
         status: raw.status ? 0 : 1,
+      }
+      // MAP content: load the pinned location out of the same description JSON
+      // (shape: { title, description?, lat, lng, zoom?, visible }) into the
+      // picker. Falls back to Phnom Penh defaults if coords are missing.
+      if (raw.content_type === ContentType.MAP) {
+        mapValue.value = {
+          lat: Number(desc1.lat) || 11.5564,
+          lng: Number(desc1.lng) || 104.9282,
+          zoom: Number(desc1.zoom) || 13,
+          title: raw.title || '',
+          visible: Number(desc1.visible) === 0 ? 0 : 1,
+        }
+        mapDescription.value = desc1.description || ''
       }
     }
   } else {
@@ -582,6 +661,11 @@ onMounted(async () => {
 }
 
 .mb-3 {
+  margin-bottom: 0.75rem;
+}
+
+.map-description {
+  width: 100%;
   margin-bottom: 0.75rem;
 }
 </style>

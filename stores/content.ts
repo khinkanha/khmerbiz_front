@@ -593,10 +593,12 @@ export const useContentStore = defineStore('content', () => {
   }
 
   const saveMapLocation = async (contentId: number, location: {
+    title?: string
+    description?: string
     lat: number
     lng: number
-    zoom: number
-    marker?: string
+    zoom?: number
+    visible: number
   }): Promise<boolean> => {
     try {
       const response = await api.put(`/content/${contentId}/map`, location)

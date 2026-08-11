@@ -118,9 +118,14 @@
                   :items="getContentForMenuItem(child.item_id)!.items" :section-title="child.item_name || ''" />
                 <VideoSection v-else-if="getContentType(child.item_id) === ContentType.VIDEO"
                   :items="getContentForMenuItem(child.item_id)!.items" :section-title="child.item_name || ''" />
-                <MapDisplay v-else-if="getContentType(child.item_id) === ContentType.MAP"
-                  :map-data="parseMapData(getContentForMenuItem(child.item_id)!.content)"
-                  :section-title="child.item_name || ''" />
+                <template v-else-if="getContentType(child.item_id) === ContentType.MAP">
+                  <h3 v-if="child.item_name" class="sub-section-title">{{ child.item_name }}</h3>
+                  <MapDisplay
+                    v-if="mapVisible(getContentForMenuItem(child.item_id)!.content)"
+                    :map-data="parseMapData(getContentForMenuItem(child.item_id)!.content)"
+                    :section-title="''"
+                  />
+                </template>
                 <DocumentSection v-else-if="getContentType(child.item_id) === ContentType.DOCUMENT"
                   :items="getContentForMenuItem(child.item_id)!.items" :section-title="child.item_name || ''" />
                 <ProductCatalog v-else-if="getContentType(child.item_id) === ContentType.PRODUCT"
@@ -142,8 +147,12 @@
                 :items="getContentForMenuItem(menuTree[0].item_id)!.items" />
               <VideoSection v-else-if="getContentType(menuTree[0].item_id) === ContentType.VIDEO"
                 :items="getContentForMenuItem(menuTree[0].item_id)!.items" />
-              <MapDisplay v-else-if="getContentType(menuTree[0].item_id) === ContentType.MAP"
-                :map-data="parseMapData(getContentForMenuItem(menuTree[0].item_id)!.content)" />
+              <template v-else-if="getContentType(menuTree[0].item_id) === ContentType.MAP">
+                <MapDisplay
+                  v-if="mapVisible(getContentForMenuItem(menuTree[0].item_id)!.content)"
+                  :map-data="parseMapData(getContentForMenuItem(menuTree[0].item_id)!.content)"
+                />
+              </template>
               <DocumentSection v-else-if="getContentType(menuTree[0].item_id) === ContentType.DOCUMENT"
                 :items="getContentForMenuItem(menuTree[0].item_id)!.items" />
               <ProductCatalog v-else-if="getContentType(menuTree[0].item_id) === ContentType.PRODUCT"
@@ -322,6 +331,15 @@ const parseMapData = (content: Content): MapData => {
     return JSON.parse(content.description || '{}')
   } catch {
     return {}
+  }
+}
+
+// Respect the admin on/off toggle: when `visible === 0` the map is hidden.
+const mapVisible = (content: Content): boolean => {
+  try {
+    return JSON.parse(content.description || '{}').visible !== 0
+  } catch {
+    return true
   }
 }
 </script>

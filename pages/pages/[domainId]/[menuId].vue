@@ -16,9 +16,17 @@
           <VideoSection v-else-if="contentSection.content.content_type === ContentType.VIDEO"
             :items="contentSection.items"
             :section-description="JSON.parse(contentSection.content.description).description" />
-          <MapDisplay v-else-if="contentSection.content.content_type === ContentType.MAP"
-            :map-data="parseMapData(contentSection.content)"
-            :section-description="JSON.parse(contentSection.content.description).description" />
+          <template v-else-if="contentSection.content.content_type === ContentType.MAP">
+            <h2 v-if="contentSection.content.title" class="map-page-title">{{ contentSection.content.title }}</h2>
+            <div v-if="parseMapDescription(contentSection.content)" class="map-page-desc"
+              v-html="parseMapDescription(contentSection.content)"></div>
+            <MapDisplay
+              v-if="mapVisible(contentSection.content)"
+              :map-data="parseMapData(contentSection.content)"
+              :section-title="''"
+              :section-description="''"
+            />
+          </template>
           <DocumentSection v-else-if="contentSection.content.content_type === ContentType.DOCUMENT"
             :items="contentSection.items"
             :section-description="JSON.parse(contentSection.content.description).description" />
@@ -100,6 +108,25 @@ const parseMapData = (content: any): MapData => {
     return {}
   }
 }
+
+// Description shown above the map (plain HTML from the rich editor). The map
+// JSON shape is { title, description?, lat, lng, zoom?, visible }.
+const parseMapDescription = (content: any): string => {
+  try {
+    return JSON.parse(content.description || '{}').description || ''
+  } catch {
+    return ''
+  }
+}
+
+// Respect the admin on/off toggle: when `visible === 0` the map is hidden.
+const mapVisible = (content: any): boolean => {
+  try {
+    return JSON.parse(content.description || '{}').visible !== 0
+  } catch {
+    return true
+  }
+}
 </script>
 
 <style scoped>
@@ -116,6 +143,28 @@ const parseMapData = (content: any): MapData => {
 
 .section {
   padding: 1.5rem 0;
+}
+
+.map-page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color, #1a202c);
+  margin: 0 0 1rem 0;
+  text-align: center;
+  font-family: var(--font-battambang);
+}
+
+.map-page-desc {
+  max-width: 800px;
+  margin: 0 auto 1.5rem;
+  line-height: 1.6;
+  color: #4a5568;
+}
+
+.map-page-desc :deep(img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
 }
 
 .section-header {

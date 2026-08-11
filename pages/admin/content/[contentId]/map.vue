@@ -18,102 +18,35 @@
       </div>
     </div>
 
-    <div class="map-container">
-      <Card class="map-card">
-        <template #content>
-          <div class="map-wrapper">
-            <LMap
-              ref="mapRef"
-              :zoom="mapZoom"
-              :center="mapCenter as any"
-              :useGlobalLeaflet="false"
-              @click="handleMapClick"
-              class="leaflet-map"
-            >
-              <LTileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution="&copy; OpenStreetMap"
-              />
-              <LMarker
-                v-if="markerPosition"
-                :lat-lng="markerPosition"
-                :draggable="true"
-                @dragend="handleMarkerDrag"
-              >
-                <LPopup>{{ markerTitle }}</LPopup>
-              </LMarker>
-            </LMap>
-          </div>
-        </template>
-      </Card>
-
-      <Card class="settings-card">
-        <template #title>{{ $t('settings.otherSetting') }}</template>
-        <template #content>
-          <div class="settings-form">
-            <div class="form-group">
-              <label for="markerTitle">{{ $t('contentManager.contentTitle') }}</label>
-              <InputText
-                id="markerTitle"
-                v-model="markerTitle"
-                :placeholder="$t('contentManager.contentTitle')"
-              />
-            </div>
-
-            <div class="form-group">
-              <label>Latitude</label>
-              <InputNumber
-                v-model="mapCenter.lat"
-                :min="-90"
-                :max="90"
-                :decimalPlaces="6"
-                @update:modelValue="updateMarkerFromInput"
-              />
-            </div>
-
-            <div class="form-group">
-              <label>Longitude</label>
-              <InputNumber
-                v-model="mapCenter.lng"
-                :min="-180"
-                :max="180"
-                :decimalPlaces="6"
-                @update:modelValue="updateMarkerFromInput"
-              />
-            </div>
-
-            <div class="form-group">
-              <label>Zoom Level</label>
-              <Slider
-                v-model="mapZoom"
-                :min="1"
-                :max="18"
-                :step="1"
-              />
-              <span class="zoom-value">{{ mapZoom }}</span>
-            </div>
-
-            <Button
-              :label="$t('contentManager.delete')"
-              icon="pi pi-trash"
-              outlined
-              severity="danger"
-              @click="clearMarker"
-              :disabled="!markerPosition"
-              class="w-full"
+    <Card class="map-card">
+      <template #content>
+        <div class="map-form">
+          <div class="form-group">
+            <label for="mapDesc">{{ $t('contentManager.description') }}</label>
+            <Textarea
+              id="mapDesc"
+              v-model="mapDescription"
+              :placeholder="$t('contentManager.description')"
+              rows="3"
+              autoResize
             />
-
-            <Message v-if="successMessage" severity="success" :closable="false">
-              {{ successMessage }}
-            </Message>
-
-            <Message v-if="errorMessage" severity="error" :closable="false">
-              {{ errorMessage }}
-            </Message>
           </div>
-        </template>
-      </Card>
-    </div>
+          <MapPicker
+            v-model="mapValue"
+            :label-visible="$t('contentManager.show')"
+            :label-hidden="$t('contentManager.notShow')"
+          />
+        </div>
+      </template>
+    </Card>
+
+    <Message v-if="successMessage" severity="success" :closable="false">
+      {{ successMessage }}
+    </Message>
+
+    <Message v-if="errorMessage" severity="error" :closable="false">
+      {{ errorMessage }}
+    </Message>
   </div>
 </template>
 
@@ -123,68 +56,49 @@ definePageMeta({
   middleware: 'auth',
 })
 
-import { LMap, LTileLayer, LMarker, LPopup } from '@vue-leaflet/vue-leaflet'
-import 'leaflet/dist/leaflet.css'
-import L from 'leaflet'
+import type { MapPickerValue } from '~/components/admin/MapPicker.vue'
 
 const contentStore = useContentStore()
 const { t } = useI18n()
 const route = useRoute()
 
-const mapRef = ref()
 const saving = ref(false)
 const successMessage = ref('')
 const errorMessage = ref('')
 
-const mapCenter = ref({ lat: 11.5564, lng: 104.9282 })
-const mapZoom = ref(13)
-const markerPosition = ref<L.LatLngExpression | null>(null)
-const markerTitle = ref('')
+const mapValue = ref<MapPickerValue>({
+  lat: 11.5564,
+  lng: 104.9282,
+  zoom: 13,
+  visible: 1,
+})
+const mapDescription = ref('')
 
 const contentId = computed(() => Number(route.params.contentId))
-
-const handleMapClick = (event: any) => {
-  markerPosition.value = event.latlng
-}
-
-const handleMarkerDrag = (event: any) => {
-  markerPosition.value = event.latlng
-}
-
-const updateMarkerFromInput = () => {
-  if (markerPosition.value) {
-    markerPosition.value = L.latLng(mapCenter.value.lat, mapCenter.value.lng)
-  }
-}
-
-const clearMarker = () => {
-  markerPosition.value = null
-}
 
 const handleSave = async () => {
   successMessage.value = ''
   errorMessage.value = ''
 
-  if (!markerPosition.value) {
-    errorMessage.value = 'Please click on the map to set a location'
+  if (!isFinite(mapValue.value.lat) || !isFinite(mapValue.value.lng)) {
+    errorMessage.value = t('contentManager.searchLocation')
     return
   }
 
   saving.value = true
-
   try {
     const result = await contentStore.saveMapLocation(contentId.value, {
-      lat: mapCenter.value.lat,
-      lng: mapCenter.value.lng,
-      zoom: mapZoom.value,
-      marker: markerTitle.value,
+      title: contentStore.currentContent?.title || '',
+      description: mapDescription.value,
+      lat: mapValue.value.lat,
+      lng: mapValue.value.lng,
+      zoom: mapValue.value.zoom,
+      visible: mapValue.value.visible,
     })
 
     if (result) {
       successMessage.value = t('common.success')
-      setTimeout(() => {
-        successMessage.value = ''
-      }, 3000)
+      setTimeout(() => { successMessage.value = '' }, 3000)
     } else {
       errorMessage.value = t('common.error')
     }
@@ -198,8 +112,29 @@ const handleSave = async () => {
 onMounted(async () => {
   await contentStore.fetchContent(contentId.value)
 
-  // TODO: Load existing map location from content
-  // For now, using default Cambodia coordinates
+  // Load the saved pinned location out of the content's description JSON
+  // (shape: { title, description?, lat, lng, zoom?, visible }). Falls back to
+  // the Phnom Penh defaults when the content has no saved map yet. The popup
+  // label (`title`) is the content's own title — not editable here.
+  const raw = contentStore.currentContent as any
+  if (raw) {
+    mapValue.value.title = raw.title || ''
+  }
+  if (raw?.description) {
+    try {
+      const p = JSON.parse(raw.description)
+      mapValue.value = {
+        lat: Number(p.lat) || 11.5564,
+        lng: Number(p.lng) || 104.9282,
+        zoom: Number(p.zoom) || 13,
+        title: raw.title || '',
+        visible: Number(p.visible) === 0 ? 0 : 1,
+      }
+      mapDescription.value = p.description || ''
+    } catch {
+      /* keep defaults */
+    }
+  }
 })
 </script>
 
@@ -228,61 +163,26 @@ onMounted(async () => {
   gap: 0.75rem;
 }
 
-.map-container {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 1.5rem;
-}
-
-@media (max-width: 768px) {
-  .map-container {
-    grid-template-columns: 1fr;
-  }
-}
-
-.map-card, .settings-card {
+.map-card {
   border: 1px solid #e2e8f0;
   height: fit-content;
 }
 
-.map-wrapper {
-  height: 500px;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.leaflet-map {
-  height: 100%;
-  width: 100%;
-}
-
-.settings-form {
+.map-form {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
 .form-group label {
   font-weight: 500;
   color: #4a5568;
   font-size: 0.875rem;
-}
-
-.zoom-value {
-  font-size: 0.875rem;
-  color: #718096;
-  text-align: center;
-  display: block;
-  margin-top: 0.25rem;
-}
-
-.w-full {
-  width: 100%;
 }
 </style>
