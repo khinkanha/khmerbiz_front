@@ -22,7 +22,7 @@
 
   <!-- Normal theme rendering -->
   <component v-else-if="themeComponent" :is="themeComponent"
-    :menu-tree="homeMenuTree.length ? homeMenuTree : domainStore.menuTree" :content-sections="contentSections"
+    :menu-tree="domainStore.menuTree" :content-sections="contentSections"
     :banners="domainStore.banners" :settings="domainStore.settings" :domain="domainStore.domain"
     :social-media="domainStore.socialMedia" :language="domainStore.currentLanguage" />
   <div v-else class="loading">
@@ -88,7 +88,6 @@ const themeComponent = computed(() => {
 })
 
 const contentSections = ref<ContentSection[]>([])
-const homeMenuTree = ref([])
 
 const mapSection = (s: any): ContentSection => ({
   content: {
@@ -111,54 +110,54 @@ const loadContent = async () => {
   const domainId = domainStore.domain?.domain_id
   if (!domainId) return
 
-  // For non-ClassicMultiPage themes, fetch home content
-  if (domainStore.settings && effectivePageStyle.value !== 0) {
-    const response = await api.get<any[]>(`/site/home?domain_id=${domainId}`)
-    if (response.success && response.data) {
-      const items = Array.isArray(response.data) ? response.data : [response.data]
-      homeMenuTree.value = items.map((s: any) => s.menu)
-      contentSections.value = items
-        .filter((s: any) => s.content)
-        .map(mapSection)
+  // Build content sections from the CURRENT (per-language) menu tree for ALL
+  // templates. We deliberately avoid `/site/home`: that endpoint ignores
+  // `lang_id` and always returns the DEFAULT language's menu+content bundle.
+  // Each language has its own menu tree with distinct item_ids, so a homepage
+  // built from `/site/home` only matches the header (fetched per-language via
+  // `/site/menu?lang_id=`) in the default language. After switching language
+  // the header's `#section-<id>` anchors target item_ids no rendered section
+  // has, so `scrollIntoView` silently does nothing — the "switch language,
+  // click menu, nothing scrolls" bug.
+  //
+  // `/site/pages/<domain_id>/<item_id>` IS language-correct because item_ids
+  // are language-specific, so building per-item from the per-language menuTree
+  // keeps section IDs, content, and the header all aligned. See the memory
+  // note "site-home-ignores-lang-id".
+  const allMenuIds: number[] = []
+  const collectIds = (items: readonly any[]) => {
+    for (const item of items) {
+      allMenuIds.push(item.item_id)
+      if (item.children?.length) collectIds(item.children)
     }
-  } else if (domainStore.settings) {
-    // Collect all menu item IDs (including children) for ClassicMultiPage
-    const allMenuIds: number[] = []
-    const collectIds = (items: readonly any[]) => {
-      for (const item of items) {
-        allMenuIds.push(item.item_id)
-        if (item.children?.length) collectIds(item.children)
-      }
-    }
-    collectIds(domainStore.menuTree)
-
-    // Fetch in batches of 4 to avoid overwhelming the browser/network
-    const batchSize = 4
-    const sections: ContentSection[] = []
-
-    for (let i = 0; i < allMenuIds.length; i += batchSize) {
-      const batch = allMenuIds.slice(i, i + batchSize)
-      const results = await Promise.all(
-        batch.map(menuId =>
-          api.get<any[]>(`/site/pages/${domainId}/${menuId}`)
-            .then(res => res.success && res.data ? res.data : null)
-            .catch(() => null)
-        )
-      )
-      for (const data of results) {
-        if (!data) continue
-        const items = Array.isArray(data) ? data : [data]
-        for (const s of items) {
-          // getSitePage returns raw content objects; getSiteHome returns { menu, content } sections
-          const section = s.content !== undefined ? s : { content: s }
-          if (!section.content) continue
-          sections.push(mapSection(section))
-        }
-      }
-    }
-    contentSections.value = sections
-  
   }
+  collectIds(domainStore.menuTree)
+
+  // Fetch in batches of 4 to avoid overwhelming the browser/network
+  const batchSize = 4
+  const sections: ContentSection[] = []
+
+  for (let i = 0; i < allMenuIds.length; i += batchSize) {
+    const batch = allMenuIds.slice(i, i + batchSize)
+    const results = await Promise.all(
+      batch.map(menuId =>
+        api.get<any[]>(`/site/pages/${domainId}/${menuId}`)
+          .then(res => res.success && res.data ? res.data : null)
+          .catch(() => null)
+      )
+    )
+    for (const data of results) {
+      if (!data) continue
+      const items = Array.isArray(data) ? data : [data]
+      for (const s of items) {
+        // getSitePage returns raw content objects (no { content } wrapper)
+        const section = s.content !== undefined ? s : { content: s }
+        if (!section.content) continue
+        sections.push(mapSection(section))
+      }
+    }
+  }
+  contentSections.value = sections
 
   // Fallback: if no content loaded, fetch the first menu item's content
   if (contentSections.value.length === 0) {
@@ -177,6 +176,8 @@ const loadContent = async () => {
   }
 }
 
+let contentLoadedOnce = false
+
 onMounted(async () => {
   if (!domainStore.domain) {
     domainStore.hydrateFromServer()
@@ -186,16 +187,24 @@ onMounted(async () => {
     await designStore.loadPublicDesign()
   }
   await loadContent()
+  contentLoadedOnce = true
 
   // Only show under construction if domain exists but has NO menus at all
   hasNoContent.value = domainStore.menuTree.length === 0
   isLoading.value = false
 })
 
-watch(() => domainStore.currentLanguage, async (newLang, oldLang) => {
-  if (newLang?.lang_id !== oldLang?.lang_id) {
-    await loadContent()
-  }
+// Rebuild content whenever the menu tree changes (i.e. after a language
+// switch). Watch `menuTree` rather than `currentLanguage`: the store's
+// setLanguage sets currentLanguage BEFORE awaiting fetchMenuTree, so a
+// currentLanguage watcher races and reads the PREVIOUS language's tree,
+// producing content keyed to the wrong item_ids. By the time menuTree changes,
+// the new language's tree is already in place. Guarded so the initial
+// population (during resolveDomain, handled by the onMounted call above) does
+// not trigger a redundant reload.
+watch(() => domainStore.menuTree, async () => {
+  if (!contentLoadedOnce) return
+  await loadContent()
 })
 
 useHead({

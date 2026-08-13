@@ -65,7 +65,13 @@ const setLanguage = async (langId: number) => {
     }
   }
   await domainStore.setLanguage(langId)
-  navigateTo('/')
+  // Full page reload: the language switch touches menu, content, design and
+  // i18n state spread across stores. Reloading guarantees everything
+  // re-initializes in the new language instead of partially patching
+  // client-side state (the saved lang_id in localStorage is reapplied on load).
+  if (import.meta.client) {
+    window.location.assign('/')
+  }
 }
 </script>
 
@@ -80,7 +86,7 @@ const setLanguage = async (langId: number) => {
   align-items: center;
   gap: 0.35rem;
   color: #4a5568;
-  font-size: 0.8rem;
+  
 }
 
 .flag-icon {
