@@ -36,7 +36,9 @@
     "publishDate": "Ngày xuất bản",
     "createNew": "Tạo mới",
     "saveDraft": "Lưu bản nháp",
-    "loadDraft": "Tải bản nháp"
+    "loadDraft": "Tải bản nháp",
+    "menuInUse": "(đang dùng)",
+    "menuNotAvailable": "Menu này đã được sử dụng bởi \"{title}\". Vui lòng chọn menu khác."
   },
   "dashboard": {
     "title": "Tổng quan Bảng điều khiển",
@@ -229,7 +231,8 @@
     "share": "Chia sẻ",
     "copy": "Sao chép",
     "move": "Di chuyển",
-    "rename": "Đổi tên"
+    "rename": "Đổi tên",
+    "more": "Thêm"
   },
   "validation": {
     "required": "Trường này là bắt buộc",

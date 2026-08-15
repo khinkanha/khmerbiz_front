@@ -25,7 +25,6 @@
       :domain-id="domainId"
       :content-id="content.content_id"
       :section-title="showTitle ? content.title : ''"
-      :show-more-link="true"
     />
     <!-- MAP content: always render title + description (so the page is never
          blank); render the map widget itself only when the toggle is ON and a

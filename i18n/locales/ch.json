@@ -38,7 +38,9 @@
     "publishDate": "发布日期",
     "createNew": "创建新内容",
     "saveDraft": "保存草稿",
-    "loadDraft": "加载草稿"
+    "loadDraft": "加载草稿",
+    "menuInUse": "（使用中）",
+    "menuNotAvailable": "此菜单已被“{title}”使用，请选择其他菜单。"
   },
   "dashboard": {
     "title": "仪表板概述",
@@ -232,7 +234,8 @@
     "share": "分享",
     "copy": "复制",
     "move": "移动",
-    "rename": "重命名"
+    "rename": "重命名",
+    "more": "更多"
   },
   "validation": {
     "required": "此字段必填",

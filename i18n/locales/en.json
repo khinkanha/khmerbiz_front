@@ -39,7 +39,9 @@
     "publishDate": "Publish Date",
     "createNew": "Create New",
     "saveDraft": "Save Draft",
-    "loadDraft": "Load Draft"
+    "loadDraft": "Load Draft",
+    "menuInUse": "(in use)",
+    "menuNotAvailable": "This menu is already used by \"{title}\". Please choose a different menu."
   },
   "dashboard": {
     "title": "Dashboard Overview",
@@ -236,7 +238,8 @@
     "share": "Share",
     "copy": "Copy",
     "move": "Move",
-    "rename": "Rename"
+    "rename": "Rename",
+    "more": "More"
   },
   "validation": {
     "required": "This field is required",

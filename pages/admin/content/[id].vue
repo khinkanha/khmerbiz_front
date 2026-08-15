@@ -74,7 +74,7 @@
                   <div class="form-group">
                     <label for="menu">{{ $t('menuManager.menuName') }} *</label>
                     <Dropdown id="menu" v-model="form.menu_id" :options="menuOptions" optionLabel="item_name"
-                      optionValue="item_id" :disabled="form.lang_id == null"
+                      optionValue="item_id" :disabled="form.lang_id == null" :optionDisabled="(o: any) => o.taken"
                       :placeholder="form.lang_id == null ? 'Select language first' : $t('menuManager.selectMenu')"
                       :class="{ 'p-invalid': errors.menu_id }" showClear />
                     <small v-if="errors.menu_id" class="p-error">{{ errors.menu_id }}</small>
@@ -209,6 +209,11 @@ const api = useApi()
 const allMenus = ref<any[]>([])
 const languageOptions = computed(() => domainStore.languages as Language[])
 
+// menu_id → owning content title, for the 1-menu-1-content rule. A menu
+// already referenced by another content cannot be selected/saved here.
+// (The current content is excluded so its own menu stays editable.)
+const menuOwners = ref<Record<number, string>>({})
+
 const menuOptions = computed(() => {
   // Filter the full menu list by the selected language. allMenus is fetched
   // with a high limit so items past the default page-of-10 (e.g. "Video") are
@@ -221,7 +226,14 @@ const menuOptions = computed(() => {
       seen.add(m.item_id)
       return true
     })
-    .map(m => ({ item_id: m.item_id, item_name: m.item_name }))
+    .map(m => {
+      const owner = menuOwners.value[m.item_id]
+      return {
+        item_id: m.item_id,
+        item_name: owner ? `${m.item_name} ${t('contentManager.menuInUse')}` : m.item_name,
+        taken: owner != null,
+      }
+    })
 })
 
 // Language is the driver now: when it changes, drop a menu that no longer
@@ -423,6 +435,11 @@ const validateForm = (): boolean => {
 
   if (form.value.menu_id === null) {
     errors.value.menu_id = t('validation.required')
+  } else if (menuOwners.value[form.value.menu_id]) {
+    // 1 menu belongs to 1 content: block saving a menu already owned elsewhere.
+    errors.value.menu_id = t('contentManager.menuNotAvailable', {
+      title: menuOwners.value[form.value.menu_id],
+    })
   }
 
   return Object.keys(errors.value).length === 0
@@ -515,6 +532,28 @@ onMounted(async () => {
     }
   } catch (e) {
     console.error('Failed to fetch menus:', e)
+  }
+
+  // Build the menu→owner map for the 1-menu-1-content rule. The list is
+  // domain-scoped by the auth token; own row is skipped (set after form load
+  // would work too, but contentId is stable here).
+  try {
+    const res = await api.get<any>('/content?limit=1000')
+    if (res.success && res.data) {
+      const contents: any[] = res.data.items || res.data
+      for (const c of contents) {
+        if (c.menu_id == null) continue
+        if (contentId.value != null && c.content_id === contentId.value) continue
+        if (menuOwners.value[c.menu_id] != null) continue
+        let ownerTitle: string = c.title || ''
+        if (!ownerTitle && c.description) {
+          try { ownerTitle = JSON.parse(c.description)?.title || '' } catch { /* plain text */ }
+        }
+        menuOwners.value[c.menu_id] = ownerTitle || `#${c.content_id}`
+      }
+    }
+  } catch (e) {
+    console.error('Failed to fetch content list for menu ownership:', e)
   }
 
   if (contentId.value) {

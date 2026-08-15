@@ -113,7 +113,9 @@
               <template v-if="getContentForMenuItem(child.item_id)">
                 <NewsSection v-if="getContentType(child.item_id) === ContentType.NEWS" :domain-id="domain.domain_id"
                   :content-id="getContentForMenuItem(child.item_id)!.content.content_id"
-                  :section-title="child.item_name || ''" />
+                  :section-title="child.item_name || ''"
+                  :show-more-link="true"
+                  :more-link="`/pages/${domain.domain_id}/${child.item_id}`" />
                 <PhotoGallery v-else-if="getContentType(child.item_id) === ContentType.PHOTO"
                   :items="getContentForMenuItem(child.item_id)!.items" :section-title="child.item_name || ''" />
                 <VideoSection v-else-if="getContentType(child.item_id) === ContentType.VIDEO"
@@ -139,7 +141,9 @@
             :id="`section-${menuTree[0].item_id}`">
             <template v-if="getContentForMenuItem(menuTree[0].item_id)">
               <NewsSection v-if="getContentType(menuTree[0].item_id) === ContentType.NEWS" :domain-id="domain.domain_id"
-                :content-id="getContentForMenuItem(menuTree[0].item_id)!.content.content_id" />
+                :content-id="getContentForMenuItem(menuTree[0].item_id)!.content.content_id"
+                :show-more-link="true"
+                :more-link="`/pages/${domain.domain_id}/${menuTree[0].item_id}`" />
               <PhotoGallery v-else-if="getContentType(menuTree[0].item_id) === ContentType.PHOTO"
                 :items="getContentForMenuItem(menuTree[0].item_id)!.items" />
               <VideoSection v-else-if="getContentType(menuTree[0].item_id) === ContentType.VIDEO"
