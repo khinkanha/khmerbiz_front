@@ -1,6 +1,6 @@
 <template>
   <section :class="['product-catalog', `lang-${currentLocale}`]">
-    <h2 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h2>
+    <h3 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h3>
     <div v-if="sectionDescription" class="section-description" v-html="sectionDescription"></div>
 
     <!-- Search and Filter Bar -->
@@ -703,7 +703,7 @@ watch(() => route.query.page, async (newPage) => {
 }
 
 .section-title {
-  font-size: 0.85rem;
+  font-size: var(--fs-section-title);
   font-weight: 700;
   color: #1a202c;
   margin: 0 0 1.5rem 0;
@@ -723,7 +723,7 @@ watch(() => route.query.page, async (newPage) => {
 }
 
 .empty-state i {
-  font-size: 3rem;
+  font-size: var(--fs-hero);
 }
 
 .product-grid {
@@ -776,7 +776,7 @@ watch(() => route.query.page, async (newPage) => {
   align-items: center;
   justify-content: center;
   color: #cbd5e0;
-  font-size: 3rem;
+  font-size: var(--fs-hero);
 }
 
 .photo-count {
@@ -785,7 +785,7 @@ watch(() => route.query.page, async (newPage) => {
   right: 8px;
   background: rgba(0, 0, 0, 0.6);
   color: #fff;
-  font-size: 0.75rem;
+  font-size: var(--fs-xs);
   padding: 2px 8px;
   border-radius: 12px;
   display: flex;
@@ -812,7 +812,7 @@ watch(() => route.query.page, async (newPage) => {
 
 .image-overlay i {
   color: white;
-  font-size: 2rem;
+  font-size: var(--fs-3xl);
 }
 
 .product-image:hover .image-overlay {
@@ -870,14 +870,14 @@ watch(() => route.query.page, async (newPage) => {
 
 .lightbox-title {
   color: white;
-  font-size: 0.875rem;
+  font-size: var(--fs-sm);
   font-weight: 500;
   margin: 0;
 }
 
 .lightbox-counter {
   color: white;
-  font-size: 0.875rem;
+  font-size: var(--fs-sm);
   font-weight: 500;
 }
 
@@ -922,7 +922,7 @@ watch(() => route.query.page, async (newPage) => {
 }
 
 .product-name {
-  font-size: 0.85rem;
+  font-size: var(--fs-sm);
   font-weight: 600;
   color: #1a202c;
   margin: 0 0 0.4rem 0;
@@ -935,7 +935,7 @@ watch(() => route.query.page, async (newPage) => {
 }
 
 .product-shortdes {
-  font-size: 1rem;
+  font-size: var(--fs-base);
   color: #718096;
   margin: 0 0 0.5rem 0;
   line-height: 1.4;
@@ -949,7 +949,7 @@ watch(() => route.query.page, async (newPage) => {
 .product-features {
   margin: 0 0 0.5rem 0;
   padding-left: 1.1rem;
-  font-size: 0.8rem;
+  font-size: var(--fs-xs);
   color: #4a5568;
   line-height: 1.4;
 }
@@ -960,13 +960,13 @@ watch(() => route.query.page, async (newPage) => {
 
 .product-price {
   margin-top: auto;
-  font-size: 1.1rem;
+  font-size: var(--fs-lg);
   font-weight: 700;
   color: var(--primary-color, #3b82f6);
 }
 
 .product-price small {
-  font-size: 0.7rem;
+  font-size: var(--fs-xs);
   font-weight: 500;
   color: #718096;
 }
@@ -1006,7 +1006,7 @@ watch(() => route.query.page, async (newPage) => {
 }
 
 .pagination-info {
-  font-size: 0.875rem;
+  font-size: var(--fs-sm);
   color: #4a5568;
   padding: 0 0.75rem;
   font-weight: 500;
@@ -1043,7 +1043,7 @@ watch(() => route.query.page, async (newPage) => {
 
 .search-icon {
   color: #a0aec0;
-  font-size: 1rem;
+  font-size: var(--fs-base);
   margin-right: 0.5rem;
 }
 
@@ -1052,7 +1052,7 @@ watch(() => route.query.page, async (newPage) => {
   border: none;
   background: transparent;
   outline: none;
-  font-size: 0.95rem;
+  font-size: var(--fs-md);
   color: #1a202c;
 }
 
@@ -1113,7 +1113,7 @@ watch(() => route.query.page, async (newPage) => {
   background: white;
   color: var(--primary-color, #3b82f6);
   border-radius: 10px;
-  font-size: 0.75rem;
+  font-size: var(--fs-xs);
   font-weight: 600;
   padding: 0 4px;
 }
@@ -1138,7 +1138,7 @@ watch(() => route.query.page, async (newPage) => {
   padding: 0.25rem 0.75rem;
   background: #e2e8f0;
   border-radius: 20px;
-  font-size: 0.875rem;
+  font-size: var(--fs-sm);
   color: #4a5568;
   transition: all 0.2s;
 }
@@ -1173,7 +1173,7 @@ watch(() => route.query.page, async (newPage) => {
   color: var(--primary-color, #3b82f6);
   cursor: pointer;
   border-radius: 20px;
-  font-size: 0.875rem;
+  font-size: var(--fs-sm);
   font-weight: 500;
   transition: all 0.2s;
   white-space: nowrap;
@@ -1184,7 +1184,7 @@ watch(() => route.query.page, async (newPage) => {
 }
 
 .empty-hint {
-  font-size: 0.875rem;
+  font-size: var(--fs-sm);
   color: #a0aec0;
   margin: 0;
 }
@@ -1218,7 +1218,7 @@ watch(() => route.query.page, async (newPage) => {
 }
 
 .filter-header h3 {
-  font-size: 1.1rem;
+  font-size: var(--fs-lg);
   font-weight: 600;
   color: #1a202c;
   margin: 0;
@@ -1249,7 +1249,7 @@ watch(() => route.query.page, async (newPage) => {
 }
 
 .filter-section h4 {
-  font-size: 0.9rem;
+  font-size: var(--fs-sm);
   font-weight: 600;
   color: #2d3748;
   margin: 0 0 0.75rem 0;
@@ -1270,7 +1270,7 @@ watch(() => route.query.page, async (newPage) => {
 
 .price-input label {
   display: block;
-  font-size: 0.75rem;
+  font-size: var(--fs-xs);
   color: #718096;
   margin-bottom: 0.25rem;
 }
@@ -1280,7 +1280,7 @@ watch(() => route.query.page, async (newPage) => {
   padding: 0.5rem;
   border: 1px solid #e2e8f0;
   border-radius: 6px;
-  font-size: 0.875rem;
+  font-size: var(--fs-sm);
 }
 
 .price-input input:focus {
@@ -1295,7 +1295,7 @@ watch(() => route.query.page, async (newPage) => {
 }
 
 .price-display {
-  font-size: 0.875rem;
+  font-size: var(--fs-sm);
   color: #4a5568;
   font-weight: 500;
   text-align: center;
@@ -1332,7 +1332,7 @@ watch(() => route.query.page, async (newPage) => {
 }
 
 .currency-checkbox span {
-  font-size: 0.9rem;
+  font-size: var(--fs-sm);
   color: #4a5568;
 }
 
@@ -1354,7 +1354,7 @@ watch(() => route.query.page, async (newPage) => {
   color: #4a5568;
   cursor: pointer;
   transition: all 0.2s;
-  font-size: 0.9rem;
+  font-size: var(--fs-sm);
   text-align: left;
 }
 
@@ -1379,7 +1379,7 @@ watch(() => route.query.page, async (newPage) => {
 }
 
 .results-count {
-  font-size: 0.875rem;
+  font-size: var(--fs-sm);
   color: #718096;
 }
 
@@ -1391,7 +1391,7 @@ watch(() => route.query.page, async (newPage) => {
   color: #4a5568;
   cursor: pointer;
   transition: all 0.2s;
-  font-size: 0.875rem;
+  font-size: var(--fs-sm);
 }
 
 .reset-btn:hover {
@@ -1422,16 +1422,16 @@ watch(() => route.query.page, async (newPage) => {
   }
 
   .product-name {
-    font-size: 0.7rem;
+    font-size: var(--fs-xs);
     margin: 0 0 0.25rem 0;
   }
 
   .product-price {
-    font-size: 0.8rem;
+    font-size: var(--fs-xs);
   }
 
   .photo-count {
-    font-size: 0.6rem;
+    font-size: var(--fs-xs);
     padding: 1px 5px;
     bottom: 4px;
     right: 4px;

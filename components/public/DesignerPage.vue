@@ -122,7 +122,7 @@ void config
   color: #94a3b8;
 }
 .designer-empty i {
-  font-size: 34px;
+  font-size: var(--fs-3xl);
   display: block;
   margin-bottom: 12px;
 }
@@ -132,7 +132,7 @@ void config
   color: #475569;
 }
 .designer-empty span {
-  font-size: 13px;
+  font-size: var(--fs-sm);
 }
 .designer-placeholder {
   display: flex;
@@ -146,11 +146,11 @@ void config
   text-align: center;
 }
 .designer-placeholder i {
-  font-size: 26px;
+  font-size: var(--fs-3xl);
   color: #cbd5e1;
 }
 .designer-placeholder span {
-  font-size: 13.5px;
+  font-size: var(--fs-sm);
 }
 .designer-social {
   display: flex;
@@ -167,7 +167,7 @@ void config
   background: var(--primary-color, #3b82f6);
   color: #fff !important;
   text-decoration: none !important;
-  font-size: 17px;
+  font-size: var(--fs-base);
 }
 .designer-social-link:hover {
   background: var(--primary-dark, #1d4ed8);

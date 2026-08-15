@@ -140,7 +140,7 @@ const mapData = computed<{ lat: number; lng: number; zoom: number; marker?: stri
 }
 
 .map-section-title {
-  font-size: 0.85rem;
+  font-size: var(--fs-section-title);
   font-weight: 700;
   color: #1a202c;
   margin: 0 0 1rem 0;

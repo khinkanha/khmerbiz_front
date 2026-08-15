@@ -114,10 +114,10 @@ const goHome = () => navigateTo('/')
 .dh-brand, .dh-toggle { display: none; }
 .dh-brand { align-items: center; gap: 8px; flex: 1; min-width: 0; }
 .dh-brand img { max-height: 40px; width: auto; object-fit: contain; }
-.dh-logo-text { color: var(--nav-text, #fff); font-weight: 800; font-size: 16px; font-family: var(--kb-heading-font, inherit); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dh-logo-text { color: var(--nav-text, #fff); font-weight: 800; font-size: var(--fs-base); font-family: var(--kb-heading-font, inherit); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .dh-toggle {
   background: rgba(255,255,255,.15); border: 0; color: #fff;
-  width: 40px; height: 40px; border-radius: 8px; cursor: pointer; font-size: 18px;
+  width: 40px; height: 40px; border-radius: 8px; cursor: pointer; font-size: var(--fs-lg);
   place-items: center;
 }
 .dh-toggle:hover { background: rgba(255,255,255,.3); }

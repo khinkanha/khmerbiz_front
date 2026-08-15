@@ -44,7 +44,7 @@ const photoUrl = config.public.photoUrl
 }
 
 .section-title {
-  font-size: 0.85rem;
+  font-size: var(--fs-section-title);
   font-weight: 700;
   color: #1a202c;
   margin: 0 0 1.5rem 0;
@@ -86,7 +86,7 @@ const photoUrl = config.public.photoUrl
   background-color: #fed7d7;
   color: #c53030;
   border-radius: 8px;
-  font-size: 1.5rem;
+  font-size: var(--fs-2xl);
   flex-shrink: 0;
 }
 
@@ -96,7 +96,7 @@ const photoUrl = config.public.photoUrl
 }
 
 .document-info h3 {
-  font-size: 0.85rem;
+  font-size: var(--fs-sm);
   font-weight: 600;
   color: #1a202c;
   margin: 0 0 0.25rem 0;
@@ -104,7 +104,7 @@ const photoUrl = config.public.photoUrl
 }
 
 .document-description {
-  font-size: 0.875rem;
+  font-size: var(--fs-sm);
   color: #718096;
   margin: 0;
   white-space: nowrap;
@@ -114,6 +114,6 @@ const photoUrl = config.public.photoUrl
 
 .document-action {
   color: #667eea;
-  font-size: 1.25rem;
+  font-size: var(--fs-xl);
 }
 </style>

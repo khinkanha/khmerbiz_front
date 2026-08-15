@@ -9,7 +9,7 @@
             :id="`section-${menuItem.item_id}`">
             <!-- Section Header -->
             <div class="section-header">
-              <h2 class="section-title">{{ menuItem.item_name }}</h2>
+              <h3 class="section-title">{{ menuItem.item_name }}</h3>
               <span class="section-tag">{{ menuItem.item_name }}</span>
             </div>
 
@@ -46,8 +46,8 @@
           <div v-if="socialMedia && socialMedia.length > 0" class="sidebar-card">
             <h3 class="sidebar-title">Follow Us</h3>
             <div class="sidebar-social">
-              <a v-for="social in socialMedia" :key="social.smid" :href="social.link"
-                target="_blank" rel="noopener noreferrer" class="social-btn">
+              <a v-for="social in socialMedia" :key="social.smid" :href="social.link" target="_blank"
+                rel="noopener noreferrer" class="social-btn">
                 <i :class="getSocialIcon(social.stype)"></i>
               </a>
             </div>
@@ -151,7 +151,7 @@ const getContentForMenuItem = (menuItemId: number): ContentSection | null => {
 
 .site-desc {
   opacity: 0.7;
-  font-size: 0.95rem;
+  font-size: var(--fs-md);
   margin: 0;
   max-width: 400px;
 }
@@ -212,7 +212,7 @@ const getContentForMenuItem = (menuItemId: number): ContentSection | null => {
 }
 
 .section-title {
-  font-size: 1.5rem;
+  font-size: var(--fs-section-title);
   font-weight: 800;
   color: #1a202c;
   margin: 0;
@@ -221,7 +221,7 @@ const getContentForMenuItem = (menuItemId: number): ContentSection | null => {
 
 .section-tag {
   margin-left: auto;
-  font-size: 0.7rem;
+  font-size: var(--fs-xs);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: #94a3b8;
@@ -336,7 +336,7 @@ const getContentForMenuItem = (menuItemId: number): ContentSection | null => {
 }
 
 .sidebar-title {
-  font-size: 0.85rem;
+  font-size: var(--fs-sm);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -360,7 +360,7 @@ const getContentForMenuItem = (menuItemId: number): ContentSection | null => {
   padding: 0.45rem 0.75rem;
   color: #475569;
   text-decoration: none;
-  font-size: 0.88rem;
+  font-size: var(--fs-sm);
   border-radius: 6px;
   transition: all 0.2s;
 }
@@ -387,7 +387,7 @@ const getContentForMenuItem = (menuItemId: number): ContentSection | null => {
   color: #475569;
   text-decoration: none;
   transition: all 0.2s;
-  font-size: 0.9rem;
+  font-size: var(--fs-sm);
 }
 
 .social-btn:hover {
@@ -396,7 +396,7 @@ const getContentForMenuItem = (menuItemId: number): ContentSection | null => {
 }
 
 .sidebar-contact p {
-  font-size: 0.85rem;
+  font-size: var(--fs-sm);
   color: #475569;
   margin: 0 0 0.5rem;
   display: flex;
@@ -405,7 +405,7 @@ const getContentForMenuItem = (menuItemId: number): ContentSection | null => {
 }
 
 .sidebar-contact p i {
-  font-size: 0.8rem;
+  font-size: var(--fs-xs);
   color: var(--primary-color, #3b82f6);
 }
 
@@ -449,9 +449,16 @@ const getContentForMenuItem = (menuItemId: number): ContentSection | null => {
 }
 
 /* Screen mode: boxed */
-.screen-boxed .container { max-width: 960px; }
+.screen-boxed .container {
+  max-width: 960px;
+}
 
 /* Banner positions */
-.banner-pos-middle { padding: 2rem 0; }
-.banner-pos-bottom { order: 999; }
+.banner-pos-middle {
+  padding: 2rem 0;
+}
+
+.banner-pos-bottom {
+  order: 999;
+}
 </style>

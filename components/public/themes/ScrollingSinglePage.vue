@@ -63,14 +63,8 @@
     <!-- Social Media -->
     <section v-if="socialMedia.length > 0" class="social-footer">
       <div class="social-inner">
-        <a
-          v-for="social in socialMedia"
-          :key="social.smid"
-          :href="social.link"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="social-icon-link"
-        >
+        <a v-for="social in socialMedia" :key="social.smid" :href="social.link" target="_blank"
+          rel="noopener noreferrer" class="social-icon-link">
           <i :class="getSocialIcon(social.stype)"></i>
         </a>
       </div>
@@ -246,7 +240,7 @@ onMounted(() => {
   border-radius: 30px;
   transition: all 0.3s;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: var(--fs-sm);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
@@ -270,7 +264,7 @@ onMounted(() => {
   cursor: pointer;
   z-index: 2;
   opacity: 0.7;
-  font-size: 0.75rem;
+  font-size: var(--fs-xs);
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -362,7 +356,7 @@ onMounted(() => {
 }
 
 .section-title {
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-size: var(--fs-section-title);
   font-weight: 700;
   color: #1a202c;
   margin: 0;
@@ -471,7 +465,7 @@ onMounted(() => {
   border-radius: 50%;
   background: #e2e8f0;
   color: #475569;
-  font-size: 1.1rem;
+  font-size: var(--fs-lg);
   text-decoration: none;
   transition: all 0.2s;
 }
@@ -507,9 +501,16 @@ onMounted(() => {
 }
 
 /* Screen mode: boxed */
-.screen-boxed .container { max-width: 960px; }
+.screen-boxed .container {
+  max-width: 960px;
+}
 
 /* Banner positions */
-.banner-pos-middle { padding: 2rem 0; }
-.banner-pos-bottom { order: 999; }
+.banner-pos-middle {
+  padding: 2rem 0;
+}
+
+.banner-pos-bottom {
+  order: 999;
+}
 </style>

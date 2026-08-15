@@ -110,7 +110,7 @@ const footerAlignClass = computed(() => {
 }
 
 .footer-brand h3 {
-  font-size: 1.1rem;
+  font-size: var(--fs-lg);
   font-weight: 700;
   margin: 0;
   color: white;
@@ -119,7 +119,7 @@ const footerAlignClass = computed(() => {
 
 .footer-text {
   color: rgba(255, 255, 255, 0.65);
-  font-size: 0.875rem;
+  font-size: var(--fs-sm);
   line-height: 1.7;
 }
 
@@ -146,7 +146,7 @@ const footerAlignClass = computed(() => {
 
 /* Headings */
 .footer-heading {
-  font-size: 0.95rem;
+  font-size: var(--fs-md);
   font-weight: 700;
   color: white;
   margin: 0 0 1rem 0;
@@ -169,7 +169,7 @@ const footerAlignClass = computed(() => {
   gap: 0.6rem;
   color: rgba(255, 255, 255, 0.65);
   text-decoration: none;
-  font-size: 0.85rem;
+  font-size: var(--fs-sm);
   padding: 0.3rem 0;
   transition: color 0.2s;
 }
@@ -179,7 +179,7 @@ const footerAlignClass = computed(() => {
 }
 
 .social-link i {
-  font-size: 1rem;
+  font-size: var(--fs-base);
   width: 28px;
   height: 28px;
   display: flex;
@@ -204,7 +204,7 @@ const footerAlignClass = computed(() => {
 .footer-bottom p {
   margin: 0;
   color: rgba(255, 255, 255, 0.45);
-  font-size: 0.8rem;
+  font-size: var(--fs-xs);
 }
 
 /* ---- Responsive ---- */

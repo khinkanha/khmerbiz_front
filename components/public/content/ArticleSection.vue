@@ -48,7 +48,7 @@ const decodedDescription = computed(() => decoded.value.description)
 }
 
 .article-title {
-  font-size: 0.85rem;
+  font-size: var(--fs-section-title);
   font-weight: 700;
   color: #1a202c;
   margin: 0 0 1rem 0;
@@ -101,6 +101,28 @@ const decodedDescription = computed(() => decoded.value.description)
   margin-top: 1.5rem;
   margin-bottom: 0.75rem;
   color: #1a202c;
+}
+
+/* Clamp content headings so editor HTML can never dwarf the menu */
+.article-content :deep(h1) {
+  font-size: var(--fs-2xl);
+}
+
+.article-content :deep(h2) {
+  font-size: var(--fs-xl);
+}
+
+.article-content :deep(h3) {
+  font-size: var(--fs-lg);
+}
+
+.article-content :deep(h4) {
+  font-size: var(--fs-base);
+}
+
+.article-content :deep(h5),
+.article-content :deep(h6) {
+  font-size: var(--fs-sm);
 }
 
 .article-content :deep(p) {

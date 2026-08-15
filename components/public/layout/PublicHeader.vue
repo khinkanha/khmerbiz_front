@@ -315,7 +315,7 @@ const isChildActive = (childId: number) => {
 }
 
 .brand-title h1 {
-  font-size: 1.35rem;
+  font-size: var(--fs-page-title);
   font-weight: 700;
   color: var(--primary-color, #1a202c);
   margin: 0;
@@ -344,7 +344,7 @@ const isChildActive = (childId: number) => {
 }
 
 .mobile-logo-title h1 {
-  font-size: 1.1rem;
+  font-size: var(--fs-lg);
   font-weight: 700;
   color: var(--primary-color, #1a202c);
   margin: 0;
@@ -391,7 +391,7 @@ const isChildActive = (childId: number) => {
   color: white !important;
   text-decoration: none;
   border-radius: 4px;
-  font-size: 0.8rem;
+  font-size: var(--fs-xs);
   font-weight: 500;
   transition: background-color 0.2s;
   white-space: nowrap;
@@ -410,7 +410,7 @@ const isChildActive = (childId: number) => {
   padding: 0.5rem;
   cursor: pointer;
   color: white;
-  font-size: 1.25rem;
+  font-size: var(--fs-xl);
   box-shadow: none !important;
   outline: none !important;
 }
@@ -461,7 +461,7 @@ const isChildActive = (childId: number) => {
   border-radius: 6px;
   color: var(--nav-text, rgba(255, 255, 255, 0.9)) !important;
   text-decoration: none !important;
-  font-size: 0.875rem;
+  font-size: var(--fs-menu);
   font-weight: 500;
   font-family: var(--font-moul, 'Moul', serif);
   transition: background-color 0.2s, color 0.2s;
@@ -522,7 +522,7 @@ const isChildActive = (childId: number) => {
 /* Toggle chevron icon */
 .toggle-icon {
   margin-left: 0.35rem;
-  font-size: 0.7rem;
+  font-size: var(--fs-xs);
   opacity: 0.7;
 }
 
@@ -534,7 +534,7 @@ const isChildActive = (childId: number) => {
   clear: both;
   color: var(--nav-dropdown-text, #4a5568);
   text-decoration: none !important;
-  font-size: 0.875rem;
+  font-size: var(--fs-menu);
   font-family: var(--font-moul, 'Moul', serif);
   transition: background-color 0.15s, color 0.15s;
   white-space: nowrap;
@@ -601,7 +601,7 @@ const isChildActive = (childId: number) => {
   }
 
   .mobile-brand .brand-title h1 {
-    font-size: 0.95rem;
+    font-size: var(--fs-md);
     color: white;
     white-space: nowrap;
     overflow: hidden;
@@ -667,7 +667,7 @@ const isChildActive = (childId: number) => {
   .dropdown-item {
     color: rgba(255, 255, 255, 0.8);
     padding: 0.7rem 1rem 0.7rem 2rem;
-    font-size: 0.825rem;
+    font-size: var(--fs-menu);
     border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   }
 

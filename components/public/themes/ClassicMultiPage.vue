@@ -31,7 +31,7 @@
                       {{ news.title }}
                     </a>
                   </h4>
-                  <p v-if="news.short_description" class="featured-excerpt">
+                  <p v-if="news.short_description">
                     {{ news.short_description }}
                   </p>
                   <p class="date">
@@ -60,7 +60,7 @@
                         {{ news.title }}
                       </a>
                     </h4>
-                    <p v-if="news.short_description" class="media-excerpt">
+                    <p v-if="news.short_description">
                       {{ news.short_description }}
                     </p>
                     <p class="date">
@@ -120,11 +120,8 @@
                   :items="getContentForMenuItem(child.item_id)!.items" :section-title="child.item_name || ''" />
                 <template v-else-if="getContentType(child.item_id) === ContentType.MAP">
                   <h3 v-if="child.item_name" class="sub-section-title">{{ child.item_name }}</h3>
-                  <MapDisplay
-                    v-if="mapVisible(getContentForMenuItem(child.item_id)!.content)"
-                    :map-data="parseMapData(getContentForMenuItem(child.item_id)!.content)"
-                    :section-title="''"
-                  />
+                  <MapDisplay v-if="mapVisible(getContentForMenuItem(child.item_id)!.content)"
+                    :map-data="parseMapData(getContentForMenuItem(child.item_id)!.content)" :section-title="''" />
                 </template>
                 <DocumentSection v-else-if="getContentType(child.item_id) === ContentType.DOCUMENT"
                   :items="getContentForMenuItem(child.item_id)!.items" :section-title="child.item_name || ''" />
@@ -148,10 +145,8 @@
               <VideoSection v-else-if="getContentType(menuTree[0].item_id) === ContentType.VIDEO"
                 :items="getContentForMenuItem(menuTree[0].item_id)!.items" />
               <template v-else-if="getContentType(menuTree[0].item_id) === ContentType.MAP">
-                <MapDisplay
-                  v-if="mapVisible(getContentForMenuItem(menuTree[0].item_id)!.content)"
-                  :map-data="parseMapData(getContentForMenuItem(menuTree[0].item_id)!.content)"
-                />
+                <MapDisplay v-if="mapVisible(getContentForMenuItem(menuTree[0].item_id)!.content)"
+                  :map-data="parseMapData(getContentForMenuItem(menuTree[0].item_id)!.content)" />
               </template>
               <DocumentSection v-else-if="getContentType(menuTree[0].item_id) === ContentType.DOCUMENT"
                 :items="getContentForMenuItem(menuTree[0].item_id)!.items" />
@@ -386,7 +381,7 @@ const mapVisible = (content: Content): boolean => {
 }
 
 .section-title {
-  font-size: 1.35rem;
+  font-size: var(--fs-section-title);
   font-weight: 700;
   color: var(--text-color, #1a202c);
   margin: 0;
@@ -442,12 +437,12 @@ const mapVisible = (content: Content): boolean => {
   align-items: center;
   justify-content: center;
   color: #cbd5e0;
-  font-size: 3rem;
+  font-size: var(--fs-hero);
   background: #f7fafc;
 }
 
 .img-placeholder.small {
-  font-size: 1.5rem;
+  font-size: var(--fs-2xl);
   aspect-ratio: auto;
   width: 100%;
   height: 100%;
@@ -465,7 +460,7 @@ const mapVisible = (content: Content): boolean => {
 }
 
 .featured-card-body .media-heading {
-  font-size: 1rem;
+  font-size: var(--fs-base);
   font-weight: 600;
   color: #333;
 }
@@ -480,7 +475,7 @@ const mapVisible = (content: Content): boolean => {
 }
 
 .featured-excerpt {
-  font-size: 0.9rem;
+  font-size: var(--fs-sm);
   color: #555;
   margin: 0 0 0.5rem 0;
   line-height: 1.6;
@@ -491,7 +486,7 @@ const mapVisible = (content: Content): boolean => {
 }
 
 .date {
-  font-size: 1rem;
+  font-size: var(--fs-base);
   color: #777;
   margin: 0;
   margin-top: 10px;
@@ -534,7 +529,7 @@ const mapVisible = (content: Content): boolean => {
 }
 
 .media-body .media-heading {
-  font-size: 0.95rem;
+  font-size: var(--fs-md);
   font-weight: 600;
 }
 
@@ -548,7 +543,7 @@ const mapVisible = (content: Content): boolean => {
 }
 
 .media-excerpt {
-  font-size: 0.875rem;
+  font-size: var(--fs-sm);
   color: #555;
   margin: 0.25rem 0 0 0;
   line-height: 1.5;
@@ -590,7 +585,7 @@ const mapVisible = (content: Content): boolean => {
   border-radius: 4px;
   background: #fff;
   color: #333;
-  font-size: 0.875rem;
+  font-size: var(--fs-sm);
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -644,7 +639,7 @@ const mapVisible = (content: Content): boolean => {
   width: 36px;
   height: 36px;
   color: #555;
-  font-size: 1.25rem;
+  font-size: var(--fs-xl);
   text-decoration: none;
   transition: color 0.2s, transform 0.2s;
 }
@@ -667,11 +662,11 @@ const mapVisible = (content: Content): boolean => {
   }
 
   .section-title {
-    font-size: 1.15rem;
+    font-size: var(--fs-section-title);
   }
 
   .featured-card-body .media-heading {
-    font-size: 0.9rem;
+    font-size: var(--fs-sm);
   }
 }
 

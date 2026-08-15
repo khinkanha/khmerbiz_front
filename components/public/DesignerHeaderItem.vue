@@ -72,7 +72,7 @@ void props
 <style scoped>
 .dhi-logo { display: flex; align-items: center; }
 .dhi-logo img { max-height: 46px; width: auto; object-fit: contain; }
-.dhi-logo-text { color: var(--nav-text, #fff); font-weight: 800; font-size: 18px; font-family: var(--kb-heading-font, inherit); }
+.dhi-logo-text { color: var(--nav-text, #fff); font-weight: 800; font-size: var(--fs-lg); font-family: var(--kb-heading-font, inherit); }
 .dhi-menu { display: flex; align-items: center; gap: 4px; }
 .dhi-menu.mobile { flex-direction: column; align-items: stretch; width: 100%; }
 .dhi-menu-item { position: relative; }
@@ -80,14 +80,14 @@ void props
 .dhi-menu-link {
   display: block; padding: 8px 12px;
   color: var(--nav-text, #fff) !important; text-decoration: none !important;
-  font-size: 14px; font-weight: 600; border-radius: 6px; white-space: nowrap;
+  font-size: var(--fs-menu); font-weight: 600; border-radius: 6px; white-space: nowrap;
 }
 .dhi-menu.mobile .dhi-menu-link { width: 100%; }
 .dhi-menu-link:hover { background: var(--nav-hover, rgba(255,255,255,.15)); }
 .dhi-sublink {
   display: block; padding: 7px 12px 7px 28px;
   color: var(--nav-text, rgba(255,255,255,.85)) !important; text-decoration: none !important;
-  font-size: 13px;
+  font-size: var(--fs-sm);
 }
 .dhi-sublink:hover { background: var(--nav-hover, rgba(255,255,255,.12)); }
 .dhi-dropdown {
@@ -99,7 +99,7 @@ void props
 .dhi-menu-item:hover > .dhi-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
 .dhi-dropdown-link {
   display: block; padding: 8px 14px;
-  color: var(--nav-dropdown-text, #4a5568) !important; text-decoration: none !important; font-size: 13px;
+  color: var(--nav-dropdown-text, #4a5568) !important; text-decoration: none !important; font-size: var(--fs-sm);
 }
 .dhi-dropdown-link:hover { background: var(--nav-dropdown-hover, #eff6ff); color: var(--primary-dark) !important; }
 .dhi-social { display: flex; align-items: center; gap: 8px; }
@@ -111,10 +111,10 @@ void props
 .dhi-social-link:hover { background: rgba(255,255,255,.3); }
 .dhi-lang {
   padding: 6px 8px; border-radius: 6px; border: 0;
-  background: rgba(255,255,255,.15); color: #fff; font-size: 13px;
+  background: rgba(255,255,255,.15); color: #fff; font-size: var(--fs-sm);
 }
 .dhi-lang option { color: #000; }
-.dhi-text { color: var(--nav-text, #fff); font-size: 14px; }
+.dhi-text { color: var(--nav-text, #fff); font-size: var(--fs-sm); }
 .dhi-menu.mobile .dhi-text { display: block; padding: 6px 4px; }
 .dhi-image { max-height: 40px; }
 </style>

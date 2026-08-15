@@ -37,7 +37,7 @@
             <span class="label-line"></span>
             <span class="label-text">Section {{ index + 1 }}</span>
           </div>
-          <h2 class="panel-title">{{ menuItem.item_name }}</h2>
+          <h3 class="panel-title">{{ menuItem.item_name }}</h3>
 
           <!-- Submenu items -->
           <div v-if="menuItem.children && menuItem.children.length > 0" class="panel-grid">
@@ -245,7 +245,7 @@ onMounted(() => {
   padding: 0.4rem 1.2rem;
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 30px;
-  font-size: 0.75rem;
+  font-size: var(--fs-xs);
   letter-spacing: 0.15em;
   text-transform: uppercase;
   margin-bottom: 1.5rem;
@@ -280,7 +280,7 @@ onMounted(() => {
   color: #0f172a;
   border: none;
   border-radius: 50px;
-  font-size: 0.9rem;
+  font-size: var(--fs-sm);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
@@ -350,7 +350,7 @@ onMounted(() => {
 }
 
 .label-text {
-  font-size: 0.75rem;
+  font-size: var(--fs-xs);
   text-transform: uppercase;
   letter-spacing: 0.15em;
   color: #94a3b8;
@@ -511,7 +511,7 @@ onMounted(() => {
   border-radius: 50%;
   background: #e2e8f0;
   color: #475569;
-  font-size: 1.1rem;
+  font-size: var(--fs-lg);
   text-decoration: none;
   transition: all 0.2s;
 }
@@ -537,7 +537,7 @@ onMounted(() => {
   }
 
   .hero-title {
-    font-size: 2.2rem;
+    font-size: var(--fs-3xl);
   }
 }
 

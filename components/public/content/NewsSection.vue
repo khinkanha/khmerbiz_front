@@ -1,6 +1,6 @@
 <template>
   <section class="news-section">
-    <h2 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h2>
+    <h3 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h3>
     <div v-if="sectionDescription" class="section-description" v-html="sectionDescription"></div>
     <div v-if="loading" class="loading-state">
       <ProgressSpinner />
@@ -19,7 +19,7 @@
             </div>
           </div>
           <div class="feature-card-body">
-            <h4 class="feature-title">{{ news.title }}</h4>
+            <h3 class="feature-title">{{ news.title }}</h3>
             <p v-if="news.short_description" class="feature-excerpt">{{ news.short_description }}</p>
             <div v-if="news.publish_date" class="feature-date">
               <i class="pi pi-calendar"></i>
@@ -40,7 +40,7 @@
             </div>
           </div>
           <div class="news-content">
-            <h4 class="news-title">{{ news.title }}</h4>
+            <h3 class="news-title">{{ news.title }}</h3>
             <p v-if="news.short_description" class="news-excerpt">
               {{ news.short_description }}
             </p>
@@ -193,7 +193,7 @@ watch(() => route.query.page, async (newPage) => {
 }
 
 .section-title {
-  font-size: 0.85rem;
+  font-size: var(--fs-section-title);
   font-weight: 700;
   color: #1a202c;
   margin: 0 0 1.5rem 0;
@@ -241,7 +241,7 @@ watch(() => route.query.page, async (newPage) => {
   z-index: 1;
   background: var(--primary-color, #3b82f6);
   color: #fff;
-  font-size: 0.7rem;
+  font-size: var(--fs-xs);
   font-weight: 700;
   padding: 4px 10px;
   border-radius: 4px;
@@ -272,7 +272,7 @@ watch(() => route.query.page, async (newPage) => {
 }
 
 .feature-title {
-  font-size: 0.85rem;
+  font-size: var(--fs-sm);
   font-weight: 700;
   color: #1a202c;
   margin: 0 0 0.5rem 0;
@@ -285,7 +285,7 @@ watch(() => route.query.page, async (newPage) => {
 }
 
 .feature-excerpt {
-  font-size: 1.1rem;
+  font-size: var(--fs-lg);
   color: #555;
   margin: 0 0 0.75rem 0;
   line-height: 1.6;
@@ -296,7 +296,7 @@ watch(() => route.query.page, async (newPage) => {
 }
 
 .feature-date {
-  font-size: 0.8rem;
+  font-size: var(--fs-xs);
   color: #999;
   display: flex;
   align-items: center;
@@ -344,7 +344,7 @@ watch(() => route.query.page, async (newPage) => {
   align-items: center;
   justify-content: center;
   color: #cbd5e0;
-  font-size: 3rem;
+  font-size: var(--fs-hero);
 }
 
 .news-content {
@@ -355,7 +355,7 @@ watch(() => route.query.page, async (newPage) => {
 }
 
 .news-title {
-  font-size: 0.85rem;
+  font-size: var(--fs-sm);
   font-weight: normal;
   color: #1a202c;
   margin: 0 0 0.5rem 0;
@@ -364,7 +364,7 @@ watch(() => route.query.page, async (newPage) => {
 }
 
 .news-excerpt {
-  font-size: 1.1rem;
+  font-size: var(--fs-lg);
   color: #718096;
   margin: 0 0 0.75rem 0;
   line-height: 1.5;
@@ -376,7 +376,7 @@ watch(() => route.query.page, async (newPage) => {
 }
 
 .news-date {
-  font-size: 0.75rem;
+  font-size: var(--fs-xs);
   color: #a0aec0;
   display: flex;
   align-items: center;
@@ -429,7 +429,7 @@ watch(() => route.query.page, async (newPage) => {
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
-  font-size: 1rem;
+  font-size: var(--fs-base);
 }
 
 .pagination-btn:hover:not(:disabled) {
@@ -444,7 +444,7 @@ watch(() => route.query.page, async (newPage) => {
 }
 
 .pagination-info {
-  font-size: 0.875rem;
+  font-size: var(--fs-sm);
   color: #4a5568;
   padding: 0 0.75rem;
   font-weight: 500;
@@ -458,7 +458,7 @@ watch(() => route.query.page, async (newPage) => {
   }
 
   .feature-title {
-    font-size: 0.85rem;
+    font-size: var(--fs-sm);
   }
 }
 </style>

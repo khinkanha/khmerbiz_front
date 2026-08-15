@@ -1,7 +1,7 @@
 <template>
   <section class="photo-gallery-section">
-    <h2 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h2>
-    <div v-if="sectionDescription" class="section-description" v-html="sectionDescription"></div>   
+    <h3 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h3>
+    <div v-if="sectionDescription" class="section-description" v-html="sectionDescription"></div>
     <div class="gallery-grid">
       <div v-for="item in items" :key="item.item_id" class="gallery-item" :class="{ featured: item.is_feature }">
         <img :src="`${photoUrl}${item.url}`" :alt="item.title" @click="openLightbox(item)" />
@@ -12,10 +12,11 @@
     </div>
 
     <!-- Lightbox Dialog -->
-    <Dialog v-model:visible="showLightbox" :style="{ width: '90vw', maxWidth: '1200px' }" :modal="true" :showHeader="false"
-      contentClass="lightbox-dialog">
+    <Dialog v-model:visible="showLightbox" :style="{ width: '90vw', maxWidth: '1200px' }" :modal="true"
+      :showHeader="false" contentClass="lightbox-dialog">
       <div class="lightbox-content" @click="showLightbox = false">
-        <Button icon="pi pi-times" rounded text severity="secondary" class="lightbox-close" @click.stop="showLightbox = false" />
+        <Button icon="pi pi-times" rounded text severity="secondary" class="lightbox-close"
+          @click.stop="showLightbox = false" />
         <img v-if="currentItem" :src="`${photoUrl}${currentItem.url || currentItem.photo}`" :alt="currentItem.title"
           class="lightbox-image" />
         <div v-if="currentItem?.title" class="lightbox-caption">
@@ -58,7 +59,7 @@ const openLightbox = (item: ContentItem) => {
 }
 
 .section-title {
-  font-size: 0.85rem;
+  font-size: var(--fs-section-title);
   font-weight: 700;
   color: #1a202c;
   margin: 0 0 1.5rem 0;
@@ -116,7 +117,7 @@ const openLightbox = (item: ContentItem) => {
 
 .item-caption p {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--fs-sm);
 }
 
 :deep(.lightbox-dialog) {
@@ -151,6 +152,6 @@ const openLightbox = (item: ContentItem) => {
   text-align: center;
   padding: 1rem;
   color: white;
-  font-size: 1rem;
+  font-size: var(--fs-base);
 }
 </style>

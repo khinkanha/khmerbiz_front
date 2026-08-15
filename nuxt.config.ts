@@ -75,6 +75,7 @@ export default defineNuxtConfig(<any>{
 
   css: [
     '~/assets/css/fonts.css',
+    '~/assets/css/typography.css',
     '~/assets/css/themes/default.css',
     '~/assets/css/themes/inverse.css',
     '~/assets/css/themes/red.css',

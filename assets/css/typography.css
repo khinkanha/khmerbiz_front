@@ -1,0 +1,43 @@
+/* Typography tokens — single source of truth for public site font sizes.
+   Semantic sizes (--fs-menu, --fs-section-title, --fs-page-title) should be
+   preferred over raw scale steps in components. */
+
+:root {
+  /* Type scale */
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-md: 0.95rem;
+  --fs-base: 1rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.25rem;
+  --fs-2xl: 1.5rem;
+  --fs-3xl: 2rem;
+  --fs-hero: 3rem;
+
+  /* Semantic sizes */
+  --fs-menu: var(--fs-md);
+  --fs-section-title: var(--fs-xl);
+  --fs-page-title: 1.35rem;
+
+  /* Fonts & rhythm */
+  --font-body: 'Battambang', system-ui, sans-serif;
+  --font-heading: 'Battambang', system-ui, sans-serif;
+  --font-moul: 'Moul', 'Battambang', system-ui, sans-serif;
+  --line-height-body: 1.8;
+
+  /* Legacy aliases (widely referenced but previously undefined) */
+  --font-battambang: var(--font-body);
+}
+
+/* Base typography for the public site. The theme class is applied to the
+   public layout wrapper div (not <body>), so it must carry the base font. */
+.theme-default,
+.theme-inverse,
+.theme-red,
+.theme-green,
+.theme-purple,
+.theme-yellow {
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  line-height: var(--line-height-body);
+}

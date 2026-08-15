@@ -77,7 +77,7 @@ useChatWidget()
   gap: 28px;
 }
 .df-col { display: flex; flex-direction: column; gap: 10px; }
-.df-text { margin: 0; font-size: 13.5px; line-height: 1.7; opacity: .9; }
+.df-text { margin: 0; font-size: var(--fs-sm); line-height: 1.7; opacity: .9; }
 .df-social { display: flex; gap: 8px; }
 .df-social-link {
   width: 34px; height: 34px; display: grid; place-items: center;
@@ -86,9 +86,9 @@ useChatWidget()
 }
 .df-social-link:hover { background: rgba(255,255,255,.2); }
 .df-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
-.df-links a { color: var(--footer-text, #cbd5e1) !important; text-decoration: none !important; font-size: 13.5px; }
+.df-links a { color: var(--footer-text, #cbd5e1) !important; text-decoration: none !important; font-size: var(--fs-sm); }
 .df-links a:hover { color: #fff !important; }
-.df-contact { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 13.5px; }
+.df-contact { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: var(--fs-sm); }
 .df-contact li { display: flex; align-items: center; gap: 8px; opacity: .9; }
 .df-contact i { color: var(--primary-color, #3b82f6); }
 .df-image { max-height: 50px; width: auto; }
@@ -100,7 +100,7 @@ useChatWidget()
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 12.5px;
+  font-size: var(--fs-sm);
   opacity: .8;
 }
 .df-copy :deep(a) { color: var(--primary-color, #93c5fd); }

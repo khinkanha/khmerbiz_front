@@ -77,7 +77,7 @@ const photoUrl = config.public.photoUrl
 }
 
 .banner-caption h2 {
-  font-size: 1.25rem;
+  font-size: var(--fs-xl);
   font-weight: 600;
   margin: 0;
   font-family: var(--font-battambang);
@@ -113,7 +113,7 @@ const photoUrl = config.public.photoUrl
   }
 
   .banner-caption h2 {
-    font-size: 1rem;
+    font-size: var(--fs-base);
   }
 }
 </style>

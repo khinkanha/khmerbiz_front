@@ -1,6 +1,6 @@
 <template>
   <section class="video-section">
-    <h2 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h2>
+    <h3 v-if="sectionTitle" class="section-title">{{ sectionTitle }}</h3>
     <div v-if="sectionDescription" class="section-description" v-html="sectionDescription"></div>
 
     <div class="video-grid">
@@ -63,7 +63,7 @@ const getEmbedUrl = (url: string): string | null => {
 }
 
 .section-title {
-  font-size: 0.85rem;
+  font-size: var(--fs-section-title);
   font-weight: 700;
   color: #1a202c;
   margin: 0 0 1.5rem 0;
@@ -113,7 +113,7 @@ const getEmbedUrl = (url: string): string | null => {
 }
 
 .video-placeholder i {
-  font-size: 3rem;
+  font-size: var(--fs-hero);
   margin-bottom: 0.5rem;
 }
 
@@ -122,7 +122,7 @@ const getEmbedUrl = (url: string): string | null => {
 }
 
 .video-caption h3 {
-  font-size: 1.125rem;
+  font-size: var(--fs-lg);
   font-weight: 600;
   color: #1a202c;
   margin: 0 0 0.25rem 0;
@@ -130,7 +130,7 @@ const getEmbedUrl = (url: string): string | null => {
 }
 
 .video-description {
-  font-size: 0.875rem;
+  font-size: var(--fs-sm);
   color: #718096;
   margin: 0;
 }

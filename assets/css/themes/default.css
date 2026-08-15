@@ -28,10 +28,9 @@
   --input-focus: #3b82f6;
 }
 
-.theme-default body {
+.theme-default {
   background-color: var(--bg-color);
   color: var(--text-color);
-  font-family: 'Battambang', system-ui, sans-serif;
 }
 
 .theme-default a {
