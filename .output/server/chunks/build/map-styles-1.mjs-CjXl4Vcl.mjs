@@ -1,0 +1,4 @@
+const map_vue_vue_type_style_index_0_scoped_e47dbbe9_lang = ".map-editor-page[data-v-e47dbbe9]{display:flex;flex-direction:column;gap:1.5rem}.page-header[data-v-e47dbbe9]{align-items:center;display:flex;justify-content:space-between}.page-title[data-v-e47dbbe9]{color:#1a202c;font-size:1.5rem;font-weight:700;margin:0}.page-actions[data-v-e47dbbe9]{display:flex;gap:.75rem}.map-card[data-v-e47dbbe9]{border:1px solid #e2e8f0;height:-moz-fit-content;height:fit-content}.map-form[data-v-e47dbbe9]{gap:1rem}.form-group[data-v-e47dbbe9],.map-form[data-v-e47dbbe9]{display:flex;flex-direction:column}.form-group[data-v-e47dbbe9]{gap:.4rem}.form-group label[data-v-e47dbbe9]{color:#4a5568;font-size:.875rem;font-weight:500}";
+
+export { map_vue_vue_type_style_index_0_scoped_e47dbbe9_lang as m };
+//# sourceMappingURL=map-styles-1.mjs-CjXl4Vcl.mjs.map
