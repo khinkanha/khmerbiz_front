@@ -1,0 +1,1 @@
+import{au as u,B as o,L as a}from"./CWxY0rF2.js";const n=u(e=>{const t=o();if(!["/member/login","/member/signup"].includes(e.path)&&!t.isAuthenticated)return a("/member/login")});export{n as default};

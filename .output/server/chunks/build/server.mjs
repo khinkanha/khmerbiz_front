@@ -1355,25 +1355,25 @@ const _routes = [
     name: "admin-builder",
     path: "/admin/builder",
     meta: __nuxt_page_meta$y || {},
-    component: () => import('./index-DmJOEJdh.mjs')
+    component: () => import('./index-Bt2VxySi.mjs')
   },
   {
     name: "admin-content-contentId-items",
     path: "/admin/content/:contentId()/items",
     meta: __nuxt_page_meta$x || {},
-    component: () => import('./items-CdjITvL8.mjs')
+    component: () => import('./items-C88uKCkt.mjs')
   },
   {
     name: "admin-content-contentId-map",
     path: "/admin/content/:contentId()/map",
     meta: __nuxt_page_meta$w || {},
-    component: () => import('./map-DAHuUZmr.mjs')
+    component: () => import('./map-B5LtwPXM.mjs')
   },
   {
     name: "admin-content-contentId-news",
     path: "/admin/content/:contentId()/news",
     meta: __nuxt_page_meta$v || {},
-    component: () => import('./news-D-tmYP-g.mjs')
+    component: () => import('./news-3z9cf1aY.mjs')
   },
   {
     name: "admin-content-contentId-products",
@@ -1385,13 +1385,13 @@ const _routes = [
     name: "admin-content-id",
     path: "/admin/content/:id()",
     meta: __nuxt_page_meta$t || {},
-    component: () => import('./_id_-CRcgP9kR.mjs')
+    component: () => import('./_id_-bFSz8yrh.mjs')
   },
   {
     name: "admin-content",
     path: "/admin/content",
     meta: __nuxt_page_meta$s || {},
-    component: () => import('./index-CrFZBTE9.mjs')
+    component: () => import('./index-FE5ePrSp.mjs')
   },
   {
     name: "admin",
@@ -1525,7 +1525,7 @@ const _routes = [
     name: "index",
     path: "/",
     meta: __nuxt_page_meta$6 || {},
-    component: () => import('./index-CSEO94JS.mjs')
+    component: () => import('./index-DxqyWud6.mjs')
   },
   {
     name: "member-login",
@@ -1549,24 +1549,19 @@ const _routes = [
     name: "pages-domainId-contentId",
     path: "/pages/:domainId()/:contentId()",
     meta: __nuxt_page_meta$2 || {},
-    component: () => import('./_contentId_-UoCO0K6i.mjs')
+    component: () => import('./_contentId_-CO_i9k50.mjs')
   },
   {
     name: "pages-domainId-menuId",
     path: "/pages/:domainId()/:menuId()",
     meta: __nuxt_page_meta$1 || {},
-    component: () => import('./_menuId_-ArSQWSxK.mjs')
+    component: () => import('./_menuId_-1dsYQyf_.mjs')
   },
   {
     name: "products-productId",
     path: "/products/:productId()",
     meta: __nuxt_page_meta || {},
     component: () => import('./_productId_-Dc60oUtM.mjs')
-  },
-  {
-    name: "test",
-    path: "/test",
-    component: () => import('./index-Dtj1xOer.mjs')
   }
 ];
 const _wrapIf = (component, props, slots) => {
@@ -36340,9 +36335,9 @@ const plugins = [
   primevue_7rYYRZQLyx
 ];
 const layouts = {
-  admin: defineAsyncComponent(() => import('./admin-B4vp8KiY.mjs')),
+  admin: defineAsyncComponent(() => import('./admin-DIHSrcnu.mjs')),
   blank: defineAsyncComponent(() => import('./blank-CPiFi3ag.mjs')),
-  default: defineAsyncComponent(() => import('./default-CbWh7iag.mjs'))
+  default: defineAsyncComponent(() => import('./default-BMXZtHSk.mjs'))
 };
 const LayoutLoader = defineComponent({
   name: "LayoutLoader",
