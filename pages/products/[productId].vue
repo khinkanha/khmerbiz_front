@@ -146,12 +146,18 @@ definePageMeta({
   layout: 'default',
 })
 
+import { toNumericId } from '~/utils/numericId'
+
 const route = useRoute()
 const config = useRuntimeConfig()
 const { public: { apiBaseUrl } } = config
 const photoUrl = config.public.photoUrl || 'https://khmer.biz'
 
-const productId = route.params.productId as string
+const productId = toNumericId(route.params.productId)
+// Non-numeric ID (e.g. /products/abc) → reject locally, never hit the API
+if (productId === null) {
+  throw createError({ statusCode: 404, statusMessage: 'Product not found', fatal: true })
+}
 
 const parseProduct = (raw: any) => {
   let parsed: any = {}
@@ -170,15 +176,25 @@ const parseProduct = (raw: any) => {
   }
 }
 
-const { data: product, pending: loading } = await useAsyncData(`product-${productId}`, async () => {
+const { data: product, pending: loading, error: fetchError } = await useAsyncData(`product-${productId}`, async () => {
   try {
     const res = await $fetch<any>(`${apiBaseUrl}/site/products/${productId}`)
     if (res?.status !== false && res?.data) return parseProduct(res.data)
-  } catch (e) {
-    console.error('Failed to fetch product:', e)
+  } catch (e: any) {
+    if (e?.statusCode === 404 || e?.status === 404) return null // no such product — 404 below
+    throw e // real failure (API down, network, 5xx) — soft-fail via the error ref
   }
-  return null
+  return null // API responded but has no data — treat as not found
 })
+
+// Real fetch failure: log it and keep the soft in-page state (fetchError set →
+// skip the 404 throw) so a flaky API can't hard-404 real pages.
+if (fetchError.value) console.error('Failed to fetch product:', fetchError.value)
+
+// Definitive "does not exist" → real 404 for the visitor (SEO-correct)
+if (!product.value && !fetchError.value) {
+  throw createError({ statusCode: 404, statusMessage: 'Product not found', fatal: true })
+}
 
 const activePhotoIndex = ref(0)
 

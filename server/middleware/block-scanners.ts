@@ -18,7 +18,18 @@ const VALID_ROOT_FILES = [
   '/robots.txt',
   '/sitemap.xml',
 ]
-
+// Common extension-less scanner probes (no dot => passes the extension check)
+const COMMON_SCANNER_PATHS = [
+  '/dockerfile',
+  '/docker-compose',
+  '/readme',
+  '/license',
+  '/changelog',
+  '/makingfile',
+  '/jenkinsfile',
+  '/mcp',
+  '/sse',
+]
 export default defineEventHandler((event) => {
   const url = event.path.split('?')[0]
 
@@ -40,6 +51,20 @@ export default defineEventHandler((event) => {
 
   for (const file of VALID_ROOT_FILES) {
     if (url === file) return
+  }
+
+  const urlLower = url.toLowerCase()
+
+  // 0. Block extension-less scanner probes (case-insensitive)
+  if (COMMON_SCANNER_PATHS.includes(urlLower)) {
+    setResponseStatus(event, 404)
+    return 'Not Found'
+  }
+
+  // 0b. Dotfile/dotdir probes: /.env, /.git/config, /.aws/credentials, ...
+  if (url.includes('/.')) {
+    setResponseStatus(event, 404)
+    return 'Not Found'
   }
 
   // 3. Everything else with a file extension (.php, .js, .css, .py, .env, etc.)

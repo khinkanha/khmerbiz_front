@@ -70,6 +70,7 @@ definePageMeta({
 import { parseNewsItem } from '~/composables/useNewsParser'
 import { useSeo } from '~/composables/useSeo'
 import { useDomainStore } from '~/stores/domain'
+import { toNumericId } from '~/utils/numericId'
 
 const route = useRoute()
 const config = useRuntimeConfig()
@@ -78,10 +79,16 @@ const photoUrl = config.public.photoUrl || 'https://khmer.biz'
 const domainStore = useDomainStore()
 const { setForNews } = useSeo()
 
-const newsId = route.params.newsId as string
+const newsId = toNumericId(route.params.newsId)
+// Non-numeric ID (e.g. /news/abc) → reject locally, never hit the API
+if (newsId === null) {
+  throw createError({ statusCode: 404, statusMessage: 'invalid news ID', fatal: true })
+  
+  
+}
 
 // SSR-aware fetch; honors the in-app router-state shortcut on client navigation.
-const { data: news, pending: loading } = await useAsyncData(`news-${newsId}`, async () => {
+const { data: news, pending: loading, error: fetchError } = await useAsyncData(`news-${newsId}`, async () => {
   if (import.meta.client) {
     const state = (history.state || {}) as { news?: any }
     if (state.news) return parseNewsItem(state.news)
@@ -89,11 +96,21 @@ const { data: news, pending: loading } = await useAsyncData(`news-${newsId}`, as
   try {
     const res = await $fetch<any>(`${apiBaseUrl}/site/news/${newsId}`)
     if (res?.status !== false && res?.data) return parseNewsItem(res.data)
-  } catch (e) {
-    console.error('Failed to fetch news:', e)
+  } catch (e: any) {
+    if (e?.statusCode === 404 || e?.status === 404) return null // no such news — 404 below
+    throw e // real failure (API down, network, 5xx) — soft-fail via the error ref
   }
-  return null
+  return null // API responded but has no data — treat as not found
 })
+
+// Real fetch failure: log it and keep the soft in-page state (fetchError set →
+// skip the 404 throw) so a flaky API can't hard-404 real pages.
+if (fetchError.value) console.error('Failed to fetch news:', fetchError.value)
+
+// Definitive "does not exist" → real 404 for the visitor (SEO-correct)
+if (!news.value && !fetchError.value) {
+  throw createError({ statusCode: 404, statusMessage: 'News not found', fatal: true })
+}
 
 // Apply SEO reactively (fires during SSR once data resolves, and on client)
 watchEffect(() => {

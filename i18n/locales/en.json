@@ -1,4 +1,11 @@
 {
+  "error": {
+    "pageNotFound": "Page Not Found",
+    "pageNotFoundDesc": "The page you are looking for doesn't exist or has been moved.",
+    "serverError": "Something Went Wrong",
+    "serverErrorDesc": "An unexpected error occurred. Please try again later.",
+    "backHome": "Back to Homepage"
+  },
   "contentManager": {
     "title": "Content Management",
     "contentTitle": "Title",

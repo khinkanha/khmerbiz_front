@@ -8,7 +8,7 @@
       <template v-else-if="contentSection">
         <section class="section">
           <NewsSection v-if="contentSection.content.content_type === ContentType.NEWS" :items="contentSection.news"
-            :domain-id="Number(domainId)" :content-id="contentSection.content.content_id"
+            :domain-id="domainId" :content-id="contentSection.content.content_id"
             :section-description="JSON.parse(contentSection.content.description).description" />
           <PhotoGallery v-else-if="contentSection.content.content_type === ContentType.PHOTO"
             :items="contentSection.items"
@@ -53,17 +53,22 @@ import type { ContentSection } from '~/types'
 import { ContentType } from '~/types'
 import { useDomainStore } from '~/stores/domain'
 import { useSeo } from '~/composables/useSeo'
+import { toNumericId } from '~/utils/numericId'
 
 const route = useRoute()
 const { public: { apiBaseUrl } } = useRuntimeConfig()
 const domainStore = useDomainStore()
 const { setForContent } = useSeo()
 
-const domainId = route.params.domainId as string
-const menuId = route.params.menuId as string
+const domainId = toNumericId(route.params.domainId)
+const menuId = toNumericId(route.params.menuId)
+// Non-numeric IDs (e.g. /pages/abc/1) → reject locally, never hit the API
+if (domainId === null || menuId === null) {
+  throw createError({ statusCode: 404, statusMessage: 'Page Not Found', fatal: true })
+}
 
 // SSR-aware fetch; refetch when the site language changes.
-const { data: contentSection, pending: loading } = await useAsyncData(
+const { data: contentSection, pending: loading, error: fetchError } = await useAsyncData(
   `page-${domainId}-${menuId}`,
   async () => {
     try {
@@ -77,13 +82,23 @@ const { data: contentSection, pending: loading } = await useAsyncData(
         },
         items: raw.items || [],
       } as ContentSection
-    } catch (e) {
-      console.error('Failed to fetch page content:', e)
-      return null
+    } catch (e: any) {
+      if (e?.statusCode === 404 || e?.status === 404) return null // no such page — 404 below
+      throw e // real failure (API down, network, 5xx) — soft-fail via the error ref
     }
   },
   { watch: [() => domainStore.currentLanguage] }
 )
+
+// Real fetch failure: log it and keep the soft in-page state (fetchError set →
+// skip the 404 throw) so a flaky API can't hard-404 real pages.
+if (fetchError.value) console.error('Failed to fetch page content:', fetchError.value)
+
+// Definitive "does not exist" → real 404 for the visitor (SEO-correct). Only
+// guards the initial load — language-change refetches keep the soft empty state.
+if (!contentSection.value && !fetchError.value) {
+  throw createError({ statusCode: 404, statusMessage: 'Page Not Found', fatal: true })
+}
 
 // Article-only SEO (no SEO for photo/video/document/map/news-listing — they
 // fall back to the layout's site-wide title).
