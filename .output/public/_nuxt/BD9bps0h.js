@@ -1,1 +1,0 @@
-import{_ as t,g as a,h as s,av as n}from"./DlZSQZ36.js";const o={},c={class:"blank-layout"};function r(e,_){return a(),s("div",c,[n(e.$slots,"default",{},void 0,!0)])}const l=t(o,[["render",r],["__scopeId","data-v-08224c30"]]);export{l as default};

@@ -1,0 +1,1 @@
+import{_ as t,f as a,g as s,av as n}from"./ChCOt4bi.js";const o={},c={class:"blank-layout"};function r(e,_){return a(),s("div",c,[n(e.$slots,"default",{},void 0,!0)])}const l=t(o,[["render",r],["__scopeId","data-v-08224c30"]]);export{l as default};

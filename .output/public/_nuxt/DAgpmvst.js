@@ -1,0 +1,1 @@
+import{au as u,B as o,M as a}from"./ChCOt4bi.js";const n=u(e=>{const t=o();if(!["/member/login","/member/signup"].includes(e.path)&&!t.isAuthenticated)return a("/member/login")});export{n as default};
