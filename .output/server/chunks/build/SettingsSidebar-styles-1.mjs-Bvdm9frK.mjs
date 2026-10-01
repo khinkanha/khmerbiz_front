@@ -1,0 +1,4 @@
+const SettingsSidebar_vue_vue_type_style_index_0_scoped_228ac633_lang = ".settings-sidebar[data-v-228ac633]{background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:1rem}.sidebar-heading[data-v-228ac633]{border-bottom:2px solid #e2e8f0;color:#1a202c;font-family:var(--font-battambang);font-size:1rem;font-weight:700;margin:0 0 .75rem;padding-bottom:.5rem}.sidebar-nav[data-v-228ac633]{display:flex;flex-direction:column;gap:.2rem;list-style:none;margin:0;padding:0}.sidebar-link[data-v-228ac633]{border-radius:4px;color:#4a5568;display:block;font-size:.85rem;padding:.55rem .75rem;text-decoration:none;transition:background-color .15s,color .15s}.sidebar-link[data-v-228ac633]:hover{background-color:#f7fafc;color:#1a202c}.sidebar-link.active[data-v-228ac633]{background-color:#3b82f6;color:#fff}";
+
+export { SettingsSidebar_vue_vue_type_style_index_0_scoped_228ac633_lang as S };
+//# sourceMappingURL=SettingsSidebar-styles-1.mjs-Bvdm9frK.mjs.map

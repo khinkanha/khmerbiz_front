@@ -1,0 +1,4 @@
+const LanguageSelector_vue_vue_type_style_index_0_scoped_1a28d5a4_lang = ".language-button[data-v-1a28d5a4],.language-selector[data-v-1a28d5a4]{align-items:center;display:flex}.language-button[data-v-1a28d5a4]{color:#4a5568;gap:.35rem}.flag-icon[data-v-1a28d5a4]{border-radius:2px;height:13px;-o-object-fit:cover;object-fit:cover;width:18px}.language-selector.dark .language-button[data-v-1a28d5a4]{color:hsla(0,0%,100%,.75)}.language-selector.dark .language-button[data-v-1a28d5a4]:hover{color:#fff}.active-language .flag-icon[data-v-1a28d5a4]{height:17px;width:22px}.lang2[data-v-1a28d5a4]{align-items:center;display:flex;margin-bottom:.5rem;margin-top:.5rem}";
+
+export { LanguageSelector_vue_vue_type_style_index_0_scoped_1a28d5a4_lang as L };
+//# sourceMappingURL=LanguageSelector-styles-1.mjs-DuOWr91r.mjs.map
